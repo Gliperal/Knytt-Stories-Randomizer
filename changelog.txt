@@ -1,0 +1,64 @@
+Version 1.2
+
+the following groups were changed:
+	elementals were moved from Common Enemies to Big Hologram Enemies
+	Friendlies now includes Knytt (to get the old Friendlies, use F-K)
+	Invisible Enemies was expanded to Invisible
+		(including springs and invisible blocks)
+		(to get the old Invisible Enemies, use I&E)
+	Big Hologram Enemies is now B, and Key Locks is now J
+	Waterfalls no longer includes ground splash tiles (1:6, 1:13, and 1:16)
+	Liquid now describes all liquid, including liquid base and waterfalls
+		(the old Liquid is now in a group called Liquid Surface)
+	Liquid surface and base tiles were moved from Literally Everything to All
+	Sinrevah (5:1) was moved from Friendlies to Enemies
+the following groups were redefined:
+	Enemies is now all things that kill Juni that are not Liquids, Spikes, Invisible, or Lasers
+	Common Enemies is now all Enemies that are not Ghosts, Hologram Enemies, or Big Hologram Enemies, or 8:17
+	Liquid Surface (formerly Liquid) is now all Liquids that are Ouchies.
+the following groups were added:
+	Solid Blocks
+	Ouchies (O): Anything that harms Juni, including water, explosions, invisible death tiles, etc.
+	KS+ collectables (+): Coins, artifacts, and golden creatures.
+	Golden Creatures (*)
+the following groups were removed:
+	The Kitchen Sink: Essentially a collection of leftovers. It can now be obtained with A-BDFIOPSVW
+	Liquid Base: The purpose served by this group is now mostly served by Solid Blocks. The old Liquid Base can still be obtained with L&solidblocks
+
+
+
+A:all (except for gamebreaking stuff)
+B:big hologram enemies
+C:common enemies
+D:decoration
+E:all enemies
+F:friendlies
+G:ghost
+H:hologram enemies
+I:invisible
+J:key locks
+K:knytt
+L:lasers
+M:often mandatory to reach certain areas
+O:ouchies (anything that harms Juni)
+P:powerups
+Q:powerups without climb
+S:save points
+U:liquid
+V:liquid surface
+W:waterfalls
+X:spikes
+
+$:these objects are essential for some maps to run properly
+!:literally everything
+
++:KS+ collectables
+*:golden creatures
+
+N
+R
+T
+Y
+
+
+?:solid blocks
