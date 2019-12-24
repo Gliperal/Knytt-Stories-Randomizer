@@ -30,9 +30,9 @@ public class RandoKey
 		for (int i = 0; i < randoGroups.size(); i++)
 			for (int j = i + 1; j < randoGroups.size(); j++)
 			{
-				byte[] commonObject = randoGroups.get(i).hasACommonObject(randoGroups.get(j));
-				if (commonObject != null)
-					throw new Exception("Error: " + commonObject[0] + ":" + commonObject[1] + " found in more than one randomizer group.");
+				int commonObject = randoGroups.get(i).firstCommonObject(randoGroups.get(j));
+				if (commonObject != -1)
+					throw new Exception("Error: " + commonObject + ":" + commonObject + " found in more than one randomizer group.");
 			}
 	}
 	
@@ -48,6 +48,7 @@ public class RandoKey
 			oc.shuffleInit(rand);
 	}
 	
+	@Deprecated
 	public void restrict(ObjectClass allowedObjects)
 	{
 		for (ObjectClass oc : randoGroups)

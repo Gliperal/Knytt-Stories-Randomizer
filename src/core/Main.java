@@ -52,6 +52,7 @@ public class Main
 			System.out.println(e.getMessage());
 			return;
 		}
+		System.exit(0);
 		
 		// Obtain user settings
 		UserSettings settings;
@@ -196,7 +197,7 @@ public class Main
 		// Status
 		if (!restoredWorlds.isEmpty())
 		{
-			System.out.println("The following worlds were resotred correctly:");
+			System.out.println("The following worlds were restored correctly:");
 			for (String w : restoredWorlds)
 				System.out.println(w);
 		}

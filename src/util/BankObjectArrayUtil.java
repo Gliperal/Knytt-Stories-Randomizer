@@ -3,8 +3,10 @@ package util;
 import java.util.ArrayList;
 import java.util.Random;
 
+// TODO delete this entire file
 public class BankObjectArrayUtil
 {
+	@Deprecated
 	public static byte[] appendToArray(byte[] array, byte bank, byte obj)
 	{
 		int oldSize = array.length;
@@ -15,7 +17,8 @@ public class BankObjectArrayUtil
 		newArray[oldSize + 1] = obj;
 		return newArray;
 	}
-	
+
+	@Deprecated
 	public static byte[] combineSortedArrays(byte[] a, byte[] b)
 	{
 		// Important numbers
@@ -78,7 +81,8 @@ public class BankObjectArrayUtil
 		// Truncate in case there were duplicate elements
 		return Util.truncate(dest, destIndex);
 	}
-	
+
+	@Deprecated
 	private static byte[] quicksort(byte[] array, int low, int high)
 	{
 		// Sorted
@@ -124,12 +128,14 @@ public class BankObjectArrayUtil
 		// Return (because Java can't pass arrays by pointer)
 		return array;
 	}
-	
+
+	@Deprecated
 	public static byte[] sort(byte[] array)
 	{
 		return quicksort(array, 0, array.length - 2);
 	}
 
+	@Deprecated
 	public static byte[] overlapSortedArrays(byte[] a, byte[] b)
 	{
 		// Important numbers
@@ -173,7 +179,8 @@ public class BankObjectArrayUtil
 		// Truncate in case there were discarded elements in both arrays
 		return Util.truncate(dest, destIndex);
 	}
-	
+
+	@Deprecated
 	public static byte[] shuffle(byte[] array, Random rand)
 	{
 		int numSpots = array.length / 2;

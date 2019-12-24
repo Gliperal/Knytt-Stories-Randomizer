@@ -1,7 +1,10 @@
 package util;
 
+// TODO delete this file too pls
 public class Util
 {
+	@Deprecated
+	// Deprecated: use Arrays.copyOf instead
 	public static byte[] truncate(byte[] array, int newLength)
 	{
 		if (newLength >= array.length)
