@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
+// TODO Make this into a singleton?
 public class ObjectClassesFile
 {
 	private String fileName;
@@ -241,6 +242,7 @@ public class ObjectClassesFile
 		tokens.remove(1);
 	}
 	
+	// TODO refactor: replace base with id and name
 	public ObjectClass buildObjectClass(ObjectClass base, String str, int line) throws Exception
 	{
 		// Tokenize

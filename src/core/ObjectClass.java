@@ -44,7 +44,7 @@ public class ObjectClass
 			updatedObjects[i] = objects[i];
 		
 		// Add new data
-		updatedObjects[oldLength] = (bank << 8) | obj;
+		updatedObjects[oldLength] = ((bank & 255) << 8) | (obj & 255);
 		
 		// Copy back
 		objects = updatedObjects;

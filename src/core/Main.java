@@ -52,7 +52,6 @@ public class Main
 			System.out.println(e.getMessage());
 			return;
 		}
-		System.exit(0);
 		
 		// Obtain user settings
 		UserSettings settings;
@@ -63,6 +62,7 @@ public class Main
 		{
 			return;
 		}
+		if (true) return;
 		
 		// Do the thing
 		UserInput.waitForEnter(input, "Press enter to begin.");
@@ -80,10 +80,11 @@ public class Main
 		// Begin randomization
 		System.out.println("Randomizing...");
 		Random rand = settings.getRandomFromSeed();
-		RandoKey randoKey = settings.randoKey();
+		RandoKey randoKey;
+		randoKey = settings.randoKey();
 		
 		// Randomize objects
-		switch(settings.randoType())
+		switch(1/*settings.randoType()*/)
 		{
 		case 1:
 			// SHUFFLE

@@ -71,7 +71,7 @@ public class UserInput
 		{
 			try
 			{
-				return Long.parseLong(rawSeed.substring(1, rawSeed.length()));
+				return Long.parseLong(rawSeed.substring(1));
 			}
 			catch (NumberFormatException e) {}
 		}
@@ -90,6 +90,7 @@ public class UserInput
 		return mapSeed;
 	}
 	
+	@Deprecated
 	public static RandoKey getRandoKeyInput(Scanner input, String prompt, ObjectClassesFile classData)
 	{
 		while (true)

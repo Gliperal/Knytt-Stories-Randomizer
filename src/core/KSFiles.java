@@ -13,6 +13,7 @@ import java.util.Scanner;
 import org.stackoverflowusers.file.WindowsShortcut;
 
 import map.KSMap;
+import util.Util;
 
 public class KSFiles
 {
@@ -120,12 +121,38 @@ public class KSFiles
 			}
 		} catch (IOException e)
 		{
-			System.out.println("IOException loading worlds.");
+			System.out.println("IOException loading worlds: " + e.getMessage());
 			return null;
 		}
 		
 		// Get user choice
-		int worldID = UserInput.getInputFromList(input, prompt, worldStrings);
+		int worldID;
+		while (true)
+		{
+			System.out.print(prompt);
+			System.out.println(" Enter world ID, or enter a string to search.");
+			String inputStr = input.nextLine();
+			try
+			{
+				worldID = Integer.parseInt(inputStr);
+				if (worldID >= 0 && worldID < worldStrings.size())
+					break;
+				System.out.println(worldID + "is out of the range of available options.");
+			}
+			catch (NumberFormatException e)
+			{
+				String[] keywords = inputStr.toLowerCase().split("\\s+");
+				ArrayList<Integer> matches = Util.keywordMatch(worldStrings, keywords);
+				if (matches.size() == 0)
+					System.out.println("No worlds found for search query \"" + inputStr + "\"");
+				else
+				{
+					System.out.println("Found " + matches.size() + " worlds matching \"" + inputStr + "\":");
+					for (int i : matches)
+						System.out.println("   " + i + "\t" + worldStrings.get(i));
+				}
+			}
+		}
 		worldFolder = worlds.get(worldID);
 		return worldFolder.getFileName().toString();
 	}

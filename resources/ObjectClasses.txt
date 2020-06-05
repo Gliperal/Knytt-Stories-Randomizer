@@ -88,7 +88,7 @@ F:friendlies
 
 	10:9, 10:10, 10:11, 10:12, 10:13,
 
-	11:1, 11:3, 11:7, 11:8,
+	11:1, 11:3, 11:7, 11:8, 11:10, 11:11,
 
 	12:1, 12:2, 12:3, 12:4, 12:7, 12:8, 12:11, 12:16,
 
@@ -262,7 +262,7 @@ C:common enemies (eliminates a lot; E-B might be better)
 A:all (except for gamebreaking stuff)
 TODO: double check these are correct
 {
-	B,D,E,F,I,L,P,S,U,
+	D,F,J,O,P,S,
 	0:2,
 	0:11,
 	0:12,
