@@ -1,27 +1,31 @@
 package core;
 
+import java.text.ParseException;
+
 public abstract class RandoRule
 {
 	private ObjectClass input;
 	private ObjectClass output;
 	
-	protected void readKey(String key, ObjectClassesFile classData) throws Exception
+	protected void readKey(String key, ObjectClassesFile classData) throws ParseException
 	{
 		String[] split = key.split("->");
 		if (split.length == 1)
 		{
-			input = new ObjectClass('.', "auto-generated object class");
-			input = classData.buildObjectClass(input, key, -1);
+			input = classData.buildObjectClass(key, -1);
 			output = input;
 		}
 		else if (split.length == 2)
 		{
-			input = new ObjectClass('.', "auto-generated object class");
-			input = classData.buildObjectClass(input, split[0], -1);
-			output = new ObjectClass('.', "auto-generated object class");
-			output = classData.buildObjectClass(output, split[1], -1);
+			input = classData.buildObjectClass(split[0], -1);
+			output = classData.buildObjectClass(split[1], -1);
 		}
 		else
-			throw new Exception("More than one -> in randomization rule.");
+			throw new ParseException("More than one -> in randomization rule.", -1);
+	}
+	
+	public String toString()
+	{
+		return "Randomization Rule (" + input.size() + " objects -> " + output.size() + " objects)";
 	}
 }

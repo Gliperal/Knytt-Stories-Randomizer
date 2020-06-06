@@ -13,17 +13,31 @@ public class ObjectClass
 {
 	private char id;
 	private String name;
+	private String creationKey;
 	private int[] objects;
 	Map<Integer, Integer> objectShuffle;
 	private boolean isSorted = false;
 	
 	private ObjectClass() {}
 	
+	// all base classes have a character id and optionally a name
+	// for combined classes, id is 0 and key is used instead
 	public ObjectClass(char id, String name)
 	{
 		this.id = Character.toUpperCase(id);
 		this.name = name;
 		objects = new int[0];
+	}
+	
+	public ObjectClass addCreationKey(String key)
+	{
+		ObjectClass group = new ObjectClass();
+		group.id = 0;
+		group.creationKey = key;
+		group.objects = objects;
+		group.objectShuffle = objectShuffle;
+		group.isSorted = isSorted;
+		return group;
 	}
 	
 	public boolean hasID(char id)
@@ -81,6 +95,7 @@ public class ObjectClass
 		}
 	}
 	
+	// key: the key string used to create the combination
 	public ObjectClass combineWith(ObjectClass that)
 	{
 		// Sort both classes if they aren't already, so that we can perform a merge with uniqueness
@@ -109,6 +124,7 @@ public class ObjectClass
 		ObjectClass group = new ObjectClass();
 		group.id = id;
 		group.name = name;
+		group.creationKey = creationKey;
 		group.objects = Arrays.copyOf(combinedObjects, k);
 		return group;
 	}
@@ -141,6 +157,7 @@ public class ObjectClass
 		ObjectClass group = new ObjectClass();
 		group.id = id;
 		group.name = name;
+		group.creationKey = creationKey;
 		group.objects = Arrays.copyOf(commonObjects, k);
 		return group;
 	}
@@ -175,6 +192,7 @@ public class ObjectClass
 		ObjectClass group = new ObjectClass();
 		group.id = id;
 		group.name = name;
+		group.creationKey = creationKey;
 		group.objects = Arrays.copyOf(uniqueObjects, k);
 		return group;
 	}
@@ -192,7 +210,11 @@ public class ObjectClass
 	
 	public String toString()
 	{
-		String result = "ObjectClass(" + id + ", " + name + ")[";
+		String result;
+		if (id != 0)
+			result = "ObjectClass(Base: " + id + ", " + name + ")[";
+		else
+			result = "ObjectClass(Manufactured: " + creationKey + ")[";
 		for (int i = 0; i < objects.length; i++)
 			result += (objects[i] >> 8) + ":" + (objects[i] & 0xFF) + ",";
 		return result + "]";
@@ -305,6 +327,11 @@ public class ObjectClass
 				j++;
 		}
 		return -1;
+	}
+	
+	public int size()
+	{
+		return objects.length;
 	}
 	
 	public static class ObjectClassComparator implements Comparator<ObjectClass>

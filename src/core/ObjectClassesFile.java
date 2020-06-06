@@ -4,12 +4,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.ParseException;
 import java.util.ArrayList;
+
+import util.Util;
 
 // TODO Make this into a singleton?
 public class ObjectClassesFile
 {
-	private String fileName;
 	private int lineNumber; // For use with the constructor error messages
 	private ArrayList<ObjectClass> classes;
 	
@@ -27,6 +29,7 @@ public class ObjectClassesFile
 		return line;
 	}
 	
+	@Deprecated
 	private ObjectClass addObject(ObjectClass oc, String object)
 	{
 		if (!object.isEmpty())
@@ -54,7 +57,19 @@ public class ObjectClassesFile
 		return null;
 	}
 	
-	private ObjectClass parseHeader(String header, int line) throws Exception
+	private class IDNamePair
+	{
+		public char id;
+		public String name;
+		
+		public IDNamePair(char id, String name)
+		{
+			this.id = id;
+			this.name = name;
+		}
+	}
+	
+	private IDNamePair parseHeader(String header, int line) throws ParseException
 	{
 		// Read until the first non-whitespace
 		int i = 0;
@@ -64,7 +79,7 @@ public class ObjectClassesFile
 				line++;
 			i++;
 			if (i == header.length())
-				throw new Exception(fileName + " Line " + line + ": Expected id for object class.");
+				throw new ParseException("Expected id for object class.", line);
 		}
 		
 		// Next character should be a char ID for the object class
@@ -73,7 +88,7 @@ public class ObjectClassesFile
 		// Check that no other object classes have the same id
 		for (ObjectClass oc : classes)
 			if (oc.hasID(id))
-				throw new Exception(fileName + " Line " + line + ": Multiple object classes with id " + id + ".");
+				throw new ParseException("Multiple object classes with id " + id + ".", line);
 		
 		// Read until the first non-whitespace (if none, the object class only has an id and no name)
 		i++;
@@ -85,13 +100,13 @@ public class ObjectClassesFile
 			if (i == header.length())
 			{
 				System.out.println("id = " + id);
-				return new ObjectClass(id, null); // TODO make sure name can be null in ObjectClass
+				return new IDNamePair(id, null); // TODO make sure name can be null in ObjectClass
 			}
 		}
 		
 		// The next character should be a :
 		if (header.charAt(i) != ':')
-			throw new Exception(fileName + " Line " + line + ": Expected \":\" after object class id.");
+			throw new ParseException("Expected \":\" after object class id.", line);
 		
 		// Read until the first non-whitespace
 		i++;
@@ -101,14 +116,14 @@ public class ObjectClassesFile
 				line++;
 			i++;
 			if (i == header.length())
-				throw new Exception(fileName + " Line " + line + ": Expected name for object class after :");
+				throw new ParseException("Expected name for object class after :", line);
 		}
 		
 		// Read object class name
 		String name = header.substring(i).trim();
 		
 		// Create a new object class
-		return new ObjectClass(id, name);
+		return new IDNamePair(id, name);
 	}
 	
 	private enum TokenType { group, and, minus, plus, openParen, closeParen };
@@ -130,7 +145,7 @@ public class ObjectClassesFile
 		}
 	}
 	
-	public void evaluateTokens(ArrayList<Token> tokens, int start) throws Exception
+	private void evaluateTokens(ArrayList<Token> tokens, int start) throws ParseException
 	{
 		// Evaluate parenthesis
 		for (int i = start; i < tokens.size(); i++)
@@ -141,7 +156,7 @@ public class ObjectClassesFile
 			if (type == TokenType.openParen)
 			{
 				if (i == tokens.size() - 1)
-					throw new Exception(fileName + " Line " + tokens.get(i).lineNumber + ": Unclosed parenthesis.");
+					throw new ParseException("Unclosed parenthesis.", tokens.get(i).lineNumber);
 				evaluateTokens(tokens, i + 1);
 				tokens.remove(i);		// remove open parenthesis (closing will be removed by evaluation)
 			}
@@ -172,9 +187,9 @@ public class ObjectClassesFile
 			if (token.type == TokenType.and)
 			{
 				if (i == start || tokens.get(i - 1).type != TokenType.group)
-					throw new Exception(fileName + " Line " + token.lineNumber + ": & with no left side");
+					throw new ParseException("& with no left side", token.lineNumber);
 				if (i == tokens.size() - 1 || tokens.get(i + 1).type != TokenType.group)
-					throw new Exception(fileName + " Line " + token.lineNumber + ": & with no right side");
+					throw new ParseException("& with no right side", token.lineNumber);
 				Token left = tokens.get(i - 1);
 				Token right = tokens.get(i + 1);
 				left.group = left.group.overlapWith(right.group);
@@ -194,9 +209,9 @@ public class ObjectClassesFile
 			if (token.type == TokenType.minus)
 			{
 				if (i == start || tokens.get(i - 1).type != TokenType.group)
-					throw new Exception(fileName + " Line " + token.lineNumber + ": Minus with no left side");
+					throw new ParseException("Minus with no left side", token.lineNumber);
 				if (i == tokens.size() - 1 || tokens.get(i + 1).type != TokenType.group)
-					throw new Exception(fileName + " Line " + token.lineNumber + ": Minus with no right side");
+					throw new ParseException("Minus with no right side", token.lineNumber);
 				Token left = tokens.get(i - 1);
 				Token right = tokens.get(i + 1);
 				left.group = left.group.eliminateFrom(right.group);
@@ -216,9 +231,9 @@ public class ObjectClassesFile
 			if (token.type == TokenType.plus)
 			{
 				if (i == start || tokens.get(i - 1).type != TokenType.group)
-					throw new Exception(fileName + " Line " + token.lineNumber + ": + with no left side");
+					throw new ParseException("+ with no left side", token.lineNumber);
 				if (i == tokens.size() - 1 || tokens.get(i + 1).type != TokenType.group)
-					throw new Exception(fileName + " Line " + token.lineNumber + ": + with no right side");
+					throw new ParseException("+ with no right side", token.lineNumber);
 				Token left = tokens.get(i - 1);
 				Token right = tokens.get(i + 1);
 				left.group = left.group.combineWith(right.group);
@@ -231,26 +246,30 @@ public class ObjectClassesFile
 		
 		// Error checking before return
 		if (tokens.size() == 0)
-			throw new Exception(fileName + ": Unknown error processing group.");
+			throw new ParseException("Unknown error processing group.", -1);
 		Token first = tokens.get(0);
 		if (first.type != TokenType.group) // then it has to be a closing parenthesis
-			throw new Exception(fileName + " Line " + first.lineNumber + ": Empty group.");
+			throw new ParseException("Empty group.", first.lineNumber);
 		if (tokens.size() == 1 || tokens.get(1).type != TokenType.closeParen)
-			throw new Exception(fileName + " Line " + first.lineNumber + ": Unbalanced parenthesis.");
+			throw new ParseException("Unbalanced parenthesis.", first.lineNumber);
 		
 		// Remove ) and return
 		tokens.remove(1);
 	}
+
+	public ObjectClass buildObjectClass(String key, int line) throws ParseException
+	{
+		return buildObjectClass(' ', "auto-generated object class", key, line);
+	}
 	
-	// TODO refactor: replace base with id and name
-	public ObjectClass buildObjectClass(ObjectClass base, String str, int line) throws Exception
+	public ObjectClass buildObjectClass(char id, String name, String key, int line) throws ParseException
 	{
 		// Tokenize
 		int i = 0;
 		ArrayList<Token> tokens = new ArrayList<Token>();
-		while (i < str.length())
+		while (i < key.length())
 		{
-			char c = str.charAt(i);
+			char c = key.charAt(i);
 			if (c == '\n')
 			{
 				line++;
@@ -289,49 +308,54 @@ public class ObjectClassesFile
 			{
 				try
 				{
-					int j = str.indexOf(':', i);
-					int bank = Integer.parseInt(str.substring(i, j));
+					int j = key.indexOf(':', i);
+					int bank = Integer.parseInt(key.substring(i, j));
 					int k = j + 1;
-					while (Character.isDigit(str.charAt(k)) && k < str.length())
+					while (Character.isDigit(key.charAt(k)) && k < key.length())
 						k++;
-					int object = Integer.parseInt(str.substring(j + 1, k));
-					ObjectClass oc = new ObjectClass(' ', "auto-generated object class");
+					int object = Integer.parseInt(key.substring(j + 1, k));
+					// assign the same id and name to all the tokens (eventually they'll be merged down into one)
+					ObjectClass oc = new ObjectClass(' ', "temporary partial class");
 					oc.add((byte) bank, (byte) object);
 					tokens.add(new Token(oc, line));
 					i = k;
 				}
 				catch (Exception e)
 				{
-					throw new Exception(fileName + " Line " + line + ": Couldn't parse object format near \"" + str.substring(i) + "\""); // TODO this gets quite unruly for strings with newlines in them
+					String snippet = Util.trimStringForPrinting(key.substring(i));
+					throw new ParseException("Couldn't parse object format near \"" + snippet + "\"", line);
 				}
 			}
 			else
 			{
 				ObjectClass oc = getObjectClass(c);
 				if (oc == null)
-					throw new Exception(fileName + " Line " + line + ": Couldn't parse object format near \"" + str.substring(i) + "\"");
+				{
+					String snippet = Util.trimStringForPrinting(key.substring(i));
+					throw new ParseException("Couldn't parse object format near \"" + snippet + "\"", line);
+				}
 				tokens.add(new Token(oc, line));
 				i++;
 			}
 		}
 		if (tokens.isEmpty())
-			throw new Exception(fileName + " Line " + line + ": Empty object class.");
+			throw new ParseException("Empty object class.", line);
 		
 		tokens.add(new Token(TokenType.closeParen, line)); // add ) to indicate end of expression
 		evaluateTokens(tokens, 0);
 		if (tokens.size() > 1)
-			throw new Exception(fileName + " Line " + tokens.get(0).lineNumber + ": Unbalanced parenthesis.");
+			throw new ParseException("Unbalanced parenthesis.", tokens.get(0).lineNumber);
 		
-		// Finish the object class and move on to the next
-		base = base.combineWith(tokens.get(0).group);
-		base.sort();
-		return base;
+		// The last remaining token has our finished object class
+		ObjectClass ret = tokens.get(0).group;
+		ret = new ObjectClass(id, name).combineWith(ret);
+		ret.sort();
+		return ret;
 	}
 	
-	public ObjectClassesFile(Path ocFile) throws Exception
+	public ObjectClassesFile(Path ocFile) throws IOException, ParseException
 	{
 		classes = new ArrayList<ObjectClass>();
-		fileName = ocFile.getFileName().toString();
 		BufferedReader br = Files.newBufferedReader(ocFile);
 		lineNumber = -1;
 		String line = "";
@@ -356,12 +380,12 @@ public class ObjectClassesFile
 				if (header.matches("\\s*"))
 					break;
 				else
-					throw new Exception(fileName + " Line " + lineNumber + ": Unexpected end of file.");
+					throw new ParseException("Unexpected end of file.", lineNumber);
 			}
 			
 			// Parse the header
 			i = header.indexOf('{');
-			ObjectClass oc = parseHeader(header.substring(0, i), startLine);
+			IDNamePair groupID = parseHeader(header.substring(0, i), startLine);
 
 			// Read until the next {
 			String body = header.substring(i + 1);
@@ -370,13 +394,13 @@ public class ObjectClassesFile
 			{
 				line = readLine(br);
 				if (line == null)
-					throw new Exception(fileName + " Line " + startLine + ": Expected \"}\" to match \"}\"");
+					throw new ParseException("Expected \"}\" to match \"}\"", startLine);
 				body += "\n" + line;
 			}
 			
 			// Parse the body
 			i = body.indexOf('}');
-			classes.add(buildObjectClass(oc, body.substring(0, i), startLine));
+			classes.add(buildObjectClass(groupID.id, groupID.name, body.substring(0, i), startLine));
 			line = body.substring(i + 1);
 		}
 		// Sort the groups alphabetically
@@ -412,7 +436,7 @@ public class ObjectClassesFile
 				throw new Exception("No object class matching ID " + classID);
 		}
 		
-		return result;
+		return result.addCreationKey(groupStr);
 	}
 	
 	public void printEverything()

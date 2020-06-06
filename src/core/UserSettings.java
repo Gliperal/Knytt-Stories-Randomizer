@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -31,6 +32,7 @@ public class UserSettings
 	
 	private boolean loadFromFile(Path settingsFile, ObjectClassesFile classData)
 	{
+		// TODO changing the file format to json would be easier maybe?
 		List<String> lines;
 		try
 		{
@@ -188,7 +190,7 @@ public class UserSettings
 					else if (type == 'R')
 						randoRules.add(new RandoRuleTrueRandom(key, classData));
 				}
-				catch (Exception e)
+				catch (ParseException e)
 				{
 					System.out.println("Failed to parse randomization key: " + e.getMessage());
 				}
@@ -197,7 +199,7 @@ public class UserSettings
 		
 		// TODO check for the same object in multiple rule inputs
 		
-		// TODO do you want to save these settings?
+		// TODO do you want to save these settings as a preset?
 	}
 	
 	public Random getRandomFromSeed()
@@ -208,6 +210,14 @@ public class UserSettings
 	public RandoKey randoKey()
 	{
 		return null;
+	}
+	
+	public String toVerboseString()
+	{
+		String str = "User settings:\n\tWorld: " + world + "\n\tSeed: " + seed;
+		for (RandoRule r : randoRules)
+			str += "\n\t" + r.toString();
+		return str;
 	}
 	
 	public void saveSettingsToFile() throws IOException

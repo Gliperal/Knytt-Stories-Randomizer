@@ -35,4 +35,14 @@ public class Util
 		}
 		return matches;
 	}
+	
+	public static String trimStringForPrinting(String msg)
+	{
+		// replace newlines
+		msg = msg.replaceAll("\n", "   ").trim();
+		// trim if oversize
+		if (msg.length() > 32)
+			msg = msg.substring(0, 29).trim() + "...";
+		return msg;
+	}
 }

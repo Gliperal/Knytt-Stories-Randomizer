@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
@@ -156,9 +157,9 @@ public class Main
 		} catch (IOException e)
 		{
 			throw new Exception("IOException reading from resources/ObjectClasses.txt.");
-		} catch (Exception e)
+		} catch (ParseException e)
 		{
-			throw new Exception("Failed to parse resources/ObjectClasses.txt:\n" + e.getMessage());
+			throw new Exception("Failed to parse resources/ObjectClasses.txt: Line " + e.getErrorOffset() + ": " + e.getMessage());
 		}
 	}
 	
