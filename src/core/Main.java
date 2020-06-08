@@ -63,6 +63,14 @@ public class Main
 		{
 			return;
 		}
+		
+		// TODO TMP Save settings (without asking lolol) and exit
+		try {
+			settings.saveSettingsToFile();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		if (true) return;
 		
 		// Do the thing
@@ -114,7 +122,7 @@ public class Main
 			break;
 		case 3:
 			// TRUE RANDOM
-			// No seeeding or anything required
+			// No seeding or anything required
 			map.randomize(randoKey, rand);
 			break;
 		}

@@ -97,6 +97,7 @@ public class KSFiles
 				Files.exists(ksDir.resolve("Knytt Stories Speedrun Edition 0.3.1.exe"));
 	}
 	
+	// TODO replace print statements with exception throwing
 	public static String haveUserSelectWorld(Scanner input, String prompt)
 	{
 		// Load worlds directory
@@ -131,6 +132,7 @@ public class KSFiles
 		{
 			System.out.print(prompt);
 			System.out.println(" Enter world ID, or enter a string to search.");
+			// TODO Enter ##-## to see all the worlds in a range
 			String inputStr = input.nextLine();
 			try
 			{
@@ -141,7 +143,7 @@ public class KSFiles
 			}
 			catch (NumberFormatException e)
 			{
-				String[] keywords = inputStr.toLowerCase().split("\\s+");
+				String[] keywords = inputStr.split("\\s+");
 				ArrayList<Integer> matches = Util.keywordMatch(worldStrings, keywords);
 				if (matches.size() == 0)
 					System.out.println("No worlds found for search query \"" + inputStr + "\"");

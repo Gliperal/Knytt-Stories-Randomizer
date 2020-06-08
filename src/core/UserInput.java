@@ -13,7 +13,8 @@ public class UserInput
 		
 		while (true)
 		{
-			System.out.println(prompt);
+			if (prompt != null)
+				System.out.println(prompt);
 			String inputStr = input.nextLine().toUpperCase();
 			if (inputStr.isEmpty())
 				return ifBlank;
@@ -56,6 +57,7 @@ public class UserInput
 		}
 	}
 	
+	// TODO no need to overcomplicate raw number inputs
 	public static long getSeedInput(Scanner input, String prompt)
 	{
 		// Get user input

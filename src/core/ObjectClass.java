@@ -33,11 +33,16 @@ public class ObjectClass
 	{
 		ObjectClass group = new ObjectClass();
 		group.id = 0;
-		group.creationKey = key;
+		group.creationKey = key.trim();
 		group.objects = objects;
 		group.objectShuffle = objectShuffle;
 		group.isSorted = isSorted;
 		return group;
+	}
+	
+	public String getCreationKey()
+	{
+		return (id == 0) ? creationKey : Character.toString(id);
 	}
 	
 	public boolean hasID(char id)

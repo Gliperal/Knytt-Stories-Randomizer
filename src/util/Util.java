@@ -19,6 +19,8 @@ public class Util
 	
 	public static ArrayList<Integer> keywordMatch(ArrayList<String> list, String[] keywords)
 	{
+		for (int i = 0; i < keywords.length; i++)
+			keywords[i] = keywords[i].toLowerCase();
 		ArrayList<Integer> matches = new ArrayList<Integer>();
 		for (int i = 0; i < list.size(); i++)
 		{
@@ -44,5 +46,15 @@ public class Util
 		if (msg.length() > 32)
 			msg = msg.substring(0, 29).trim() + "...";
 		return msg;
+	}
+	
+	public static void displayListConsicesly(ArrayList<String> list, int maxLines, int maxLinesIfNotAll)
+	{
+		int size = list.size();
+		int displaySize = (size <= maxLines) ? size : maxLinesIfNotAll;
+		for (int i = 0; i < displaySize; i++)
+			System.out.println("\t" + list.get(i));
+		if (displaySize < size)
+			System.out.println("\t+ " + (size - displaySize) + " more");
 	}
 }
