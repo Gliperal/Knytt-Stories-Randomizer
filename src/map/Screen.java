@@ -56,7 +56,8 @@ public class Screen
 			System.out.println();
 		}
 	}
-	
+
+	@Deprecated
 	/**
 	 * Uses the true random algorithm
 	 */
@@ -83,7 +84,8 @@ public class Screen
 			}
 		}
 	}
-	
+
+	@Deprecated
 	public void randomize(RandoKey randoKey)
 	{
 		// Iterate through all the tiles

@@ -182,6 +182,7 @@ public class KSMap
 		gos.close();
 	}
 	
+	@Deprecated
 	/**
 	 * Uses the true random algorithm
 	 */
@@ -190,7 +191,8 @@ public class KSMap
 		for(Screen s : screens)
 			s.randomize(randoKey, rand);
 	}
-	
+
+	@Deprecated
 	/**
 	 * Uses the transform algorithm
 	 */

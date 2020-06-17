@@ -57,26 +57,22 @@ public class UserInput
 		}
 	}
 	
-	// TODO no need to overcomplicate raw number inputs
-	public static long getSeedInput(Scanner input, String prompt)
+	public static Long getSeedInput(Scanner input, String prompt)
 	{
 		// Get user input
 		System.out.println(prompt);
 		String rawSeed = input.nextLine();
 		
-		// Empty string is a truly pseudorandom seed (using the system clock)
+		// Empty string is a null seed (will be generated later)
 		if (rawSeed.isEmpty())
-			return System.nanoTime();
+			return null;
 		
-		// String of the form m###### is a raw seed
-		if (rawSeed.charAt(0) == 'm')
+		// Numerical string is a raw seed
+		try
 		{
-			try
-			{
-				return Long.parseLong(rawSeed.substring(1));
-			}
-			catch (NumberFormatException e) {}
+			return Long.parseLong(rawSeed.substring(1));
 		}
+		catch (NumberFormatException e) {}
 		
 		// Convert string seed into a long
 		long seed = 0;
@@ -87,6 +83,7 @@ public class UserInput
 		}
 		
 		// Generate a seed for the map based on the user's seed.
+		// (so that short strings won't generate low seed numbers)
 		Random rand = new Random(seed);
 		long mapSeed = rand.nextLong();
 		return mapSeed;

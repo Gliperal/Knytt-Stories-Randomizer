@@ -55,23 +55,7 @@ public class Main
 		}
 		
 		// Obtain user settings
-		UserSettings settings;
-		try
-		{
-			settings = new UserSettings(input, classData);
-		} catch (Exception e)
-		{
-			return;
-		}
-		
-		// TODO TMP Save settings (without asking lolol) and exit
-		try {
-			settings.saveSettingsToFile();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		if (true) return;
+		UserSettings settings = new UserSettings(input, classData);
 		
 		// Do the thing
 		UserInput.waitForEnter(input, "Press enter to begin.");
@@ -89,43 +73,8 @@ public class Main
 		// Begin randomization
 		System.out.println("Randomizing...");
 		Random rand = settings.getRandomFromSeed();
-		RandoKey randoKey;
-		randoKey = settings.randoKey();
-		
-		// Randomize objects
-		switch(1/*settings.randoType()*/)
-		{
-		case 1:
-			// SHUFFLE
-			// Collect all the relevant objects in order
-			ObjectShuffle shuffle = new ObjectShuffle(randoKey);
-			map.populateShuffle(shuffle);
-			// Shuffle those objects
-			shuffle.generateShuffle(rand);
-			// Randomize the map by walking through the objects in the exact same order as before
-			map.shuffle(shuffle);
-			break;
-		case 0:
-			// PERMUTE
-			// Collect all the relevant objects
-			ObjectClass mapObjects = map.allObjects();
-			mapObjects.sort();
-			// Trim RandoKey down to only use those objects
-			randoKey.restrict(mapObjects);
-			// Continue as with transform
-		case 2:
-			// TRANSFORM
-			// Seed the key
-			randoKey.seed(rand);
-			// Then go screen by screen
-			map.randomize(randoKey);
-			break;
-		case 3:
-			// TRUE RANDOM
-			// No seeding or anything required
-			map.randomize(randoKey, rand);
-			break;
-		}
+		for (RandoRule rule : settings.getRandoRules())
+			rule.randomize(map, rand);
 		
 		// Randomize music
 		map.randomizeMusic(rand);

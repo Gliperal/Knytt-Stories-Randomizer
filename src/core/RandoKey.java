@@ -3,6 +3,7 @@ package core;
 import java.util.ArrayList;
 import java.util.Random;
 
+@Deprecated
 public class RandoKey
 {
 	private String keyString;

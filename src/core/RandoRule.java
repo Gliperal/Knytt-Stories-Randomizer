@@ -1,6 +1,7 @@
 package core;
 
 import java.text.ParseException;
+import java.util.Random;
 
 public abstract class RandoRule
 {
@@ -51,6 +52,8 @@ public abstract class RandoRule
 		String key = str.substring(1);
 		return create(type, key, classData);
 	}
+	
+	public abstract void randomize(map.KSMap map, Random rand);
 	
 	protected abstract char getID();
 	

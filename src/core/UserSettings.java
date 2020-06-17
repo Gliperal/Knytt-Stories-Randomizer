@@ -260,7 +260,10 @@ public class UserSettings
 			}
 			ArrayList<Integer> matches = Util.keywordMatch(presetNames, search.split("\\s+"));
 			if (matches.size() == 0)
+			{
 				System.out.println("Found no presets matching \"" + search + "\"");
+				continue;
+			}
 			System.out.println("Presets matching \"" + search + "\"");
 			for (int i : matches)
 				System.out.println(presetNames.get(i));
@@ -374,16 +377,22 @@ public class UserSettings
 		return new Random(seed);
 	}
 	
-	public RandoKey randoKey()
+	public ArrayList<RandoRule> getRandoRules()
 	{
-		return null;
+		return randoRules;
 	}
 	
 	public void savePresetsToFile() throws IOException
 	{
-		byte[] settingsBytes = Files.readAllBytes(settingsFile);
-		String settingsString = new String(settingsBytes);
-		JSONObject data = new JSONObject(settingsString);
+		JSONObject data;
+		if (Files.exists(settingsFile))
+		{
+			byte[] settingsBytes = Files.readAllBytes(settingsFile);
+			String settingsString = new String(settingsBytes);
+			data = new JSONObject(settingsString);
+		}
+		else
+			data = new JSONObject();
 		
 		JSONObject presetsJSON = new JSONObject();
 		for (String key : presets.keySet())
