@@ -123,7 +123,7 @@ public class Main
 	private static void restoreMain(Scanner input)
 	{
 		// Confirm
-		if (!UserInput.getBooleanInput(input, "This will restore all your randomized levels to their original states. Are you sure you wish to continue? [Y/N]"))
+		if (!UserInput.getBooleanInput(input, "This will restore all your randomized levels to their original states. Are you sure you wish to continue?"))
 			return;
 		
 		// Load Knytt Stories location

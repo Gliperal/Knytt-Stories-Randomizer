@@ -2,12 +2,14 @@ package core;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
 import util.BankObjectArrayUtil;
+import util.Util;
 
 public class ObjectClass
 {
@@ -63,7 +65,7 @@ public class ObjectClass
 			updatedObjects[i] = objects[i];
 		
 		// Add new data
-		updatedObjects[oldLength] = ((bank & 255) << 8) | (obj & 255);
+		updatedObjects[oldLength] = Util.combineBankObj(bank, obj);
 		
 		// Copy back
 		objects = updatedObjects;
@@ -100,7 +102,11 @@ public class ObjectClass
 		}
 	}
 	
-	// key: the key string used to create the combination
+	/**
+	 * Returns a new ObjectClass that contains all of the objects from this ObjectClass and the one passed as an argument. Neither of the inputs are modified. The creation key is taken from the ObjectClass whose method is called.
+	 * @param that The ObjectClass to be combined with.
+	 * @return The union of the two inputs.
+	 */
 	public ObjectClass combineWith(ObjectClass that)
 	{
 		// Sort both classes if they aren't already, so that we can perform a merge with uniqueness
@@ -134,6 +140,11 @@ public class ObjectClass
 		return group;
 	}
 	
+	/**
+	 * Returns a new ObjectClass that contains all of the objects that are common to both this ObjectClass and the one passed as an argument. Neither of the inputs are modified. The creation key is taken from the ObjectClass whose method is called.
+	 * @param that The ObjectClass to be overlapped with.
+	 * @return The intersection of the two inputs.
+	 */
 	public ObjectClass overlapWith(ObjectClass that)
 	{
 		// Sort both classes if they aren't already, so that we can perform a linear search
@@ -167,6 +178,11 @@ public class ObjectClass
 		return group;
 	}
 	
+	/**
+	 * Returns a clone of the ObjectClass, but stripped of all objects that are present in the ObjectClass passed as an argument. Neither of the inputs are modified. The creation key is taken from the ObjectClass whose method is called.
+	 * @param that The ObjectClass containing forbidden objects.
+	 * @return The difference of the two inputs.
+	 */
 	public ObjectClass eliminateFrom(ObjectClass that)
 	{
 		// Sort both classes if they aren't already, so that we can perform a linear search
@@ -225,18 +241,22 @@ public class ObjectClass
 		return result + "]";
 	}
 	
-	public boolean hasObject(int bank, int obj)
+	public boolean hasObject(int bankObj)
 	{
-		for (int i = 0; i < objects.length; i += 2)
-			if (objects[i] == bank && objects[i+1] == obj)
+		for (int i = 0; i < objects.length; i++)
+			if (objects[i] == bankObj)
 				return true;
 		return false;
 	}
 	
-	public byte[] randomObject(Random rand)
+	public boolean hasObject(int bank, int obj)
 	{
-		return new byte[] {0, 0};
-		// TODO return objects[rand.nextInt(objects.length)];
+		return hasObject(Util.combineBankObj(bank, obj));
+	}
+	
+	public int randomObject(Random rand)
+	{
+		return objects[rand.nextInt(objects.length)];
 	}
 	
 	@Deprecated
@@ -264,6 +284,7 @@ public class ObjectClass
 		*/
 	}
 	
+	@Deprecated
 	public void shuffleInit(Random rand)
 	{
 		/*
@@ -310,6 +331,25 @@ public class ObjectClass
 		return new byte[] {0, 0};
 		//short key = (short) (bank*256 + obj);
 		//return objectShuffle.get(key);
+	}
+	
+	public int[] toList()
+	{
+		// TODO Not sure if it's safe to return objects
+		return Arrays.copyOf(objects, objects.length);
+	}
+	
+	public int[] toShuffle(Random rand)
+	{
+		int len = objects.length;
+		ArrayList<Integer> indexes = new ArrayList<Integer>();
+		for (int i = 0; i < len; i++)
+			indexes.add(i);
+		Collections.shuffle(indexes, rand);
+		int[] shuffle = new int[len];
+		for (int i = 0; i < len; i++)
+			shuffle[i] = objects[indexes.get(i)];
+		return shuffle;
 	}
 	
 	public String indentifier()

@@ -202,7 +202,7 @@ public class KSFiles
 				Files.copy(mapFile, originalMapFile);
 			} catch (IOException e)
 			{
-				if (UserInput.getBooleanInput(input, "Unable to make a backup of the map file. The original map will be overwritten. Are you sure you wish to continue? [Y/N]"))
+				if (UserInput.getBooleanInput(input, "Unable to make a backup of the map file. The original map will be overwritten. Are you sure you wish to continue?"))
 					originalMapFile = mapFile;
 				else
 					return false;

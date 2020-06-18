@@ -1,12 +1,14 @@
 package map;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.zip.GZIPOutputStream;
 
 import core.ObjectClass;
 import core.ObjectShuffle;
 import core.RandoKey;
+import util.Util;
 
 public class Screen
 {
@@ -124,7 +126,7 @@ public class Screen
 		gos.write(data, 0, 3006);
 	}
 	
-	public void collectObjects(ObjectClass objects)
+	public void collectObjects(ObjectClass objects, boolean includeEmpty)
 	{
 		for (int layer = 4; layer < 8; layer++)
 		{
@@ -134,12 +136,48 @@ public class Screen
 			{
 				byte bank = data[bankOffset + tile];
 				byte obj = data[objOffset + tile];
-				if (obj != 0)
+				if (obj != 0 || includeEmpty)
 					objects.add(bank, obj);
 			}
 		}
 	}
 	
+	public void exportObjects(ArrayList<Integer> list, boolean includeEmpty)
+	{
+		for (int layer = 4; layer < 8; layer++)
+		{
+			int bankOffset = layer*500 - 750;
+			int objOffset = layer*500 - 1000;
+			for (int tile = 0; tile < 250; tile++)
+			{
+				byte bank = data[bankOffset + tile];
+				byte obj = data[objOffset + tile];
+				if (obj != 0 || includeEmpty)
+					list.add(Util.combineBankObj(bank, obj));
+			}
+		}
+	}
+	
+	public int importObjects(int[] arr, int offset, boolean includeEmpty)
+	{
+		for (int layer = 4; layer < 8; layer++)
+		{
+			int bankOffset = layer*500 - 750;
+			int objOffset = layer*500 - 1000;
+			for (int tile = 0; tile < 250; tile++)
+			{
+				if (data[objOffset + tile] != 0 || includeEmpty)
+				{
+					data[bankOffset + tile] = Util.separateBank(arr[offset]);
+					data[objOffset + tile] = Util.separateObj(arr[offset]);
+					offset++;
+				}
+			}
+		}
+		return offset;
+	}
+	
+	@Deprecated
 	public void populateShuffle(ObjectShuffle shuffle)
 	{
 		for (int layer = 4; layer < 8; layer++)
@@ -155,7 +193,8 @@ public class Screen
 			}
 		}
 	}
-
+	
+	@Deprecated
 	public void shuffle(ObjectShuffle shuffle)
 	{
 		// Iterate through all the tiles

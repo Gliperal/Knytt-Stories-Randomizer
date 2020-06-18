@@ -57,4 +57,32 @@ public class Util
 		if (displaySize < size)
 			System.out.println("\t+ " + (size - displaySize) + " more");
 	}
+	
+	public static int combineBankObj(int bank, int obj)
+	{
+		return ((bank & 255) << 8) | (obj & 255);
+	}
+	
+	public static byte separateBank(int object)
+	{
+		return (byte) (object >> 8);
+	}
+	
+	public static byte separateObj(int object)
+	{
+		return (byte) object;
+	}
+	
+	public static int[] mergeArrays(int[] a, int[] b)
+	{
+		int alen = a.length;
+		int blen = b.length;
+		int rlen = alen + blen;
+		int[] ret = new int[rlen];
+		for (int i = 0; i < alen; i++)
+			ret[i] = a[i];
+		for (int i = 0; i < blen; i++)
+			ret[alen + i] = b[i];
+		return ret;
+	}
 }

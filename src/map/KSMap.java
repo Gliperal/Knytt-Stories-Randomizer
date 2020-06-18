@@ -207,21 +207,53 @@ public class KSMap
 		for(Screen s : screens)
 			s.println();
 	}
-
-	public ObjectClass allObjects()
+	
+	public ObjectClass allObjects(boolean includeEmpty)
 	{
 		ObjectClass objects = new ObjectClass('.', null);
 		for(Screen s : screens)
-			s.collectObjects(objects);
+			s.collectObjects(objects, includeEmpty);
 		return objects;
 	}
 	
+	/**
+	 * Creates an array containing the integer representation of every object in the level, in the order they are stored in the file.
+	 * @param includeEmpty True if the empty space object (0:0) should be included in the list. As many maps have a lot of empty space, this can significantly increase memory use.
+	 * @return An array of every object contained in the level.
+	 */
+	public int[] exportObjects(boolean includeEmpty)
+	{
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		for(Screen s : screens)
+			s.exportObjects(list, includeEmpty);
+		int len = list.size();
+		int[] ret = new int[len];
+		for (int i = 0; i < len; i++)
+			ret[i] = list.get(i);
+		return ret;
+	}
+	
+	/**
+	 * Replaces all the objects in the level with those from an array. Ideally this array should match one from a call to {@link #exportObjects(boolean) exportObjects}, using the same value of includeEmpty.
+	 * @param arr An array of objects to replace the existing objects in the level.
+	 * @param includeEmpty True if empty space (0:0) should be considered an object.
+	 * @throws ArrayIndexOutOfBoundsException If arr contains less objects than exist in the level
+	 */
+	public void importObjects(int[] arr, boolean includeEmpty) throws ArrayIndexOutOfBoundsException
+	{
+		int offset = 0;
+		for(Screen s : screens)
+			offset = s.importObjects(arr, offset, includeEmpty);
+	}
+	
+	@Deprecated
 	public void populateShuffle(ObjectShuffle shuffle)
 	{
 		for(Screen s : screens)
 			s.populateShuffle(shuffle);
 	}
 	
+	@Deprecated
 	public void shuffle(ObjectShuffle shuffle)
 	{
 		for(Screen s : screens)

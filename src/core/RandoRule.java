@@ -5,8 +5,8 @@ import java.util.Random;
 
 public abstract class RandoRule
 {
-	private ObjectClass input;
-	private ObjectClass output;
+	protected ObjectClass input;
+	protected ObjectClass output;
 	private String creationKey;
 	
 	protected void readKey(String key, ObjectClassesFile classData) throws ParseException

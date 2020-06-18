@@ -63,8 +63,8 @@ public class RandoKey
 	{
 		for (ObjectClass oc : randoGroups)
 		{
-			if (oc.hasObject(bank, obj))
-				return oc.randomObject(rand);
+			//if (oc.hasObject(bank, obj))
+			//	return oc.randomObject(rand);
 		}
 		return null;
 	}

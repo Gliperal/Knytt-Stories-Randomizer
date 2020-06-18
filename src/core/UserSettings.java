@@ -66,7 +66,11 @@ public class UserSettings
 		// World
 		try {
 			world = data.getString("world");
+			KSFiles.specifyWorld(world);
 		} catch(JSONException e) {
+			world = null;
+		} catch (Exception e) // TODO or whatever exception specifyWorld will eventually throw
+		{
 			world = null;
 		}
 		
@@ -218,7 +222,7 @@ public class UserSettings
 				continue;
 			if (!presets.containsKey(name))
 				break;
-			if (UserInput.getBooleanInput(input, "Preset \"" + name + "\" already exists. Overwrite? [Y/N]"))
+			if (UserInput.getBooleanInput(input, "Preset \"" + name + "\" already exists. Overwrite?"))
 				break;
 		}
 		JSONArray preset = new JSONArray();
@@ -354,8 +358,10 @@ public class UserSettings
 			{
 				String randoTypes = setRandoTypes(input, classData);
 				setRandoRules(input, classData, randoTypes);
-				if (UserInput.getBooleanInput(input, "Would you like to save these randomization rules as a preset? [Y/N]"))
+				if (UserInput.getBooleanInput(input, "Would you like to save these randomization rules as a preset?"))
 					saveRulesAsPreset(input);
+				else
+					System.out.println("Rules updated.");
 			}
 			else if (c == 'P')
 				loadRandoPreset(input, classData);

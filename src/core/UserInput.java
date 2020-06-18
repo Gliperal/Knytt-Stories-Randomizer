@@ -41,7 +41,7 @@ public class UserInput
 	{
 		while (true)
 		{
-			System.out.println(prompt);
+			System.out.println(prompt + " [Y/N]");
 			switch(input.nextLine().toLowerCase())
 			{
 			case "y":
