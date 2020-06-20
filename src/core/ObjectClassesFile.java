@@ -29,26 +29,6 @@ public class ObjectClassesFile
 		return line;
 	}
 	
-	@Deprecated
-	private ObjectClass addObject(ObjectClass oc, String object)
-	{
-		if (!object.isEmpty())
-			if (!oc.add(object))
-			{
-				// If it's not an object, see if it's an object class ID
-				if (object.length() == 1)
-					for (ObjectClass otherClass : classes)
-						if (otherClass.hasID(object.charAt(0)))
-						{
-							// if so, add all the objects from that class
-							return oc.combineWith(otherClass);
-						}
-				// If it's not, return null
-				return null;
-			}
-		return oc;
-	}
-	
 	private ObjectClass getObjectClass(char id)
 	{
 		for (ObjectClass oc : classes)
@@ -100,7 +80,7 @@ public class ObjectClassesFile
 			if (i == header.length())
 			{
 				System.out.println("id = " + id);
-				return new IDNamePair(id, null); // TODO make sure name can be null in ObjectClass
+				return new IDNamePair(id, null);
 			}
 		}
 		

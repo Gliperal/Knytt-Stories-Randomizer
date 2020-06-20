@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import util.BankObjectArrayUtil;
 import util.Util;
 
 public class ObjectClass
@@ -218,17 +216,6 @@ public class ObjectClass
 		return group;
 	}
 	
-	@Deprecated
-	public void trim(ObjectClass that)
-	{
-		// Sort both classes if they aren't already
-		sort();
-		that.sort();
-		
-		// Trim
-		//objects = BankObjectArrayUtil.overlapSortedArrays(objects, that.objects);
-	}
-	
 	public String toString()
 	{
 		String result;
@@ -257,80 +244,6 @@ public class ObjectClass
 	public int randomObject(Random rand)
 	{
 		return objects[rand.nextInt(objects.length)];
-	}
-	
-	@Deprecated
-	public void shuffle(Random rand)
-	{
-		/*
-		int numSpots = objects.length / 2;
-		ArrayList<Integer> availableSpots = new ArrayList<Integer>();
-		for (int i = 0; i < numSpots; i++)
-			availableSpots.add(i*2);
-		
-		byte[] shuffled = new byte[objects.length];
-		int shuffledIndex = 0;
-		while (numSpots > 0)
-		{
-			int i = rand.nextInt(numSpots);
-			int spot = availableSpots.remove(i);
-			shuffled[shuffledIndex] = objects[spot];
-			shuffled[shuffledIndex+1] = objects[spot+1];
-			numSpots--;
-			shuffledIndex += 2;
-		}
-		
-		objects = shuffled;
-		*/
-	}
-	
-	@Deprecated
-	public void shuffleInit(Random rand)
-	{
-		/*
-		int numObjects = objects.length / 2;
-		ArrayList<Integer> available = new ArrayList<Integer>();
-		for (int i = 0; i < numObjects; i++)
-			available.add(i*2);
-		
-		objectShuffle = new HashMap<Short, byte[]>();
-		for (int i = 0; i < objects.length; i += 2)
-		{
-			short key = (short) (objects[i]*256 + objects[i+1]);
-			int r = available.remove(rand.nextInt(numObjects));
-			numObjects--;
-			byte[] value = new byte[]
-			{
-					objects[r],
-					objects[r+1]
-			};
-			objectShuffle.put(key, value);
-		}
-		*/
-	}
-	
-	/*
-	@Deprecated
-	public byte[] objectAfter(byte bank, byte obj)
-	{
-		for (int index = 0; index < objects.length; index += 2)
-			if (objects[index] == bank && objects[index+1] == obj)
-			{
-				int indexAfter = (index + 2) % objects.length;
-				return new byte[] {objects[indexAfter], objects[indexAfter+1]};
-			}
-		
-		// Object not in this class
-		return null;
-	}
-	*/
-	
-	@Deprecated
-	public byte[] shuffleObject(byte bank, byte obj)
-	{
-		return new byte[] {0, 0};
-		//short key = (short) (bank*256 + obj);
-		//return objectShuffle.get(key);
 	}
 	
 	public int[] toList()

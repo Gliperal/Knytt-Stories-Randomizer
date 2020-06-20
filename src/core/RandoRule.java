@@ -67,7 +67,7 @@ public abstract class RandoRule
 		return oc.getCreationKey() + " (" + oc.size() + " objects)";
 	}
 	
-	public String toString()
+	public String toDisplayString()
 	{
 		String ruleStr = objectClassString(input);
 		if (input != output)

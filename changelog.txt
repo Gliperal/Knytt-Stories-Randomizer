@@ -1,27 +1,42 @@
-Version 1.2
+========= VERSION 2.0 =========================================
 
-the following groups were changed:
-	elementals were moved from Common Enemies to Big Hologram Enemies
+Lots of changes to the user interface:
+	Changed the entire flow to a less linear style.
+	Implemented keyword search for levels.
+	Added the option to save randomization presets.
+
+
+========= VERSION 1.2 (pre-release) ===========================
+
+Fundamentally changed the way object groups are defined. Definitions now support the following operators (lowest to highest precedence):
+	AND operator (&): Creates the overlap of two groups. E&G creates a group of all objects that are both Enemies and Ghosts.
+	Difference (-): Removes all element of one group from the other. I-O creates a group of all Invisible that are not harmful (i.e. invisible blocks).
+	Combination (+): Combines two groups. Useful for low precedence. E&G+I-O creates a group of both ghost enemies and invisible blocks.
+	Parenthesis: (E&G)(I-O) is another way to write the group of both ghost enemies and invisible blocks.
+
+The following groups were changed:
+	Elementals (2:18 and 2:19) were moved from Common Enemies to Big Hologram Enemies
 	Friendlies now includes Knytt (to get the old Friendlies, use F-K)
 	Invisible Enemies was expanded to Invisible
 		(including springs and invisible blocks)
-		(to get the old Invisible Enemies, use I&E)
+		(to get the old Invisible Enemies, use I&O)
 	Big Hologram Enemies is now B, and Key Locks is now J
 	Waterfalls no longer includes ground splash tiles (1:6, 1:13, and 1:16)
 	Liquid now describes all liquid, including liquid base and waterfalls
 		(the old Liquid is now in a group called Liquid Surface)
-	Liquid surface and base tiles were moved from Literally Everything to All
+	Liquid surface and liquid base tiles were moved from Literally Everything to All
 	Sinrevah (5:1) was moved from Friendlies to Enemies
-the following groups were redefined:
+The following groups were redefined:
 	Enemies is now all things that kill Juni that are not Liquids, Spikes, Invisible, or Lasers
-	Common Enemies is now all Enemies that are not Ghosts, Hologram Enemies, or Big Hologram Enemies, or 8:17
+	Common Enemies is now all Enemies that are not Ghosts, Hologram Enemies, Big Hologram Enemies, or 8:17
 	Liquid Surface (formerly Liquid) is now all Liquids that are Ouchies.
-the following groups were added:
+The following groups were added:
 	Solid Blocks
 	Ouchies (O): Anything that harms Juni, including water, explosions, invisible death tiles, etc.
 	KS+ collectables (+): Coins, artifacts, and golden creatures.
 	Golden Creatures (*)
-the following groups were removed:
+	Empty Space (_): Useful for moving objects to random locations (shuffle) or deleting unwanted objects.
+The following groups were removed:
 	The Kitchen Sink: Essentially a collection of leftovers. It can now be obtained with A-BDFIOPSVW
 	Liquid Base: The purpose served by this group is now mostly served by Solid Blocks. The old Liquid Base can still be obtained with L&solidblocks
 
@@ -49,6 +64,8 @@ V:liquid surface
 W:waterfalls
 X:spikes
 
+?:solid blocks
+_:empty space
 $:these objects are essential for some maps to run properly
 !:literally everything
 
@@ -59,6 +76,4 @@ N
 R
 T
 Y
-
-
-?:solid blocks
+Z

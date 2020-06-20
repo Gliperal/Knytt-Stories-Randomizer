@@ -2,12 +2,9 @@ package map;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.zip.GZIPOutputStream;
 
 import core.ObjectClass;
-import core.ObjectShuffle;
-import core.RandoKey;
 import util.Util;
 
 public class Screen
@@ -56,59 +53,6 @@ public class Screen
 				System.out.print(c);
 			}
 			System.out.println();
-		}
-	}
-
-	@Deprecated
-	/**
-	 * Uses the true random algorithm
-	 */
-	public void randomize(RandoKey randoKey, Random rand)
-	{
-		// Iterate through all the tiles
-		for (int layer = 4; layer < 8; layer++)
-		{
-			int bankOffset = layer*500 - 750;
-			int objOffset = layer*500 - 1000;
-			for (int tile = 0; tile < 250; tile++)
-			{
-				// Collect bank and object
-				byte bank = data[bankOffset + tile];
-				byte obj = data[objOffset + tile];
-				// Send to RandoKey to randomize
-				byte[] replacement = randoKey.randomize(bank, obj, rand);
-				if (replacement != null)
-				{
-					// If valid object for randomizing, replace it
-					data[bankOffset + tile] = replacement[0];
-					data[objOffset + tile] = replacement[1];
-				}
-			}
-		}
-	}
-
-	@Deprecated
-	public void randomize(RandoKey randoKey)
-	{
-		// Iterate through all the tiles
-		for (int layer = 4; layer < 8; layer++)
-		{
-			int bankOffset = layer*500 - 750;
-			int objOffset = layer*500 - 1000;
-			for (int tile = 0; tile < 250; tile++)
-			{
-				// Collect bank and object
-				byte bank = data[bankOffset + tile];
-				byte obj = data[objOffset + tile];
-				// Send to RandoKey to randomize
-				byte[] replacement = randoKey.randomize(bank, obj);
-				if (replacement != null)
-				{
-					// If valid object for randomizing, replace it
-					data[bankOffset + tile] = replacement[0];
-					data[objOffset + tile] = replacement[1];
-				}
-			}
 		}
 	}
 	
@@ -175,48 +119,6 @@ public class Screen
 			}
 		}
 		return offset;
-	}
-	
-	@Deprecated
-	public void populateShuffle(ObjectShuffle shuffle)
-	{
-		for (int layer = 4; layer < 8; layer++)
-		{
-			int bankOffset = layer*500 - 750;
-			int objOffset = layer*500 - 1000;
-			for (int tile = 0; tile < 250; tile++)
-			{
-				byte bank = data[bankOffset + tile];
-				byte obj = data[objOffset + tile];
-				if (obj != 0)
-					shuffle.count(bank, obj);
-			}
-		}
-	}
-	
-	@Deprecated
-	public void shuffle(ObjectShuffle shuffle)
-	{
-		// Iterate through all the tiles
-		for (int layer = 4; layer < 8; layer++)
-		{
-			int bankOffset = layer*500 - 750;
-			int objOffset = layer*500 - 1000;
-			for (int tile = 0; tile < 250; tile++)
-			{
-				// Collect bank and object
-				byte bank = data[bankOffset + tile];
-				byte obj = data[objOffset + tile];
-				// Send to ObjectShuffle to randomize
-				byte[] replacement = shuffle.popShuffledItem(bank, obj);
-				if (replacement != null)
-				{
-					// If valid object for randomizing, replace it
-					data[bankOffset + tile] = replacement[0];
-					data[objOffset + tile] = replacement[1];
-				}
-			}
-		}
 	}
 	
 	public byte getMusic()

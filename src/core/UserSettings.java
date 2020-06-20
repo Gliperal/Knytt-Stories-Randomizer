@@ -46,7 +46,7 @@ public class UserSettings
 			"'-------------------------'---------------------'------------------------'";
 	
 	private String world;
-	private Long seed; // TODO seed can now be null
+	private Long seed;
 	private ArrayList<RandoRule> randoRules;
 	private HashMap<String, JSONArray> presets;
 	

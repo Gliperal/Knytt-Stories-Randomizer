@@ -54,6 +54,6 @@ public class RandoRuleShuffle extends RandoRule
 	
 	public String toString()
 	{
-		return "Shuffle " + super.toString();
+		return "Shuffle " + super.toDisplayString();
 	}
 }

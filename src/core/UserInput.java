@@ -89,26 +89,6 @@ public class UserInput
 		return mapSeed;
 	}
 	
-	@Deprecated
-	public static RandoKey getRandoKeyInput(Scanner input, String prompt, ObjectClassesFile classData)
-	{
-		while (true)
-		{
-			System.out.println(prompt);
-			String inputStr = input.nextLine();
-			try
-			{
-				if (inputStr.isEmpty())
-					return new RandoKey("B,P,E", classData);
-				return new RandoKey(inputStr, classData);
-			}
-			catch (Exception e)
-			{
-				System.out.println("Key creation failed with the following error(s):\n" + e.getMessage());
-			}
-		}
-	}
-	
 	public static void waitForEnter(Scanner input, String prompt)
 	{
 		System.out.println(prompt);

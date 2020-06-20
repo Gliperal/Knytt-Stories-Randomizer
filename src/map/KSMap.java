@@ -16,13 +16,9 @@ import java.util.zip.GZIPOutputStream;
 import org.apache.commons.io.IOUtils;
 
 import core.ObjectClass;
-import core.ObjectShuffle;
-import core.RandoKey;
 
 public class KSMap
 {
-	// The byte sequence 0 -66 11 0 0 denotes end of header
-	// public static final String endOfHeader = "\u0000\uFFBE\u000B\u0000\u0000";
 	private ArrayList<Screen> screens;
 	
 	public KSMap()
@@ -182,26 +178,6 @@ public class KSMap
 		gos.close();
 	}
 	
-	@Deprecated
-	/**
-	 * Uses the true random algorithm
-	 */
-	public void randomize(RandoKey randoKey, Random rand)
-	{
-		for(Screen s : screens)
-			s.randomize(randoKey, rand);
-	}
-
-	@Deprecated
-	/**
-	 * Uses the transform algorithm
-	 */
-	public void randomize(RandoKey randoKey)
-	{
-		for(Screen s : screens)
-			s.randomize(randoKey);
-	}
-	
 	public void printScreens()
 	{
 		for(Screen s : screens)
@@ -244,20 +220,6 @@ public class KSMap
 		int offset = 0;
 		for(Screen s : screens)
 			offset = s.importObjects(arr, offset, includeEmpty);
-	}
-	
-	@Deprecated
-	public void populateShuffle(ObjectShuffle shuffle)
-	{
-		for(Screen s : screens)
-			s.populateShuffle(shuffle);
-	}
-	
-	@Deprecated
-	public void shuffle(ObjectShuffle shuffle)
-	{
-		for(Screen s : screens)
-			s.shuffle(shuffle);
 	}
 	
 	public void randomizeMusic(Random rand)
