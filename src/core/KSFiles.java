@@ -1,6 +1,7 @@
 package core;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -27,24 +28,24 @@ public class KSFiles
 		Path workingDir = Paths.get(System.getProperty("user.dir"));
 		
 		// If the jar is being run from a subfolder of the KS directory
-		System.out.print("Checking local files...");
+		Console.printString("Checking local files...");
 		ksDir = workingDir.getParent();
 		if (isKSDirectory(ksDir))
 		{
-			System.out.println(" Yes.");
+			Console.printString(" Yes.");
 			return true;
 		}
-		System.out.println(" No.");
+		Console.printString(" No.");
 		
 		// If there is a symbolic link in the working directory called "KS"
 		System.out.print("Checking for a KS symbolic link...");
 		ksDir = workingDir.resolve("KS");
 		if (isKSDirectory(ksDir))
 		{
-			System.out.println(" Yes.");
+			Console.printString(" Yes.");
 			return true;
 		}
-		System.out.println(" No.");
+		Console.printString(" No.");
 		
 		// If there is a Windows link in the working directory called "KS"
 		System.out.print("Checking for a KS.lnk Windows link...");
@@ -57,12 +58,12 @@ public class KSFiles
 				ksDir = Paths.get(shortcut.getRealFilename());
 				if (isKSDirectory(ksDir))
 				{
-					System.out.println(" Yes.");
+					Console.printString(" Yes.");
 					return true;
 				}
 			} catch (Exception e) {}
 		}
-		System.out.println(" No.");
+		Console.printString(" No.");
 		
 		// If there is a text file in the working directory called KS.txt, containing the Knytt Stories directory
 		System.out.print("Checking in KS.txt...");
@@ -76,12 +77,12 @@ public class KSFiles
 				ksDir = Paths.get(line);
 				if (isKSDirectory(ksDir))
 				{
-					System.out.println(" Yes.");
+					Console.printString(" Yes.");
 					return true;
 				}
 			} catch (IOException e) {}
 		}
-		System.out.println(" No.");
+		Console.printString(" No.");
 		return false;
 	}
 	
@@ -98,15 +99,12 @@ public class KSFiles
 	}
 	
 	// TODO replace print statements with exception throwing
-	public static String haveUserSelectWorld(Scanner input, String prompt)
+	public static String haveUserSelectWorld(Scanner input, String prompt) throws FileNotFoundException, IOException
 	{
 		// Load worlds directory
 		Path worldsDir = ksDir.resolve("Worlds");
 		if (!Files.exists(worldsDir))
-		{
-			System.out.println("Missing Worlds directory.");
-			return null;
-		}
+			throw new FileNotFoundException("Missing Worlds directory.");
 		
 		// Collect worlds
 		ArrayList<Path> worlds = new ArrayList<Path>();
@@ -122,16 +120,14 @@ public class KSFiles
 			}
 		} catch (IOException e)
 		{
-			System.out.println("IOException loading worlds: " + e.getMessage());
-			return null;
+			throw new IOException("IOException loading worlds: " + e.getMessage());
 		}
 		
 		// Get user choice
 		int worldID;
 		while (true)
 		{
-			System.out.print(prompt);
-			System.out.println(" Enter world ID, or enter a string to search.");
+			Console.printString(prompt + " Enter world ID, or enter a string to search.");
 			// TODO Enter ##-## to see all the worlds in a range
 			String inputStr = input.nextLine();
 			try
@@ -139,19 +135,19 @@ public class KSFiles
 				worldID = Integer.parseInt(inputStr);
 				if (worldID >= 0 && worldID < worldStrings.size())
 					break;
-				System.out.println(worldID + "is out of the range of available options.");
+				Console.printString(worldID + "is out of the range of available options.");
 			}
 			catch (NumberFormatException e)
 			{
 				String[] keywords = inputStr.split("\\s+");
 				ArrayList<Integer> matches = Util.keywordMatch(worldStrings, keywords);
 				if (matches.size() == 0)
-					System.out.println("No worlds found for search query \"" + inputStr + "\"");
+					Console.printString("No worlds found for search query \"" + inputStr + "\"");
 				else
 				{
-					System.out.println("Found " + matches.size() + " worlds matching \"" + inputStr + "\":");
+					Console.printString("Found " + matches.size() + " worlds matching \"" + inputStr + "\":");
 					for (int i : matches)
-						System.out.println("   " + i + "\t" + worldStrings.get(i));
+						Console.printString("   " + i + "\t" + worldStrings.get(i));
 				}
 			}
 		}
@@ -159,39 +155,39 @@ public class KSFiles
 		return worldFolder.getFileName().toString();
 	}
 	
-	public static void specifyWorld(String worldName) throws Exception
+	public static void specifyWorld(String worldName) throws FileNotFoundException
 	{
 		// Load worlds directory
 		Path worldsDir = ksDir.resolve("Worlds");
 		if (!Files.exists(worldsDir))
-			throw new Exception("Missing Worlds directory.");
+			throw new FileNotFoundException("Missing Worlds directory.");
 		
-		// TODO Do a thing...
+		// Attempt to set world
 		worldFolder = worldsDir.resolve(worldName);
-		// TODO Throw exception if world doesn't exist
+		if (!Files.exists(worldFolder.resolve("Map.bin")))
+		{
+			worldFolder = null;
+			throw new FileNotFoundException(worldName + " is not a valid world.");
+		}
 	}
 	
-	private static Path getMapFile()
+	private static void getMapFile() throws FileNotFoundException
 	{
 		if (mapFile == null)
 		{
 			// Load map file
-			System.out.println("Loading map file...");
+			Console.printString("Loading map file...");
 			mapFile = worldFolder.resolve("Map.bin");
 			if (!Files.exists(mapFile))
-			{
-				System.out.println("Error: Unable to locate file " + mapFile);
-				return null;
-			}
+				throw new FileNotFoundException("Unable to locate file " + mapFile);
 		}
-		return mapFile;
 	}
 	
-	public static boolean backupMapFile(Scanner input)
+	public static boolean backupMapFile(Scanner input) throws FileNotFoundException
 	{
 		// Make sure we have a map loaded
-		if (mapFile == null && getMapFile() == null)
-			return false;
+		if (mapFile == null)
+			getMapFile();
 		
 		// Back it up (the backup is also the file we'll be reading in)
 		originalMapFile = worldFolder.resolve("MapBackup.rando.bin");
@@ -211,47 +207,34 @@ public class KSFiles
 		return true;
 	}
 	
-	public static ArrayList<String> backedUpWorlds()
+	public static ArrayList<String> backedUpWorlds() throws IOException
 	{
 		// Load worlds directory
 		Path worldsDir = ksDir.resolve("Worlds");
 		if (!Files.exists(worldsDir))
-		{
-			System.out.println("Missing Worlds directory.");
-			return null;
-		}
+			throw new FileNotFoundException("Missing Worlds directory.");
 		
 		// Collect worlds
 		ArrayList<String> result = new ArrayList<String>();
-		try
+		for (Path world : Files.newDirectoryStream(worldsDir))
 		{
-			for (Path world : Files.newDirectoryStream(worldsDir))
-			{
-				// If the world is not a folder, automatically ignore
-				if (!Files.isDirectory(world))
-					continue;
-				// If the world contains a rando backup file, it's backed up
-				Path mapBackup = world.resolve("MapBackup.rando.bin");
-				if (Files.exists(mapBackup))
-					result.add(world.getFileName().toString());
-			}
-			return result;
-		} catch (IOException e)
-		{
-			System.out.println("Unable to process Worlds directory.");
-			return null;
+			// If the world is not a folder, automatically ignore
+			if (!Files.isDirectory(world))
+				continue;
+			// If the world contains a rando backup file, it's backed up
+			Path mapBackup = world.resolve("MapBackup.rando.bin");
+			if (Files.exists(mapBackup))
+				result.add(world.getFileName().toString());
 		}
+		return result;
 	}
 	
-	public static boolean restoreMapFile(String worldName)
+	public static boolean restoreMapFile(String worldName) throws FileNotFoundException
 	{
 		// Load worlds directory
 		Path worldsDir = ksDir.resolve("Worlds");
 		if (!Files.exists(worldsDir))
-		{
-			System.out.println("Missing Worlds directory.");
-			return false;
-		}
+			throw new FileNotFoundException("Missing Worlds directory.");
 		
 		// Load paths
 		Path world = worldsDir.resolve(worldName);
@@ -272,44 +255,42 @@ public class KSFiles
 		}
 	}
 	
-	public static KSMap readMap()
+	public static KSMap readMap() throws Exception
 	{
+		Path file = (originalMapFile != null) ? originalMapFile : mapFile;
 		try
 		{
-			return new KSMap(originalMapFile);
+			if (mapFile == null)
+				getMapFile();
+			return new KSMap(file);
 		} catch (NoSuchFileException e)
 		{
-			System.out.println("Error: Unable to open file " + mapFile);
-			return null;
+			throw new Exception("Unable to open file " + file);
 		} catch (IOException e)
 		{
-			System.out.println("Error: IOException reading file " + mapFile);
-			return null;
+			throw new Exception("IOException reading file " + file);
 		} catch (Exception e)
 		{
-			System.out.println("Error parsing map file: " + e.getMessage());
-			return null;
+			throw new Exception("Unable to parse map file: " + e.getMessage());
 		}
 	}
 	
-	public static boolean writeMap(KSMap map)
+	public static void writeMap(KSMap map) throws Exception
 	{
 		try
 		{
+			if (mapFile == null)
+				getMapFile();
 			map.saveToFile(mapFile);
-			return true;
 		} catch (NoSuchFileException e)
 		{
-			System.out.println("Error: Unable to open file " + mapFile);
-			return false;
+			throw new Exception("Unable to open file " + mapFile);
 		} catch (IOException e)
 		{
-			System.out.println("Error: IOException writing to file " + mapFile);
-			return false;
+			throw new Exception("IOException writing to file " + mapFile);
 		} catch (Exception e)
 		{
-			System.out.println("Error writing screen data: " + e.getMessage());
-			return false;
+			throw new Exception("Unable to write screen data: " + e.getMessage());
 		}
 	}
 }

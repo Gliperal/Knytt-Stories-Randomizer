@@ -1,6 +1,6 @@
 ?:solid blocks
 {
-	1:7, 1:8, 1:9, 1:11, 1:12, 1:17, 1:21, 1:24,
+	1:7, 1:8, 1:9, 1:11, 1:17, 1:21, 1:24,
 
 	12:5,
 
@@ -262,7 +262,7 @@ C:common enemies (eliminates a lot; E-B might be better)
 A:all (except for gamebreaking stuff)
 TODO: double check these are correct
 {
-	D,F,J,O,P,S,
+	D,F,J,O,P,S,?,
 	0:2,
 	0:11,
 	0:12,

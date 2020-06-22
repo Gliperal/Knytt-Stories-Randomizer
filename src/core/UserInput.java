@@ -14,7 +14,7 @@ public class UserInput
 		while (true)
 		{
 			if (prompt != null)
-				System.out.println(prompt);
+				Console.printString(prompt);
 			String inputStr = input.nextLine().toUpperCase();
 			if (inputStr.isEmpty())
 				return ifBlank;
@@ -24,16 +24,16 @@ public class UserInput
 					if (c == inputChar)
 						return c;
 			
-			System.out.print("Please respond with ");
+			Console.putString("Please respond with ");
 			for (int i = 0; i < chars.length; i++)
 			{
 				if (i != 0)
-					System.out.print(", ");
+					Console.putString(", ");
 				if (i == chars.length - 1)
-					System.out.print("or ");
-				System.out.print(chars[i]);
+					Console.putString("or ");
+				Console.putString(Character.toString(chars[i]));
 			}
-			System.out.println(".");
+			Console.printString(".");
 		}
 	}
 	
@@ -41,7 +41,7 @@ public class UserInput
 	{
 		while (true)
 		{
-			System.out.println(prompt + " [Y/N]");
+			Console.printString(prompt + " [Y/N]");
 			switch(input.nextLine().toLowerCase())
 			{
 			case "y":
@@ -51,7 +51,7 @@ public class UserInput
 			case "no":
 				return false;
 			default:
-				System.out.println("Please respond with either Y or N.");
+				Console.printString("Please respond with either Y or N.");
 				continue;
 			}
 		}
@@ -60,7 +60,7 @@ public class UserInput
 	public static Long getSeedInput(Scanner input, String prompt)
 	{
 		// Get user input
-		System.out.println(prompt);
+		Console.printString(prompt);
 		String rawSeed = input.nextLine();
 		
 		// Empty string is a null seed (will be generated later)
@@ -91,7 +91,7 @@ public class UserInput
 	
 	public static void waitForEnter(Scanner input, String prompt)
 	{
-		System.out.println(prompt);
+		Console.printString(prompt);
 		input.nextLine();
 	}
 	
@@ -103,13 +103,13 @@ public class UserInput
 		int numOptions = list.size();
 		while (true)
 		{
-			System.out.println(prompt);
+			Console.printString(prompt);
 			if (offset > 0)
-				System.out.println("u\tScroll up");
+				Console.printString("u\tScroll up");
 			for (int i = offset; i < offset + pageSize && i < list.size(); i++)
-				System.out.println(i + "\t" + list.get(i));
+				Console.printString(i + "\t" + list.get(i));
 			if (offset + pageSize < numOptions)
-				System.out.println("d\tScroll down");
+				Console.printString("d\tScroll down");
 			
 			inputStr = input.nextLine();
 			if (inputStr.toLowerCase().equals("u"))
@@ -130,12 +130,12 @@ public class UserInput
 				{
 					int choice = Integer.parseInt(inputStr);
 					if (choice < 0 || choice > numOptions - 1)
-						System.out.println(choice + "is out of the range of available options.");
+						Console.printString(choice + "is out of the range of available options.");
 					return choice;
 				}
 				catch (NumberFormatException e)
 				{
-					System.out.println("Please enter a number, or u or d to scroll");
+					Console.printString("Please enter a number, or u or d to scroll");
 				}
 			}
 		}

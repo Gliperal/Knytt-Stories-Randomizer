@@ -62,6 +62,18 @@ public abstract class RandoRule
 		return getID() + creationKey;
 	}
 	
+	public int conflictsWith(RandoRule that)
+	{
+		int obj = input.firstCommonObject(that.input);
+		if (obj == -1)
+			obj = input.firstCommonObject(that.output);
+		if (obj == -1)
+			obj = output.firstCommonObject(that.input);
+		if (obj == -1)
+			obj = output.firstCommonObject(that.output);
+		return obj;
+	}
+	
 	private String objectClassString(ObjectClass oc)
 	{
 		return oc.getCreationKey() + " (" + oc.size() + " objects)";

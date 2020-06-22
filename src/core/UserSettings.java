@@ -1,5 +1,6 @@
 package core;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -50,7 +51,13 @@ public class UserSettings
 	private ArrayList<RandoRule> randoRules;
 	private HashMap<String, JSONArray> presets;
 	
-	private boolean loadFromFile(ObjectClassesFile classData)
+	/**
+	 * 
+	 * @param classData
+	 * @return The number of milliseconds since the file was saved, or 0 if
+	 * such information could not be obtained. Returns -1 on error.
+	 */
+	private long loadFromFile(ObjectClassesFile classData)
 	{
 		JSONObject data;
 		try
@@ -60,17 +67,14 @@ public class UserSettings
 			data = new JSONObject(settingsString);
 		} catch (IOException e)
 		{
-			return false;
+			return -1;
 		}
 		
 		// World
 		try {
 			world = data.getString("world");
 			KSFiles.specifyWorld(world);
-		} catch(JSONException e) {
-			world = null;
-		} catch (Exception e) // TODO or whatever exception specifyWorld will eventually throw
-		{
+		} catch(JSONException | FileNotFoundException e) {
 			world = null;
 		}
 		
@@ -94,7 +98,7 @@ public class UserSettings
 			randoRules = null;
 		} catch (ParseException e)
 		{
-			System.out.println("Error parsing rules: " + e.getMessage() + " (line " + e.getErrorOffset() + ")");
+			Console.printRed("Error parsing rules: " + e.getMessage() + " (line " + e.getErrorOffset() + ")");
 			randoRules = null;
 		}
 		
@@ -109,22 +113,35 @@ public class UserSettings
 		}
 		
 		// Loaded successfully
-		return true;
+		try
+		{
+			return System.currentTimeMillis() - data.getLong("timestamp");
+		}
+		catch(JSONException e)
+		{
+			return 0;
+		}
 	}
-		
+	
 	private void setSeed(Scanner input)
 	{
 		seed = UserInput.getSeedInput(input, "Enter seed or leave blank for random.");
-		System.out.println("Seed entered.");
+		Console.printString("Seed entered.");
 	}
 	
 	private void setWorld(Scanner input)
 	{
-		world = KSFiles.haveUserSelectWorld(input, "Select the world to randomize.");
-		if (world == null)
-			System.out.println("Failed to select world.");
-		else
-			System.out.println("World specified: " + world);
+		try
+		{
+			world = KSFiles.haveUserSelectWorld(input, "Select the world to randomize.");
+			Console.printString("World specified: " + world);
+		}
+		catch (IOException e)
+		{
+			Console.printError(e.getMessage());
+			Console.printString("Failed to select world.");
+			world = null;
+		}
 	}
 	
 	private String setRandoTypes(Scanner input, ObjectClassesFile classData)
@@ -132,18 +149,18 @@ public class UserSettings
 		String randoTypes;
 		while (true)
 		{
-			System.out.println("Enter type(s) of randomization (leave blank if unsure). Enter H for help. \n\tP: Permute\n\tS: Shuffle\n\tT: Transform\n\tR: True random");
+			Console.printString("Enter type(s) of randomization (leave blank if unsure). Enter H for help. \n\tP: Permute\n\tS: Shuffle\n\tT: Transform\n\tR: True random");
 			randoTypes = input.nextLine().replaceAll("\\s+", "").toUpperCase();
 			if (randoTypes.startsWith("H"))
 			{
-				System.out.println(RANDO_TYPE_TABLE);
+				Console.printString(RANDO_TYPE_TABLE);
 				continue;
 			}
 			boolean validTypes = true;
 			for (int i = 0; i < randoTypes.length(); i++)
 				if ("PSTR".indexOf(randoTypes.charAt(i)) == -1)
 				{
-					System.out.println("Error: " + randoTypes.charAt(i) + " was not recognized as a randomization type.");
+					Console.printError(randoTypes.charAt(i) + " was not recognized as a randomization type.");
 					validTypes = false;
 					break;
 				}
@@ -157,22 +174,22 @@ public class UserSettings
 	
 	private void setRandoRules(Scanner input, ObjectClassesFile classData, String randoTypes)
 	{
-		System.out.println("Randomizable groups:");
+		Console.printString("Randomizable groups:");
 		classData.tabPrintClasses();
 		randoRules = new ArrayList<RandoRule>();
 		for (int i = 0; i < randoTypes.length(); i++)
 		{
 			char type = randoTypes.charAt(i);
 			if (randoTypes.length() == 1)
-				System.out.println("Enter rules for the randomization (leave blank if unsure). One rule per line. Leave an empty line when done.");
+				Console.printString("Enter rules for the randomization (leave blank if unsure). One rule per line. Leave an empty line when done.");
 			else if (type == RandoRulePermute.ID)
-				System.out.println("Enter rules for the Permute randomization (leave blank if unsure). One rule per line. Leave an empty line when done.");
+				Console.printString("Enter rules for the Permute randomization (leave blank if unsure). One rule per line. Leave an empty line when done.");
 			else if (type == RandoRuleShuffle.ID)
-				System.out.println("Enter rules for the Shuffle randomization (leave blank if unsure). One rule per line. Leave an empty line when done.");
+				Console.printString("Enter rules for the Shuffle randomization (leave blank if unsure). One rule per line. Leave an empty line when done.");
 			else if (type == RandoRuleTransform.ID)
-				System.out.println("Enter rules for the Transform randomization (leave blank if unsure). One rule per line. Leave an empty line when done.");
+				Console.printString("Enter rules for the Transform randomization (leave blank if unsure). One rule per line. Leave an empty line when done.");
 			else
-				System.out.println("Enter rules for the True Random randomization (leave blank if unsure). One rule per line. Leave an empty line when done.");
+				Console.printString("Enter rules for the True Random randomization (leave blank if unsure). One rule per line. Leave an empty line when done.");
 			boolean noRules = true;
 			while (true)
 			{
@@ -186,7 +203,7 @@ public class UserSettings
 				}
 				catch (ParseException e)
 				{
-					System.out.println("Failed to parse randomization key: " + e.getMessage());
+					Console.printString("Failed to parse randomization key: " + e.getMessage());
 				}
 			}
 			if (noRules)
@@ -201,7 +218,7 @@ public class UserSettings
 				catch(ParseException e)
 				{
 					// If that fails
-					System.out.println("Failed to parse default randomization rules.");
+					Console.printError("Failed to parse default randomization rules.");
 					randoRules = null;
 					return;
 				}
@@ -216,7 +233,7 @@ public class UserSettings
 		String name;
 		while (true)
 		{
-			System.out.println("Enter a name for this preset.");
+			Console.printString("Enter a name for this preset.");
 			name = input.nextLine().trim();
 			if (name.isEmpty())
 				continue;
@@ -232,29 +249,30 @@ public class UserSettings
 		try
 		{
 			savePresetsToFile();
-			System.out.println("Preset saved.");
+			Console.printString("Preset saved.");
 		}
 		catch (IOException e)
 		{
-			System.out.println("Preset added, but unable to access resources/UserSettings.txt to save.");
+			Console.printWarning("Preset added, but unable to access resources/UserSettings.txt to save.");
 		}
 	}
 	
+	// TODO Add a way to edit/delete presets
 	private void loadRandoPreset(Scanner input, ObjectClassesFile classData)
 	{
 		if (presets == null || presets.isEmpty())
 		{
-			System.out.println("No presets available.");
+			Console.printString("No presets available.");
 			return;
 		}
 		ArrayList<String> presetNames = new ArrayList<String>(presets.keySet());
 		presetNames.sort(new AlphabeticalComparator());
-		System.out.println("Available presets:");
+		Console.printString("Available presets:");
 		Util.displayListConsicesly(presetNames, 8, 6);
 		JSONArray preset;
 		while (true)
 		{
-			System.out.println("Enter the name of a preset to load or a string to search.");
+			Console.printString("Enter the name of a preset to load or a string to search.");
 			String search = input.nextLine();
 			// TODO containsKey case insensitive
 			if (presets.containsKey(search))
@@ -265,12 +283,12 @@ public class UserSettings
 			ArrayList<Integer> matches = Util.keywordMatch(presetNames, search.split("\\s+"));
 			if (matches.size() == 0)
 			{
-				System.out.println("Found no presets matching \"" + search + "\"");
+				Console.printString("Found no presets matching \"" + search + "\"");
 				continue;
 			}
-			System.out.println("Presets matching \"" + search + "\"");
+			Console.printString("Presets matching \"" + search + "\"");
 			for (int i : matches)
-				System.out.println(presetNames.get(i));
+				Console.printString(presetNames.get(i));
 		}
 		try
 		{
@@ -283,11 +301,11 @@ public class UserSettings
 			}
 			// TODO would you like this preset to replace or add onto the existing rules?
 			randoRules = rules;
-			System.out.println("Preset loaded.");
+			Console.printString("Preset loaded.");
 		}
 		catch (ParseException e)
 		{
-			System.out.println("Error loading preset: " + e.getMessage() + " (line " + e.getErrorOffset() + ")");
+			Console.printRed("Error loading preset: " + e.getMessage() + " (line " + e.getErrorOffset() + ")");
 		}
 	}
 	
@@ -295,28 +313,43 @@ public class UserSettings
 	{
 		String worldStr = (world == null) ? "[use W to select world]" : world;
 		String seedStr = (seed == null) ? "[will be randomly generated; use S to set seed]" : seed.toString();
-		System.out.println("Settings:\nWorld: " + worldStr + "\nSeed: " + seedStr);
+		Console.printString("Settings:\nWorld: " + worldStr + "\nSeed: " + seedStr);
 		if (randoRules == null)
-			System.out.println("Randomization rules: [use R to set rules]");
+			Console.printString("Randomization rules: [use R to set rules]");
 		else
 		{
-			System.out.println("Randomization rules:");
+			Console.printString("Randomization rules:");
 			for (RandoRule r : randoRules)
-				System.out.println("\t" + r.toString());
+				Console.printString("\t" + r.toString());
 		}
 	}
 	
 	private boolean checkForErrors()
 	{
+		// Check for the same object in multiple rule inputs
+		// (TODO update to just the inputs when rules can all happen at once)
+		for (int a = 0; a < randoRules.size(); a++)
+		{
+			RandoRule ruleA = randoRules.get(a);
+			for (int b = a + 1; b < randoRules.size(); b++)
+			{
+				RandoRule ruleB = randoRules.get(b);
+				int obj = ruleA.conflictsWith(ruleB);
+				if (obj != -1)
+					Console.printWarning("Bank " + Util.separateBank(obj) + " object " + Util.separateObj(obj) + " found in more than one randomization rule. Overlap between rules may lead to undefined behavior.");
+			}
+		}
+		
+		// Check for fatal errors
 		boolean ok = true;
 		if (world == null)
 		{
-			System.out.println("No world specified! Use W to set world.");
+			Console.printError("No world specified! Use W to set world.");
 			ok = false;
 		}
 		if (randoRules == null)
 		{
-			System.out.println("No randomization rules specified! Use R to set rules.");
+			Console.printError("No randomization rules specified! Use R to set rules.");
 			ok = false;
 		}
 		return ok;
@@ -330,10 +363,12 @@ public class UserSettings
 		if (Files.exists(settingsFile))
 		{
 			// Load settings from last randomization by default
-			if (loadFromFile(classData))
-			{
-				// TODO "Loaded last saved settings from __ minutes ago"
-			}
+			long time_ago;
+			time_ago = loadFromFile(classData);
+			if (time_ago > 0)
+				Console.printString("Loaded last saved settings from " + Util.millisecondsToTimeString(time_ago) + " ago.");
+			else if (time_ago == 0)
+				Console.printString("Loaded settings from unknown date.");
 			else
 				loaded = false;
 		}
@@ -341,15 +376,15 @@ public class UserSettings
 			loaded = false;
 		
 		if (!loaded)
-			System.out.println("Could not load UserSettings.txt. Presets and previous randomization will not be available.");
+			Console.printWarning("Could not load UserSettings.txt. Presets and previous randomization will not be available.");
 		
 		// Main input loop
-		System.out.println(HELP_MESSAGE);
+		Console.printString(HELP_MESSAGE);
 		while (true)
 		{
 			char c = UserInput.getCharInput(input, null, "HWSRPDB".toCharArray(), '.');
 			if (c == 'H' || c == '.')
-				System.out.println(HELP_MESSAGE);
+				Console.printString(HELP_MESSAGE);
 			else if (c == 'W')
 				setWorld(input);
 			else if (c == 'S')
@@ -361,7 +396,7 @@ public class UserSettings
 				if (UserInput.getBooleanInput(input, "Would you like to save these randomization rules as a preset?"))
 					saveRulesAsPreset(input);
 				else
-					System.out.println("Rules updated.");
+					Console.printString("Rules updated.");
 			}
 			else if (c == 'P')
 				loadRandoPreset(input, classData);
@@ -369,13 +404,15 @@ public class UserSettings
 				displaySettings();
 			else if (c == 'B')
 				if (checkForErrors())
-					break;
+				{
+					displaySettings();
+					if (UserInput.getBooleanInput(input, "Confirm that the above settings are correct to begin randomization."))
+						break;
+				}
 		}
 		
 		if (seed == null)
 			seed = System.nanoTime();
-		
-		// TODO check for the same object in multiple rule inputs
 	}
 	
 	public Random getRandomFromSeed()
@@ -418,9 +455,13 @@ public class UserSettings
 			rulesJSON.put(r.saveToString());
 		data.put("rules", rulesJSON);
 		JSONObject presetsJSON = new JSONObject();
-		for (String key : presets.keySet())
-			presetsJSON.put(key, presets.get(key));
-		data.put("presets", presetsJSON);
+		if (presets != null)
+		{
+			for (String key : presets.keySet())
+				presetsJSON.put(key, presets.get(key));
+			data.put("presets", presetsJSON);
+		}
+		data.put("timestamp", System.currentTimeMillis());
 		Files.write(settingsFile, data.toString().getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 	}
 }

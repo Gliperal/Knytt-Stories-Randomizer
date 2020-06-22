@@ -72,4 +72,24 @@ public class Util
 			ret[alen + i] = b[i];
 		return ret;
 	}
+	
+	public static String millisecondsToTimeString(long time)
+	{
+		if (time < 1000)
+			return time + " milliseconds";
+		time /= 1000;
+		if (time < 60)
+			return time + ((time == 1) ? " second" : " seconds");
+		time /= 60;
+		if (time < 60)
+			return time + ((time == 1) ? " minute" : " minutes");
+		time /= 60;
+		if (time < 24)
+			return time + ((time == 1) ? " hour" : " hours");
+		time /= 24;
+		if (time < 365)
+			return time + ((time == 1) ? " day" : " days");
+		time /= 365;
+		return time + ((time == 1) ? " year" : " years");
+	}
 }

@@ -79,7 +79,8 @@ public class ObjectClassesFile
 			i++;
 			if (i == header.length())
 			{
-				System.out.println("id = " + id);
+				// TODO why is this print statement even here?
+				// System.out.println("id = " + id);
 				return new IDNamePair(id, null);
 			}
 		}
@@ -422,12 +423,12 @@ public class ObjectClassesFile
 	public void printEverything()
 	{
 		for (ObjectClass oc : classes)
-			System.out.println(oc);
+			Console.printString(oc.toString());
 	}
-
+	
 	public void tabPrintClasses()
 	{
 		for (ObjectClass oc : classes)
-			System.out.println("\t" + oc.indentifier());
+			Console.printString("\t" + oc.indentifier());
 	}
 }
