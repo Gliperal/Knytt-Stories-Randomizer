@@ -4,11 +4,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -16,23 +14,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import util.AlphabeticalComparator;
 import util.Util;
 
 public class UserSettings
 {
-	private static final Path settingsFile = Paths.get("resources", "UserSettings.txt");
-	private static final String RANDOMIZER_HEADER =
-			"KNYTT STORIES RANDOMIZER\n" +
-			"version 2.0";
 	private static final String HELP_MESSAGE =
-			"B: Begin randomization.\n" +
-			"D: Display current settings.\n" +
-			"H: Show help.\n" +
-			"P: Load randomization rules from preset.\n" +
-			"R: Specify randomization rules.\n" +
-			"S: Enter seed.\n" +
-			"W: Select world to randomize.";
+			"==========--  W: Select world    R: Specify rules    S: Enter seed  --==========\n" + 
+			"=======================--  P: Preset menu    B: Begin  --=======================";
+	private static final String PRESET_PROMPT =
+			"--  L: Load preset    S: Save current settings as preset    D: Delete preset  --\n" + 
+			"=========================--  Leave blank to return.  --=========================";
 	public static final String RANDO_TYPE_TABLE = 
 			"                          ,---------------------,------------------------,\n" + 
 			"                          | Objects of the same | Objects are randomized |\n" + 
@@ -46,10 +37,39 @@ public class UserSettings
 			"| the randomization group |                     |                        |\n" + 
 			"'-------------------------'---------------------'------------------------'";
 	
+	private Path settingsFile;
 	private String world;
 	private Long seed;
 	private ArrayList<RandoRule> randoRules;
-	private HashMap<String, JSONArray> presets;
+	private RulesPresets presets;
+	
+	public UserSettings(Path file, ObjectClassesFile classData)
+	{
+		if (file == null)
+			throw new NullPointerException();
+		settingsFile = file;
+		presets = new RulesPresets();
+		
+		// Try to load settings file
+		String filename = file.toString();
+		if (Files.exists(settingsFile))
+		{
+			// Load settings from last randomization by default
+			long time_ago = loadFromFile(classData);
+			if (time_ago < 0)
+				Console.printWarning("Could not load " + filename + ". Presets and previous randomization will not be available.");
+			else
+			{
+				if (time_ago > 0)
+					Console.printString("Loaded last saved settings from " + Util.millisecondsToTimeString(time_ago) + " ago:");
+				else if (time_ago == 0)
+					Console.printString("Loaded settings from unknown date:");
+				displaySettings();
+			}
+		}
+		else
+			Console.printString("Could not find" + filename + ". Skipping...");
+	}
 	
 	/**
 	 * 
@@ -78,13 +98,6 @@ public class UserSettings
 			world = null;
 		}
 		
-		// Seed
-		try {
-			seed = data.getLong("seed");
-		} catch(JSONException e) {
-			seed = null;
-		}
-		
 		// Rules
 		try {
 			randoRules = new ArrayList<RandoRule>();
@@ -104,13 +117,9 @@ public class UserSettings
 		
 		// Presets
 		try {
-			presets = new HashMap<String, JSONArray>();
 			JSONObject presetsJSON = data.getJSONObject("presets");
-			for (String key : presetsJSON.keySet())
-				presets.put(key, presetsJSON.getJSONArray(key));
-		} catch(JSONException e) {
-			presets = null;
-		}
+			presets = new RulesPresets(presetsJSON);
+		} catch(JSONException e) {}
 		
 		// Loaded successfully
 		try
@@ -228,80 +237,48 @@ public class UserSettings
 	
 	private void saveRulesAsPreset(Scanner input)
 	{
-		if (presets == null)
-			presets = new HashMap<String, JSONArray>();
-		String name;
-		while (true)
+		if (randoRules == null)
+			Console.printString("No rules currently specified to save.");
+		else if (presets.addPreset(input, randoRules))
 		{
-			Console.printString("Enter a name for this preset.");
-			name = input.nextLine().trim();
-			if (name.isEmpty())
-				continue;
-			if (!presets.containsKey(name))
-				break;
-			if (UserInput.getBooleanInput(input, "Preset \"" + name + "\" already exists. Overwrite?"))
-				break;
+			try
+			{
+				savePresetsToFile();
+				Console.printString("Preset saved.");
+			}
+			catch (IOException e)
+			{
+				Console.printWarning("Preset added, but unable to access resources/UserSettings.txt to save.");
+			}
 		}
-		JSONArray preset = new JSONArray();
-		for (RandoRule rule : randoRules)
-			preset.put(rule.saveToString());
-		presets.put(name, preset);
-		try
+		else
+			Console.printString("Preset saving cancelled.");
+	}
+	
+	private void deletePreset(Scanner input)
+	{
+		if (presets.deletePreset(input))
 		{
-			savePresetsToFile();
-			Console.printString("Preset saved.");
-		}
-		catch (IOException e)
-		{
-			Console.printWarning("Preset added, but unable to access resources/UserSettings.txt to save.");
+			try
+			{
+				savePresetsToFile();
+				Console.printString("Preset deleted.");
+			}
+			catch (IOException e)
+			{
+				Console.printWarning("Preset deleted, but unable to access resources/UserSettings.txt to save.");
+			}
 		}
 	}
 	
-	// TODO Add a way to edit/delete presets
 	private void loadRandoPreset(Scanner input, ObjectClassesFile classData)
 	{
-		if (presets == null || presets.isEmpty())
-		{
-			Console.printString("No presets available.");
-			return;
-		}
-		ArrayList<String> presetNames = new ArrayList<String>(presets.keySet());
-		presetNames.sort(new AlphabeticalComparator());
-		Console.printString("Available presets:");
-		Util.displayListConsicesly(presetNames, 8, 6);
-		JSONArray preset;
-		while (true)
-		{
-			Console.printString("Enter the name of a preset to load or a string to search.");
-			String search = input.nextLine();
-			// TODO containsKey case insensitive
-			if (presets.containsKey(search))
-			{
-				preset = presets.get(search);
-				break;
-			}
-			ArrayList<Integer> matches = Util.keywordMatch(presetNames, search.split("\\s+"));
-			if (matches.size() == 0)
-			{
-				Console.printString("Found no presets matching \"" + search + "\"");
-				continue;
-			}
-			Console.printString("Presets matching \"" + search + "\"");
-			for (int i : matches)
-				Console.printString(presetNames.get(i));
-		}
+		// TODO would you like this preset to replace or add onto the existing rules?
 		try
 		{
-			ArrayList<RandoRule> rules = new ArrayList<RandoRule>();
-			for (int i = 0; i < preset.length(); i++)
-			{
-				String ruleStr = preset.getString(i);
-				RandoRule rule = RandoRule.loadFromString(ruleStr, classData);
-				rules.add(rule);
-			}
-			// TODO would you like this preset to replace or add onto the existing rules?
-			randoRules = rules;
-			Console.printString("Preset loaded.");
+			ArrayList<RandoRule> rules = presets.loadPreset(input, classData);
+			if (rules != null)
+				randoRules = rules;
 		}
 		catch (ParseException e)
 		{
@@ -309,11 +286,30 @@ public class UserSettings
 		}
 	}
 	
+	private void presetMenu(Scanner input, ObjectClassesFile classData)
+	{
+		while (true)
+		{
+			System.out.println();
+			switch (UserInput.getCharInput(input, PRESET_PROMPT, "LSD".toCharArray(), '.'))
+			{
+			case 'L':
+				loadRandoPreset(input, classData);
+			case 'S':
+				saveRulesAsPreset(input);
+			case 'D':
+				deletePreset(input);
+			case '.':
+				return;
+			}
+		}
+	}
+	
 	private void displaySettings()
 	{
 		String worldStr = (world == null) ? "[use W to select world]" : world;
 		String seedStr = (seed == null) ? "[will be randomly generated; use S to set seed]" : seed.toString();
-		Console.printString("Settings:\nWorld: " + worldStr + "\nSeed: " + seedStr);
+		Console.printString("World: " + worldStr + "\nSeed: " + seedStr);
 		if (randoRules == null)
 			Console.printString("Randomization rules: [use R to set rules]");
 		else
@@ -326,20 +322,6 @@ public class UserSettings
 	
 	private boolean checkForErrors()
 	{
-		// Check for the same object in multiple rule inputs
-		// (TODO update to just the inputs when rules can all happen at once)
-		for (int a = 0; a < randoRules.size(); a++)
-		{
-			RandoRule ruleA = randoRules.get(a);
-			for (int b = a + 1; b < randoRules.size(); b++)
-			{
-				RandoRule ruleB = randoRules.get(b);
-				int obj = ruleA.conflictsWith(ruleB);
-				if (obj != -1)
-					Console.printWarning("Bank " + Util.separateBank(obj) + " object " + Util.separateObj(obj) + " found in more than one randomization rule. Overlap between rules may lead to undefined behavior.");
-			}
-		}
-		
 		// Check for fatal errors
 		boolean ok = true;
 		if (world == null)
@@ -352,38 +334,34 @@ public class UserSettings
 			Console.printError("No randomization rules specified! Use R to set rules.");
 			ok = false;
 		}
+		else
+		{
+			// Check for the same object in multiple rule inputs
+			// (TODO update to just the inputs when rules can all happen at once)
+			for (int a = 0; a < randoRules.size(); a++)
+			{
+				RandoRule ruleA = randoRules.get(a);
+				for (int b = a + 1; b < randoRules.size(); b++)
+				{
+					RandoRule ruleB = randoRules.get(b);
+					int obj = ruleA.conflictsWith(ruleB);
+					if (obj != -1)
+						Console.printWarning("Bank " + Util.separateBank(obj) + " object " + Util.separateObj(obj) + " found in more than one randomization rule. Overlap between rules may lead to undefined behavior.");
+				}
+			}
+		}
 		return ok;
 	}
 	
 	// TODO exceptions are not being caught and printed properly
-	public UserSettings(Scanner input, ObjectClassesFile classData)
+	public void edit(Scanner input, ObjectClassesFile classData)
 	{
-		// Try to load settings file
-		boolean loaded = true;
-		if (Files.exists(settingsFile))
-		{
-			// Load settings from last randomization by default
-			long time_ago;
-			time_ago = loadFromFile(classData);
-			if (time_ago > 0)
-				Console.printString("Loaded last saved settings from " + Util.millisecondsToTimeString(time_ago) + " ago.");
-			else if (time_ago == 0)
-				Console.printString("Loaded settings from unknown date.");
-			else
-				loaded = false;
-		}
-		else
-			loaded = false;
-		
-		if (!loaded)
-			Console.printWarning("Could not load UserSettings.txt. Presets and previous randomization will not be available.");
-		
 		// Main input loop
 		Console.printString(HELP_MESSAGE);
 		while (true)
 		{
-			char c = UserInput.getCharInput(input, null, "HWSRPDB".toCharArray(), '.');
-			if (c == 'H' || c == '.')
+			char c = UserInput.getCharInput(input, null, "WSRPDB".toCharArray(), '.');
+			if (c == '.')
 				Console.printString(HELP_MESSAGE);
 			else if (c == 'W')
 				setWorld(input);
@@ -393,30 +371,28 @@ public class UserSettings
 			{
 				String randoTypes = setRandoTypes(input, classData);
 				setRandoRules(input, classData, randoTypes);
-				if (UserInput.getBooleanInput(input, "Would you like to save these randomization rules as a preset?"))
-					saveRulesAsPreset(input);
-				else
-					Console.printString("Rules updated.");
+				Console.printString("Rules updated.");
 			}
 			else if (c == 'P')
-				loadRandoPreset(input, classData);
+				presetMenu(input, classData);
 			else if (c == 'D')
+			{
+				Console.printString("Settings:");
 				displaySettings();
+			}
 			else if (c == 'B')
 				if (checkForErrors())
 				{
 					displaySettings();
-					if (UserInput.getBooleanInput(input, "Confirm that the above settings are correct to begin randomization."))
-						break;
+					break;
 				}
 		}
-		
-		if (seed == null)
-			seed = System.nanoTime();
 	}
 	
 	public Random getRandomFromSeed()
 	{
+		if (seed == null)
+			seed = System.nanoTime();
 		return new Random(seed);
 	}
 	
@@ -436,12 +412,7 @@ public class UserSettings
 		}
 		else
 			data = new JSONObject();
-		
-		JSONObject presetsJSON = new JSONObject();
-		for (String key : presets.keySet())
-			presetsJSON.put(key, presets.get(key));
-		data.put("presets", presetsJSON);
-		
+		data.put("presets", presets.toJSON());
 		Files.write(settingsFile, data.toString().getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 	}
 	
@@ -454,13 +425,8 @@ public class UserSettings
 		for (RandoRule r : randoRules)
 			rulesJSON.put(r.saveToString());
 		data.put("rules", rulesJSON);
-		JSONObject presetsJSON = new JSONObject();
-		if (presets != null)
-		{
-			for (String key : presets.keySet())
-				presetsJSON.put(key, presets.get(key));
-			data.put("presets", presetsJSON);
-		}
+		if (!presets.isEmpty())
+			data.put("presets", presets.toJSON());
 		data.put("timestamp", System.currentTimeMillis());
 		Files.write(settingsFile, data.toString().getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 	}

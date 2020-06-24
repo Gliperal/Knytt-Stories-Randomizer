@@ -1,4 +1,25 @@
-========= VERSION 2.0 =========================================
+========= VERSION 2.0.2 =========================================
+
+Removed colored printing (doesn't work in cmd).
+Launches game on exit.
+No longer asks for confirmation before randomizing / saving settings.
+Able to cancel out of the save preset menu.
+Deleted "H: Show help."
+Made "D: Display current settings." a silent option
+Automatically shows the settings on successful load.
+Stopped seed from being loaded from previous randomization.
+Changed page size in world list to 10.
+Added preset deletion and moved all the preset stuff into a sub menu.
+Made the UI prettier.
+
+The following object groups were given new IDs:
+	The "often mandatory to reach certain areas" group was changed from M to %.
+	KS+ collectables was changed from + to Z (since + is now a special character).
+	Golden Creatures was changed from * to Y.
+	The semi-new Solid Blocks category was changed from ? (placeholder) to M.
+
+
+========= VERSION 2.0.1 =========================================
 
 Lots of changes to the user interface:
 	Changed the entire flow to a less linear style.
@@ -6,7 +27,7 @@ Lots of changes to the user interface:
 	Added the option to save randomization presets.
 
 
-========= VERSION 1.2 (pre-release) ===========================
+========= VERSION 2.0.0 =========================================
 
 Fundamentally changed the way object groups are defined. Definitions now support the following operators (lowest to highest precedence):
 	AND operator (&): Creates the overlap of two groups. E&G creates a group of all objects that are both Enemies and Ghosts.
@@ -39,41 +60,3 @@ The following groups were added:
 The following groups were removed:
 	The Kitchen Sink: Essentially a collection of leftovers. It can now be obtained with A-BDFIOPSVW
 	Liquid Base: The purpose served by this group is now mostly served by Solid Blocks. The old Liquid Base can still be obtained with L&solidblocks
-
-
-
-A:all (except for gamebreaking stuff)
-B:big hologram enemies
-C:common enemies
-D:decoration
-E:all enemies
-F:friendlies
-G:ghost
-H:hologram enemies
-I:invisible
-J:key locks
-K:knytt
-L:lasers
-M:often mandatory to reach certain areas
-O:ouchies (anything that harms Juni)
-P:powerups
-Q:powerups without climb
-S:save points
-U:liquid
-V:liquid surface
-W:waterfalls
-X:spikes
-
-?:solid blocks
-_:empty space
-$:these objects are essential for some maps to run properly
-!:literally everything
-
-+:KS+ collectables
-*:golden creatures
-
-N
-R
-T
-Y
-Z

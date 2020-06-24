@@ -1,4 +1,4 @@
-?:solid blocks
+M:solid blocks
 {
 	1:7, 1:8, 1:9, 1:11, 1:17, 1:21, 1:24,
 
@@ -254,15 +254,14 @@ E:all enemies
 	O-UXIL
 }
 
-C:common enemies (eliminates a lot; E-B might be better)
+C:common enemies
 {
 	E-BGH,8:17,2:32
 }
 
 A:all (except for gamebreaking stuff)
-TODO: double check these are correct
 {
-	D,F,J,O,P,S,?,
+	D,F,J,O,P,S,U,
 	0:2,
 	0:11,
 	0:12,
@@ -298,7 +297,7 @@ TODO: double check these are correct
 	16:1,
 }
 
-M:often mandatory to reach certain areas
+%:often mandatory to reach certain areas
 {
 	12:5,
 	12:17,
@@ -323,12 +322,11 @@ $:these objects are essential for some maps to run properly
 }
 
 !:literally everything
-TODO: double check these are correct
 {
-	A,M,$
+	A,%,$,M
 }
 
-*:golden creatures
+Y:golden creatures
 {
 	19:1, 19:2, 19:3, 19:4, 19:5, 19:6, 19:7, 19:8, 19:9, 19:10,
 	19:11, 19:12, 19:13, 19:14, 19:15, 19:16, 19:17, 19:18, 19:19, 19:20,
@@ -337,9 +335,9 @@ TODO: double check these are correct
 	19:41, 19:42, 19:43, 19:44, 19:45, 19:46, 19:47, 19:48, 19:49, 19:50
 }
 
-+:KS+ collectables
+Z:KS+ collectables
 {
-	*,
+	Y,
 	19:51, 19:52, 19:53, 19:54, 19:55, 19:56, 19:57, 19:58, 19:59, 19:60,
 	19:61, 19:62, 19:63, 19:64, 19:65, 19:66, 19:67, 19:68, 19:69, 19:70,
 	19:71, 19:72, 19:73, 19:74, 19:75, 19:76, 19:77, 19:78, 19:79, 19:80,

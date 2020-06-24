@@ -14,6 +14,12 @@ import map.KSMap;
 
 public class Main
 {
+	private static final String RANDOMIZER_HEADER =
+			"                          ,--------------------------,\n" + 
+			"                          | KNYTT STORIES RANDOMIZER |\n" + 
+			"                          |      version  2.0.2      |\n" + 
+			"                          '--------------------------'";
+	
 	public static void main(String[] args)
 	{
 		// Get user input
@@ -55,8 +61,12 @@ public class Main
 			return;
 		}
 		
+		// Display header
+		Console.printString(RANDOMIZER_HEADER);
+		
 		// Obtain user settings
-		UserSettings settings = new UserSettings(input, classData);
+		UserSettings settings = new UserSettings(Paths.get("resources", "UserSettings.txt"), classData);
+		settings.edit(input, classData);
 		
 		// Make sure the map exists and is backed up
 		try
@@ -100,16 +110,23 @@ public class Main
 		}
 		
 		// Save user settings
-		if (UserInput.getBooleanInput(input, "Would you like to save these settings for re-randomization?"))
+		try
 		{
-			try
-			{
-				settings.saveSettingsToFile();
-				Console.printString("Settings saved successfully.");
-			} catch (IOException e)
-			{
-				Console.printError("Failed to save settings: " + e.getMessage());
-			}
+			settings.saveSettingsToFile();
+			Console.printString("Settings saved successfully.");
+		} catch (IOException e)
+		{
+			Console.printError("Failed to save settings: " + e.getMessage());
+		}
+		
+		// Launch Knytt Stories
+		// TODO Add the option to not
+		try
+		{
+			KSFiles.launchKS();
+		} catch (IOException e)
+		{
+			Console.printError("Could not launch Knytt Stories: " + e.getMessage());
 		}
 	}
 	

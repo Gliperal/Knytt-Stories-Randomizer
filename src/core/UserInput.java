@@ -99,7 +99,7 @@ public class UserInput
 	{
 		String inputStr;
 		int offset = 0;
-		int pageSize = 5;
+		int pageSize = 10;
 		int numOptions = list.size();
 		while (true)
 		{

@@ -14,12 +14,12 @@ public class Console
 	
 	public static void printWarning(String str)
 	{
-		System.out.println("WARNING: \033[33m" + str + "\033[0m");
+		System.out.println("WARNING: " + str);
 	}
 	
 	public static void printRed(String err)
 	{
-		System.out.println("\033[31m" + err + "\033[0m");
+		System.out.println(err);
 	}
 	
 	public static void printError(String err)

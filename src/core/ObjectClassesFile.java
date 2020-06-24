@@ -389,7 +389,6 @@ public class ObjectClassesFile
 		
 		// Close the reader
 		br.close();
-		printEverything();
 	}
 	
 	private void sort()

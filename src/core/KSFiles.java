@@ -18,6 +18,13 @@ import util.Util;
 
 public class KSFiles
 {
+	private static final String[] EXECUTABLES = {
+			"Knytt Stories Plus.exe",
+			"knytt stories ex.exe",
+			"Knytt Stories Speedrun Edition 0.2.2.exe",
+			"Knytt Stories Speedrun Edition 0.3.1.exe",
+			"Knytt Stories.exe"
+	};
 	private static Path ksDir = null;
 	private static Path worldFolder = null;
 	private static Path mapFile = null;
@@ -86,16 +93,22 @@ public class KSFiles
 		return false;
 	}
 	
-	private static boolean isKSDirectory(Path ksDir)
+	private static Path getExecutable(Path dir)
 	{
-		if (!Files.isDirectory(ksDir))
-			return false;
-		return
-				Files.exists(ksDir.resolve("Knytt Stories.exe")) ||
-				Files.exists(ksDir.resolve("Knytt Stories Plus.exe")) ||
-				Files.exists(ksDir.resolve("knytt stories ex.exe")) ||
-				Files.exists(ksDir.resolve("Knytt Stories Speedrun Edition 0.2.2.exe")) ||
-				Files.exists(ksDir.resolve("Knytt Stories Speedrun Edition 0.3.1.exe"));
+		if (!Files.isDirectory(dir))
+			return null;
+		for (String name : EXECUTABLES)
+		{
+			Path exe = dir.resolve(name);
+			if (Files.exists(exe))
+				return exe;
+		}
+		return null;
+	}
+	
+	private static boolean isKSDirectory(Path dir)
+	{
+		return getExecutable(dir) != null;
 	}
 	
 	// TODO replace print statements with exception throwing
@@ -292,5 +305,14 @@ public class KSFiles
 		{
 			throw new Exception("Unable to write screen data: " + e.getMessage());
 		}
+	}
+
+	public static void launchKS() throws IOException
+	{
+		Runtime run = Runtime.getRuntime();
+		Path exe = getExecutable(ksDir);
+		if (exe == null)
+			throw new FileNotFoundException("Unable to locate Knytt Stories executable.");
+		run.exec(exe.toString());
 	}
 }
