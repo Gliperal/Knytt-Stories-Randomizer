@@ -32,30 +32,10 @@ public class RulesPresets
 	{
 		ArrayList<String> presetNames = new ArrayList<String>(presets.keySet());
 		presetNames.sort(new AlphabeticalComparator());
-		Console.printString("Available presets:");
-		Util.displayListConsicesly(presetNames, 8, 6);
-		while (true)
-		{
-			Console.printString(prompt);
-			String search = input.nextLine();
-			if (search.isEmpty())
-			{
-				Console.printString("Cancelled.");
-				return null;
-			}
-			// TODO containsKey case insensitive
-			if (presets.containsKey(search))
-				return search;
-			ArrayList<Integer> matches = Util.keywordMatch(presetNames, search.split("\\s+"));
-			if (matches.size() == 0)
-			{
-				Console.printString("Found no presets matching \"" + search + "\"");
-				continue;
-			}
-			Console.printString("Presets matching \"" + search + "\"");
-			for (int i : matches)
-				Console.printString(presetNames.get(i));
-		}
+		int id = UserInput.getInputFromList(input, prompt, "preset", presetNames);
+		if (id == -1)
+			return null;
+		return presetNames.get(id);
 	}
 	
 	public boolean addPreset(Scanner input, ArrayList<RandoRule> rules)
@@ -86,7 +66,7 @@ public class RulesPresets
 			Console.printString("No presets available.");
 			return null;
 		}
-		String name = selectPreset(input, "Enter the name of a preset to load, a string to search, or nothing to cancel.");
+		String name = selectPreset(input, "Select a preset to load.");
 		if (name == null)
 			return null;
 		JSONArray preset = presets.get(name);
@@ -116,7 +96,7 @@ public class RulesPresets
 			Console.printString("No presets to delete.");
 			return false;
 		}
-		String name = selectPreset(input, "Enter the name of a preset to delete, a string to search, or nothing to cancel.");
+		String name = selectPreset(input, "Choose a preset to delete.");
 		if (name == null)
 			return false;
 		presets.remove(name);

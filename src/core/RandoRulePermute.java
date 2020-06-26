@@ -31,7 +31,6 @@ public class RandoRulePermute extends RandoRuleTransform
 	
 	public String toString()
 	{
-		// TODO this doesn't work cause super is now Transform
 		return "Permute " + super.toDisplayString();
 	}
 }

@@ -12,6 +12,11 @@ public class Console
 		System.out.println(str);
 	}
 	
+	public static void printf(String format, Object... args)
+	{
+		System.out.printf(format, args);
+	}
+	
 	public static void printWarning(String str)
 	{
 		System.out.println("WARNING: " + str);

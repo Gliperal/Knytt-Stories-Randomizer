@@ -11,6 +11,8 @@ Stopped seed from being loaded from previous randomization.
 Changed page size in world list to 10.
 Added preset deletion and moved all the preset stuff into a sub menu.
 Made the UI prettier.
+Combined old list selection (paginated) and new list selection (string search) into one.
+	World selection and preset selection now both use the combined format.
 
 The following object groups were given new IDs:
 	The "often mandatory to reach certain areas" group was changed from M to %.

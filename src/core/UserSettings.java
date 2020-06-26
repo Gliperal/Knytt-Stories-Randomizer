@@ -143,7 +143,10 @@ public class UserSettings
 		try
 		{
 			world = KSFiles.haveUserSelectWorld(input, "Select the world to randomize.");
-			Console.printString("World specified: " + world);
+			if (world == null)
+				Console.printString("Cancelled.");
+			else
+				Console.printString("World specified: " + world);
 		}
 		catch (IOException e)
 		{
@@ -273,7 +276,6 @@ public class UserSettings
 	
 	private void loadRandoPreset(Scanner input, ObjectClassesFile classData)
 	{
-		// TODO would you like this preset to replace or add onto the existing rules?
 		try
 		{
 			ArrayList<RandoRule> rules = presets.loadPreset(input, classData);
@@ -295,10 +297,16 @@ public class UserSettings
 			{
 			case 'L':
 				loadRandoPreset(input, classData);
+				return;
+			// TODO case 'A':
+			//	loadRandoPresetAndThenAddItToTheExistingRules();
+			//	break;
 			case 'S':
 				saveRulesAsPreset(input);
+				return;
 			case 'D':
 				deletePreset(input);
+				return;
 			case '.':
 				return;
 			}

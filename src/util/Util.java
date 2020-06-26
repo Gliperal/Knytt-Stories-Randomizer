@@ -92,4 +92,26 @@ public class Util
 		time /= 365;
 		return time + ((time == 1) ? " year" : " years");
 	}
+	
+	public static Integer stringToInteger(String s)
+	{
+		try
+		{
+			return Integer.parseInt(s);
+		}
+		catch (NumberFormatException e)
+		{
+			return null;
+		}
+	}
+	
+	public static int[] stringToRange(String str)
+	{
+		String[] split = str.split("-");
+		if (split.length != 2)
+			return null;
+		int start = Integer.parseInt(split[0]);
+		int end = Integer.parseInt(split[1]);
+		return new int[] {start, end};
+	}
 }

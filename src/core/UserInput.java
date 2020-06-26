@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
+import util.Util;
+
 public class UserInput
 {
 	public static char getCharInput(Scanner input, String prompt, char[] chars, char ifBlank)
@@ -95,48 +97,87 @@ public class UserInput
 		input.nextLine();
 	}
 	
-	public static int getInputFromList(Scanner input, String prompt, ArrayList<String> list)
+	public static int getInputFromList(Scanner input, String prompt, String unit, ArrayList<String> list)
 	{
 		String inputStr;
 		int offset = 0;
 		int pageSize = 10;
 		int numOptions = list.size();
+		boolean showDisplay = true;
 		while (true)
 		{
-			Console.printString(prompt);
-			if (offset > 0)
-				Console.printString("u\tScroll up");
-			for (int i = offset; i < offset + pageSize && i < list.size(); i++)
-				Console.printString(i + "\t" + list.get(i));
-			if (offset + pageSize < numOptions)
-				Console.printString("d\tScroll down");
+			// Display page of options
+			if (showDisplay)
+			{
+				Console.printString((offset > 0)
+						? "+-- U: scroll up ---------------------------------------------------------------"
+						: "+-------------------------------------------------------------------------------");
+				for (int i = offset; i < offset + pageSize && i < list.size(); i++)
+					Console.printf("|%4d. %s\n", i, list.get(i));
+				Console.printString((offset + pageSize < numOptions)
+						? "+-- D: scroll down -------------------------------------------------------------"
+						: "+-------------------------------------------------------------------------------");
+				showDisplay = false;
+			}
+			Console.printString(prompt + " Enter " + unit + " ID. Enter a string to search or ##-## to see all " + unit + "s in a range. Leave blank to cancel.");
 			
+			// Get user input
 			inputStr = input.nextLine();
+			if (inputStr.isEmpty())
+				return -1; // TODO catch
+			
+			// Change page
 			if (inputStr.toLowerCase().equals("u"))
 			{
-				offset -= 5;
+				offset -= pageSize;
 				if (offset < 0)
 					offset = 0;
+				showDisplay = true;
+				continue;
 			}
 			else if (inputStr.toLowerCase().equals("d"))
 			{
-				offset += 5;
+				offset += pageSize;
 				if (offset + pageSize > numOptions)
 					offset = numOptions - pageSize;
+				showDisplay = true;
+				continue;
 			}
+			
+			// input = ID (return)
+			Integer choice = Util.stringToInteger(inputStr);
+			if (choice != null)
+			{
+				if (choice >= 0 && choice < numOptions)
+					return choice;
+				else
+					Console.printString(choice + " is out of the range of available options.");
+				continue;
+			}
+			
+			// input = ##-## (range)
+			int[] range = Util.stringToRange(inputStr);
+			if (range != null)
+			{
+				if (range[0] < 0 || range[0] >= numOptions ||
+						range[1] < 0 || range[1] >= numOptions ||
+						range[1] < range[0])
+					Console.printString(inputStr + " is not a valid range.");
+				else
+					for (int i = range[0]; i <= range[1]; i++)
+						Console.printString("\t" + i + ". " + list.get(i));
+				continue;
+			}
+			
+			// input = string (search)
+			ArrayList<Integer> matches = Util.keywordMatch(list, inputStr.split("\\s+"));
+			if (matches.size() == 0)
+				Console.printString("Found no " + unit + "s matching \"" + inputStr + "\"");
 			else
 			{
-				try
-				{
-					int choice = Integer.parseInt(inputStr);
-					if (choice < 0 || choice > numOptions - 1)
-						Console.printString(choice + "is out of the range of available options.");
-					return choice;
-				}
-				catch (NumberFormatException e)
-				{
-					Console.printString("Please enter a number, or u or d to scroll");
-				}
+				Console.printString(unit + "s matching \"" + inputStr + "\"");
+				for (int i : matches)
+					Console.printString("\t" + i + ". " + list.get(i));
 			}
 		}
 	}

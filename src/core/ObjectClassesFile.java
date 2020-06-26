@@ -78,11 +78,7 @@ public class ObjectClassesFile
 				line++;
 			i++;
 			if (i == header.length())
-			{
-				// TODO why is this print statement even here?
-				// System.out.println("id = " + id);
 				return new IDNamePair(id, null);
-			}
 		}
 		
 		// The next character should be a :

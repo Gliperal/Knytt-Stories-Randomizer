@@ -137,33 +137,9 @@ public class KSFiles
 		}
 		
 		// Get user choice
-		int worldID;
-		while (true)
-		{
-			Console.printString(prompt + " Enter world ID, or enter a string to search.");
-			// TODO Enter ##-## to see all the worlds in a range
-			String inputStr = input.nextLine();
-			try
-			{
-				worldID = Integer.parseInt(inputStr);
-				if (worldID >= 0 && worldID < worldStrings.size())
-					break;
-				Console.printString(worldID + "is out of the range of available options.");
-			}
-			catch (NumberFormatException e)
-			{
-				String[] keywords = inputStr.split("\\s+");
-				ArrayList<Integer> matches = Util.keywordMatch(worldStrings, keywords);
-				if (matches.size() == 0)
-					Console.printString("No worlds found for search query \"" + inputStr + "\"");
-				else
-				{
-					Console.printString("Found " + matches.size() + " worlds matching \"" + inputStr + "\":");
-					for (int i : matches)
-						Console.printString("   " + i + "\t" + worldStrings.get(i));
-				}
-			}
-		}
+		int worldID = UserInput.getInputFromList(input, prompt, "world", worldStrings);
+		if (worldID == -1)
+			return null;
 		worldFolder = worlds.get(worldID);
 		return worldFolder.getFileName().toString();
 	}
