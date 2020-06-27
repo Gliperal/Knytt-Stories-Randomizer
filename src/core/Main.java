@@ -35,8 +35,8 @@ public class Main
 		} catch(Exception e)
 		{
 			e.printStackTrace();
+			UserInput.waitForEnter(input, null);
 		}
-		UserInput.waitForEnter(input, "Press enter to exit.");
 	}
 	
 	public static void randoMain(Scanner input)
@@ -66,7 +66,10 @@ public class Main
 		
 		// Obtain user settings
 		UserSettings settings = new UserSettings(Paths.get("resources", "UserSettings.txt"), classData);
-		settings.edit(input, classData);
+		if (settings.firstLaunch() && UserInput.getBooleanInput(input, "It looks like it's your first time using the randomizer. Would you like to be guided through it?"))
+			settings.ezEdit(input, classData);
+		else
+			settings.edit(input, classData);
 		
 		// Make sure the map exists and is backed up
 		try
@@ -120,13 +123,17 @@ public class Main
 		}
 		
 		// Launch Knytt Stories
-		// TODO Add the option to not
-		try
+		Console.printString("Enter K to launch Knytt Stories and exit, or anything else to exit.");
+		if (input.nextLine().toUpperCase().startsWith("K"))
 		{
-			KSFiles.launchKS();
-		} catch (IOException e)
-		{
-			Console.printError("Could not launch Knytt Stories: " + e.getMessage());
+			try
+			{
+				KSFiles.launchKS();
+			} catch (IOException e)
+			{
+				Console.printError("Could not launch Knytt Stories: " + e.getMessage());
+				UserInput.waitForEnter(input, "Press enter to exit.");
+			}
 		}
 	}
 	

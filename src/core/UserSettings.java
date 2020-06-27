@@ -22,8 +22,9 @@ public class UserSettings
 			"==========--  W: Select world    R: Specify rules    S: Enter seed  --==========\n" + 
 			"=======================--  P: Preset menu    B: Begin  --=======================";
 	private static final String PRESET_PROMPT =
-			"--  L: Load preset    S: Save current settings as preset    D: Delete preset  --\n" + 
-			"=========================--  Leave blank to return.  --=========================";
+			"============--  L: Load preset    A: Add preset to current rules  --============\r\n" + 
+			"===========--  S: Save current rules as preset   D: Delete preset  --===========\r\n" + 
+			"==========================-  Leave blank to return.  -==========================";
 	public static final String RANDO_TYPE_TABLE = 
 			"                          ,---------------------,------------------------,\n" + 
 			"                          | Objects of the same | Objects are randomized |\n" + 
@@ -42,6 +43,7 @@ public class UserSettings
 	private Long seed;
 	private ArrayList<RandoRule> randoRules;
 	private RulesPresets presets;
+	private boolean firstLaunch;
 	
 	public UserSettings(Path file, ObjectClassesFile classData)
 	{
@@ -68,7 +70,7 @@ public class UserSettings
 			}
 		}
 		else
-			Console.printString("Could not find" + filename + ". Skipping...");
+			firstLaunch = true;
 	}
 	
 	/**
@@ -274,13 +276,18 @@ public class UserSettings
 		}
 	}
 	
-	private void loadRandoPreset(Scanner input, ObjectClassesFile classData)
+	private void loadRandoPreset(Scanner input, ObjectClassesFile classData, boolean append)
 	{
 		try
 		{
 			ArrayList<RandoRule> rules = presets.loadPreset(input, classData);
 			if (rules != null)
-				randoRules = rules;
+			{
+				if (append)
+					randoRules.addAll(rules);
+				else
+					randoRules = rules;
+			}
 		}
 		catch (ParseException e)
 		{
@@ -293,14 +300,14 @@ public class UserSettings
 		while (true)
 		{
 			System.out.println();
-			switch (UserInput.getCharInput(input, PRESET_PROMPT, "LSD".toCharArray(), '.'))
+			switch (UserInput.getCharInput(input, PRESET_PROMPT, "LADS".toCharArray(), '.'))
 			{
 			case 'L':
-				loadRandoPreset(input, classData);
+				loadRandoPreset(input, classData, false);
 				return;
-			// TODO case 'A':
-			//	loadRandoPresetAndThenAddItToTheExistingRules();
-			//	break;
+			case 'A':
+				loadRandoPreset(input, classData, true);
+				return;
 			case 'S':
 				saveRulesAsPreset(input);
 				return;
@@ -397,6 +404,21 @@ public class UserSettings
 		}
 	}
 	
+	public void ezEdit(Scanner input, ObjectClassesFile classData)
+	{
+		do
+		{
+			while (world == null)
+				setWorld(input);
+			while (randoRules == null)
+			{
+				String randoTypes = setRandoTypes(input, classData);
+				setRandoRules(input, classData, randoTypes);
+			}
+		}
+		while (checkForErrors() == false);
+	}
+	
 	public Random getRandomFromSeed()
 	{
 		if (seed == null)
@@ -407,6 +429,11 @@ public class UserSettings
 	public ArrayList<RandoRule> getRandoRules()
 	{
 		return randoRules;
+	}
+	
+	public boolean firstLaunch()
+	{
+		return firstLaunch;
 	}
 	
 	public void savePresetsToFile() throws IOException

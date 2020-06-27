@@ -93,7 +93,8 @@ public class UserInput
 	
 	public static void waitForEnter(Scanner input, String prompt)
 	{
-		Console.printString(prompt);
+		if (prompt != null)
+			Console.printString(prompt);
 		input.nextLine();
 	}
 	
@@ -124,7 +125,7 @@ public class UserInput
 			// Get user input
 			inputStr = input.nextLine();
 			if (inputStr.isEmpty())
-				return -1; // TODO catch
+				return -1;
 			
 			// Change page
 			if (inputStr.toLowerCase().equals("u"))

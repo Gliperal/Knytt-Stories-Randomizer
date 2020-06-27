@@ -14,7 +14,6 @@ import java.util.Scanner;
 import org.stackoverflowusers.file.WindowsShortcut;
 
 import map.KSMap;
-import util.Util;
 
 public class KSFiles
 {
@@ -111,7 +110,6 @@ public class KSFiles
 		return getExecutable(dir) != null;
 	}
 	
-	// TODO replace print statements with exception throwing
 	public static String haveUserSelectWorld(Scanner input, String prompt) throws FileNotFoundException, IOException
 	{
 		// Load worlds directory

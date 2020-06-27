@@ -10,7 +10,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import util.AlphabeticalComparator;
-import util.Util;
 
 public class RulesPresets
 {

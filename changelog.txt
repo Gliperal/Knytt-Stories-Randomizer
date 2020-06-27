@@ -13,6 +13,10 @@ Added preset deletion and moved all the preset stuff into a sub menu.
 Made the UI prettier.
 Combined old list selection (paginated) and new list selection (string search) into one.
 	World selection and preset selection now both use the combined format.
+Added an option to add a preset to the existing rules, rather than overwriting them.
+"Press enter to exit" will now only occur if there is an error.
+Added categories to help organize object classes.
+Added a linear selection process for new users (if no UserSettings file is detected).
 
 The following object groups were given new IDs:
 	The "often mandatory to reach certain areas" group was changed from M to %.

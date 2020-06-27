@@ -13,6 +13,7 @@ public class ObjectClass
 {
 	private char id;
 	private String name;
+	private String category;
 	private String creationKey;
 	private int[] objects;
 	Map<Integer, Integer> objectShuffle;
@@ -20,13 +21,19 @@ public class ObjectClass
 	
 	private ObjectClass() {}
 	
-	// all base classes have a character id and optionally a name
+	// all base classes have a character id and optionally a name and category
 	// for combined classes, id is 0 and key is used instead
 	public ObjectClass(char id, String name)
 	{
 		this.id = Character.toUpperCase(id);
 		this.name = name;
 		objects = new int[0];
+	}
+	
+	public ObjectClass(char id, String name, String category)
+	{
+		this(id, name);
+		this.category = category;
 	}
 	
 	public ObjectClass addCreationKey(String key)
@@ -133,6 +140,7 @@ public class ObjectClass
 		ObjectClass group = new ObjectClass();
 		group.id = id;
 		group.name = name;
+		group.category = category;
 		group.creationKey = creationKey;
 		group.objects = Arrays.copyOf(combinedObjects, k);
 		return group;
@@ -171,6 +179,7 @@ public class ObjectClass
 		ObjectClass group = new ObjectClass();
 		group.id = id;
 		group.name = name;
+		group.category = category;
 		group.creationKey = creationKey;
 		group.objects = Arrays.copyOf(commonObjects, k);
 		return group;
@@ -211,6 +220,7 @@ public class ObjectClass
 		ObjectClass group = new ObjectClass();
 		group.id = id;
 		group.name = name;
+		group.category = category;
 		group.creationKey = creationKey;
 		group.objects = Arrays.copyOf(uniqueObjects, k);
 		return group;
@@ -220,7 +230,12 @@ public class ObjectClass
 	{
 		String result;
 		if (id != 0)
-			result = "ObjectClass(Base: " + id + ", " + name + ")[";
+		{
+			if (category == null)
+				result = "ObjectClass(Base: " + id + ", " + name + ")[";
+			else
+				result = "ObjectClass(Base: " + id + ", " + name + ", " + category + ")[";
+		}
 		else
 			result = "ObjectClass(Manufactured: " + creationKey + ")[";
 		for (int i = 0; i < objects.length; i++)
@@ -248,7 +263,6 @@ public class ObjectClass
 	
 	public int[] toList()
 	{
-		// TODO Not sure if it's safe to return objects
 		return Arrays.copyOf(objects, objects.length);
 	}
 	
@@ -268,6 +282,11 @@ public class ObjectClass
 	public String indentifier()
 	{
 		return Character.toUpperCase(id) + ": " + name;
+	}
+	
+	public String getCategory()
+	{
+		return category;
 	}
 	
 	public int firstCommonObject(ObjectClass that)

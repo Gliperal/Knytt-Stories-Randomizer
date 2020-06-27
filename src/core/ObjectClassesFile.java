@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import util.Util;
 
@@ -37,19 +39,7 @@ public class ObjectClassesFile
 		return null;
 	}
 	
-	private class IDNamePair
-	{
-		public char id;
-		public String name;
-		
-		public IDNamePair(char id, String name)
-		{
-			this.id = id;
-			this.name = name;
-		}
-	}
-	
-	private IDNamePair parseHeader(String header, int line) throws ParseException
+	private ObjectClassMetadata parseHeader(String header, int line) throws ParseException
 	{
 		// Read until the first non-whitespace
 		int i = 0;
@@ -78,7 +68,7 @@ public class ObjectClassesFile
 				line++;
 			i++;
 			if (i == header.length())
-				return new IDNamePair(id, null);
+				return new ObjectClassMetadata(id, null);
 		}
 		
 		// The next character should be a :
@@ -96,11 +86,18 @@ public class ObjectClassesFile
 				throw new ParseException("Expected name for object class after :", line);
 		}
 		
-		// Read object class name
-		String name = header.substring(i).trim();
+		// Split on the next : (if it exists), separating name and category
+		int split = header.indexOf(':', i);
+		if (split != -1)
+		{
+			String name = header.substring(i, split).trim();
+			String category = header.substring(split + 1).trim();
+			return new ObjectClassMetadata(id, name, category);
+		}
 		
-		// Create a new object class
-		return new IDNamePair(id, name);
+		// If not, then just read the name
+		String name = header.substring(i).trim();
+		return new ObjectClassMetadata(id, name);
 	}
 	
 	private enum TokenType { group, and, minus, plus, openParen, closeParen };
@@ -233,13 +230,13 @@ public class ObjectClassesFile
 		// Remove ) and return
 		tokens.remove(1);
 	}
-
+	
 	public ObjectClass buildObjectClass(String key, int line) throws ParseException
 	{
-		return buildObjectClass(' ', "auto-generated object class", key, line);
+		return buildObjectClass(new ObjectClassMetadata(' ', "auto-generated object class"), key, line);
 	}
 	
-	public ObjectClass buildObjectClass(char id, String name, String key, int line) throws ParseException
+	public ObjectClass buildObjectClass(ObjectClassMetadata metadata, String key, int line) throws ParseException
 	{
 		// Tokenize
 		int i = 0;
@@ -325,7 +322,7 @@ public class ObjectClassesFile
 		
 		// The last remaining token has our finished object class
 		ObjectClass ret = tokens.get(0).group;
-		ret = new ObjectClass(id, name).combineWith(ret);
+		ret = new ObjectClass(metadata.id, metadata.name, metadata.category).combineWith(ret);
 		ret.sort();
 		return ret;
 	}
@@ -362,8 +359,8 @@ public class ObjectClassesFile
 			
 			// Parse the header
 			i = header.indexOf('{');
-			IDNamePair groupID = parseHeader(header.substring(0, i), startLine);
-
+			ObjectClassMetadata groupID = parseHeader(header.substring(0, i), startLine);
+			
 			// Read until the next {
 			String body = header.substring(i + 1);
 			startLine = lineNumber;
@@ -377,7 +374,7 @@ public class ObjectClassesFile
 			
 			// Parse the body
 			i = body.indexOf('}');
-			classes.add(buildObjectClass(groupID.id, groupID.name, body.substring(0, i), startLine));
+			classes.add(buildObjectClass(groupID, body.substring(0, i), startLine));
 			line = body.substring(i + 1);
 		}
 		// Sort the groups alphabetically
@@ -423,7 +420,30 @@ public class ObjectClassesFile
 	
 	public void tabPrintClasses()
 	{
+		Map<String, ArrayList<ObjectClass>> categories = new HashMap<String, ArrayList<ObjectClass>>();
 		for (ObjectClass oc : classes)
-			Console.printString("\t" + oc.indentifier());
+		{
+			String category = oc.getCategory();
+			if (categories.containsKey(category))
+				categories.get(category).add(oc);
+			else
+			{
+				ArrayList<ObjectClass> categoryObjs = new ArrayList<ObjectClass>();
+				categoryObjs.add(oc);
+				categories.put(category, categoryObjs);
+			}
+		}
+		for (String category : categories.keySet())
+		{
+			ArrayList<ObjectClass> categoryObjs = categories.get(category);
+			if (category == null)
+				category = "MISCELLANEOUS";
+			String str = "-- " + category.toUpperCase() + " --";
+			while (str.length() < 80)
+				str += '-';
+			Console.printString(str);
+			for (ObjectClass oc : categoryObjs)
+				Console.printString("\t" + oc.indentifier());
+		}
 	}
 }
