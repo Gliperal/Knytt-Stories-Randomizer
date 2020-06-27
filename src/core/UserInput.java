@@ -111,13 +111,13 @@ public class UserInput
 			if (showDisplay)
 			{
 				Console.printString((offset > 0)
-						? "+-- U: scroll up ---------------------------------------------------------------"
-						: "+-------------------------------------------------------------------------------");
+						? "+-- U: scroll up --------------------------------------------------------------"
+						: "+------------------------------------------------------------------------------");
 				for (int i = offset; i < offset + pageSize && i < list.size(); i++)
 					Console.printf("|%4d. %s\n", i, list.get(i));
 				Console.printString((offset + pageSize < numOptions)
-						? "+-- D: scroll down -------------------------------------------------------------"
-						: "+-------------------------------------------------------------------------------");
+						? "+-- D: scroll down ------------------------------------------------------------"
+						: "+------------------------------------------------------------------------------");
 				showDisplay = false;
 			}
 			Console.printString(prompt + " Enter " + unit + " ID. Enter a string to search or ##-## to see all " + unit + "s in a range. Leave blank to cancel.");

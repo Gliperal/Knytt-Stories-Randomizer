@@ -19,12 +19,12 @@ import util.Util;
 public class UserSettings
 {
 	private static final String HELP_MESSAGE =
-			"==========--  W: Select world    R: Specify rules    S: Enter seed  --==========\n" + 
-			"=======================--  P: Preset menu    B: Begin  --=======================";
+			"==========--  W: Select world    R: Specify rules    S: Enter seed  --=========\n" + 
+			"=======================--  P: Preset menu    B: Begin  --======================";
 	private static final String PRESET_PROMPT =
-			"============--  L: Load preset    A: Add preset to current rules  --============\r\n" + 
-			"===========--  S: Save current rules as preset   D: Delete preset  --===========\r\n" + 
-			"==========================-  Leave blank to return.  -==========================";
+			"============--  L: Load preset    A: Add preset to current rules  --===========\r\n" + 
+			"===========--  S: Save current rules as preset   D: Delete preset  --==========\r\n" + 
+			"==========================-  Leave blank to return.  -=========================";
 	public static final String RANDO_TYPE_TABLE = 
 			"                          ,---------------------,------------------------,\n" + 
 			"                          | Objects of the same | Objects are randomized |\n" + 
