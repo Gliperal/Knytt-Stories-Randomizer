@@ -31,4 +31,9 @@ public class Console
 	{
 		printRed("ERROR: " + err);
 	}
+	
+	public static void debug(String str, int foo)
+	{
+		System.out.println("DEBUG>>> " + str);
+	}
 }

@@ -368,39 +368,45 @@ public class UserSettings
 		return ok;
 	}
 	
-	// TODO exceptions are not being caught and printed properly
 	public void edit(Scanner input, ObjectClassesFile classData)
 	{
 		// Main input loop
 		Console.printString(HELP_MESSAGE);
 		while (true)
 		{
-			char c = UserInput.getCharInput(input, null, "WSRPDB".toCharArray(), '.');
-			if (c == '.')
-				Console.printString(HELP_MESSAGE);
-			else if (c == 'W')
-				setWorld(input);
-			else if (c == 'S')
-				setSeed(input);
-			else if (c == 'R')
+			String s = input.nextLine().toUpperCase();
+			if (s.isEmpty())
+				s = ".";
+			switch(s.charAt(0))
 			{
+			case 'W':
+				setWorld(input);
+				break;
+			case 'S':
+				setSeed(input);
+				break;
+			case 'R':
 				String randoTypes = setRandoTypes(input, classData);
 				setRandoRules(input, classData, randoTypes);
 				Console.printString("Rules updated.");
-			}
-			else if (c == 'P')
+				break;
+			case 'P':
 				presetMenu(input, classData);
-			else if (c == 'D')
-			{
+				break;
+			case 'D':
 				Console.printString("Settings:");
 				displaySettings();
-			}
-			else if (c == 'B')
+				break;
+			case 'B':
 				if (checkForErrors())
 				{
 					displaySettings();
-					break;
+					return;
 				}
+				break;
+			default:
+				Console.printString(HELP_MESSAGE);
+			}
 		}
 	}
 	

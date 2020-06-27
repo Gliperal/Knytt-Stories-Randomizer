@@ -117,6 +117,27 @@ public class ObjectClassesFile
 			this.type = TokenType.group;
 			this.group = group;
 		}
+		
+		public String toString()
+		{
+			switch(type)
+			{
+			case group:
+				return "G";
+			case and:
+				return "&";
+			case minus:
+				return "-";
+			case plus:
+				return "+";
+			case openParen:
+				return "(";
+			case closeParen:
+				return ")";
+			default:
+				return ".";
+			}
+		}
 	}
 	
 	private void evaluateTokens(ArrayList<Token> tokens, int start) throws ParseException
@@ -219,16 +240,16 @@ public class ObjectClassesFile
 		}
 		
 		// Error checking before return
-		if (tokens.size() == 0)
+		if (tokens.size() <= start)
 			throw new ParseException("Unknown error processing group.", -1);
-		Token first = tokens.get(0);
+		Token first = tokens.get(start);
 		if (first.type != TokenType.group) // then it has to be a closing parenthesis
 			throw new ParseException("Empty group.", first.lineNumber);
-		if (tokens.size() == 1 || tokens.get(1).type != TokenType.closeParen)
+		if (tokens.size() == start + 1 || tokens.get(start + 1).type != TokenType.closeParen)
 			throw new ParseException("Unbalanced parenthesis.", first.lineNumber);
 		
 		// Remove ) and return
-		tokens.remove(1);
+		tokens.remove(start + 1);
 	}
 	
 	public ObjectClass buildObjectClass(String key, int line) throws ParseException
