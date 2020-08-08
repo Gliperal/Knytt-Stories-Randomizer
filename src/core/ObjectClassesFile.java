@@ -306,7 +306,7 @@ public class ObjectClassesFile
 					int j = key.indexOf(':', i);
 					int bank = Integer.parseInt(key.substring(i, j));
 					int k = j + 1;
-					while (Character.isDigit(key.charAt(k)) && k < key.length())
+					while (k < key.length() && Character.isDigit(key.charAt(k)))
 						k++;
 					int object = Integer.parseInt(key.substring(j + 1, k));
 					// assign the same id and name to all the tokens (eventually they'll be merged down into one)
@@ -460,7 +460,7 @@ public class ObjectClassesFile
 			if (category == null)
 				category = "MISCELLANEOUS";
 			String str = "-- " + category.toUpperCase() + " --";
-			while (str.length() < 80)
+			while (str.length() < Console.MAX_LENGTH)
 				str += '-';
 			Console.printString(str);
 			for (ObjectClass oc : categoryObjs)

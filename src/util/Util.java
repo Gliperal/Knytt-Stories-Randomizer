@@ -114,4 +114,20 @@ public class Util
 		int end = Integer.parseInt(split[1]);
 		return new int[] {start, end};
 	}
+	
+	public static int firstIndexOf(String str, String chs)
+	{
+		for (int i = 0; i < str.length(); i++)
+			if (chs.indexOf(str.charAt(i)) != -1)
+				return i;
+		return -1;
+	}
+	
+	public static int lastIndexOf(String str, String chs, int end)
+	{
+		for (int i = end-1; i >= 0; i--)
+			if (chs.indexOf(str.charAt(i)) != -1)
+				return i;
+		return -1;
+	}
 }

@@ -22,8 +22,8 @@ public class UserSettings
 			"==========--  W: Select world    R: Specify rules    S: Enter seed  --=========\n" + 
 			"=======================--  P: Preset menu    B: Begin  --======================";
 	private static final String PRESET_PROMPT =
-			"============--  L: Load preset    A: Add preset to current rules  --===========\r\n" + 
-			"===========--  S: Save current rules as preset   D: Delete preset  --==========\r\n" + 
+			"============--  L: Load preset    A: Add preset to current rules  --===========\n" + 
+			"===========--  S: Save current rules as preset   D: Delete preset  --==========\n" + 
 			"==========================-  Leave blank to return.  -=========================";
 	public static final String RANDO_TYPE_TABLE = 
 			"                          ,---------------------,------------------------,\n" + 
@@ -287,6 +287,9 @@ public class UserSettings
 					randoRules.addAll(rules);
 				else
 					randoRules = rules;
+				Console.printString("Loaded preset. Current rules:");
+				for (RandoRule r : randoRules)
+					Console.printString("\t" + r.toString());
 			}
 		}
 		catch (ParseException e)

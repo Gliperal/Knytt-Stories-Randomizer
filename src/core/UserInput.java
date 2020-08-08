@@ -102,7 +102,7 @@ public class UserInput
 	{
 		String inputStr;
 		int offset = 0;
-		int pageSize = 10;
+		int pageSize = 20;
 		int numOptions = list.size();
 		boolean showDisplay = true;
 		while (true)

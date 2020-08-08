@@ -17,7 +17,7 @@ public class Main
 	private static final String RANDOMIZER_HEADER =
 			"                          ,--------------------------,\n" + 
 			"                          | KNYTT STORIES RANDOMIZER |\n" + 
-			"                          |      version  2.0.2      |\n" + 
+			"                          |      version  2.0.3      |\n" + 
 			"                          '--------------------------'";
 	
 	public static void main(String[] args)
