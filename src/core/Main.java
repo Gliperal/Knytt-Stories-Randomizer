@@ -123,8 +123,8 @@ public class Main
 		}
 		
 		// Launch Knytt Stories
-		Console.printString("Enter K to launch Knytt Stories and exit, or anything else to exit.");
-		if (input.nextLine().toUpperCase().startsWith("K"))
+		Console.printString("Press enter to exit. Type any letter to launch Knytt Stories and exit.");
+		if (!input.nextLine().isEmpty())
 		{
 			try
 			{

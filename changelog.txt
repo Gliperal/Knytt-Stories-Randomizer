@@ -1,3 +1,19 @@
+========= VERSION 2.0.3 =========================================
+
+Now displays the preset rules when one is loaded.
+Fixed an error in the parsing of randomization rules.
+Fixed lines of length 80 printing with an extra newline.
+Changed name of category containing ghost, invisible, and liquids to CLEAR.
+The following object groups were changed:
+	Spikes was changed from X to N.
+	KS+ artifacts was added (X).
+Changed level page size from 10 to 20.
+Fixed an infinite loop caused by trying to permute objects that didn't exist in the map.
+Added a hidden option (K) to launch knytt stories before randomizing.
+Changed the option to launch knytt stories on exit from K to any letter.
+Fixed the license.
+
+
 ========= VERSION 2.0.2 =========================================
 
 Removed colored printing (doesn't work in cmd).

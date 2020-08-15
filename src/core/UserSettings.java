@@ -407,6 +407,15 @@ public class UserSettings
 					return;
 				}
 				break;
+			case 'K':
+				try
+				{
+					KSFiles.launchKS();
+				} catch (IOException e)
+				{
+					Console.printError("Could not launch Knytt Stories: " + e.getMessage());
+				}
+				break;
 			default:
 				Console.printString(HELP_MESSAGE);
 			}
