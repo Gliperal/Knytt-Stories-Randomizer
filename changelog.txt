@@ -1,5 +1,10 @@
 ========= VERSION 2.0.3 =========================================
 
+Moved WIN tile from All (A) to Essential ($).
+
+
+========= VERSION 2.0.3 =========================================
+
 Now displays the preset rules when one is loaded.
 Fixed an error in the parsing of randomization rules.
 Fixed lines of length 80 printing with an extra newline.

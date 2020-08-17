@@ -262,7 +262,6 @@ C:common enemies:enemies
 A:all (except for gamebreaking stuff)
 {
 	D,F,J,O,P,S,U,
-	0:2,
 	0:11,
 	0:12,
 	0:13,
@@ -315,6 +314,7 @@ A:all (except for gamebreaking stuff)
 
 $:these objects are essential for some maps to run properly
 {
+	0:2,
 	0:14,
 	0:15,
 	0:16,
