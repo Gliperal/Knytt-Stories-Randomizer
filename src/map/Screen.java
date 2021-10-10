@@ -130,4 +130,25 @@ public class Screen
 	{
 		data[3004] = value;
 	}
+
+	public int countObject(byte bank, byte obj)
+	{
+		int count = 0;
+		for (int layer = 4; layer < 8; layer++)
+		{
+			int bankOffset = layer*500 - 750;
+			int objOffset = layer*500 - 1000;
+			for (int tile = 0; tile < 250; tile++)
+			{
+				if ((int)data[bankOffset + tile] == bank && (int)data[objOffset + tile] == obj)
+					count++;
+			}
+		}
+		return count;
+	}
+
+	public String toString()
+	{
+		return "Screen[" + header + "]";
+	}
 }

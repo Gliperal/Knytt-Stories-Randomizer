@@ -247,9 +247,9 @@ public class KSFiles
 		Path file = (originalMapFile != null) ? originalMapFile : mapFile;
 		try
 		{
-			if (mapFile == null)
+			if (file == null)
 				getMapFile();
-			return new KSMap(file);
+			return new KSMap(mapFile);
 		} catch (NoSuchFileException e)
 		{
 			throw new Exception("Unable to open file " + file);

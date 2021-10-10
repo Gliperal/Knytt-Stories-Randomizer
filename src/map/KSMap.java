@@ -254,4 +254,15 @@ public class KSMap
 			s.setMusic(value);
 		}
 	}
+
+	public void findObject(byte bank, byte obj)
+	{
+		for(Screen s : screens)
+		{
+			int count = s.countObject(bank, obj);
+			if (count > 0)
+				// TODO return something instead
+				System.out.println(count + " on screen " + s.toString());
+		}
+	}
 }
