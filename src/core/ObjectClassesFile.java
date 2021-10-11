@@ -104,7 +104,7 @@ public class ObjectClassesFile
 	private class Token
 	{
 		public TokenType type;
-		public ObjectClass group;
+		public ObjectGroup group;
 		public int lineNumber;
 		
 		public Token(TokenType type, int lineNumber)
@@ -112,7 +112,7 @@ public class ObjectClassesFile
 			this.type = type;
 		}
 		
-		public Token(ObjectClass group, int lineNumber)
+		public Token(ObjectGroup group, int lineNumber)
 		{
 			this.type = TokenType.group;
 			this.group = group;
@@ -252,12 +252,7 @@ public class ObjectClassesFile
 		tokens.remove(start + 1);
 	}
 	
-	public ObjectClass buildObjectClass(String key, int line) throws ParseException
-	{
-		return buildObjectClass(new ObjectClassMetadata(' ', "auto-generated object class"), key, line);
-	}
-	
-	public ObjectClass buildObjectClass(ObjectClassMetadata metadata, String key, int line) throws ParseException
+	public ObjectGroup buildObjectGroup(String key, int line) throws ParseException
 	{
 		// Tokenize
 		int i = 0;
@@ -310,9 +305,9 @@ public class ObjectClassesFile
 						k++;
 					int object = Integer.parseInt(key.substring(j + 1, k));
 					// assign the same id and name to all the tokens (eventually they'll be merged down into one)
-					ObjectClass oc = new ObjectClass(' ', "temporary partial class");
-					oc.add((byte) bank, (byte) object);
-					tokens.add(new Token(oc, line));
+					ObjectGroup group = new ObjectGroup();
+					group.add((byte) bank, (byte) object);
+					tokens.add(new Token(group, line));
 					i = k;
 				}
 				catch (Exception e)
@@ -329,7 +324,7 @@ public class ObjectClassesFile
 					String snippet = Util.trimStringForPrinting(key.substring(i));
 					throw new ParseException("Couldn't parse object format near \"" + snippet + "\"", line);
 				}
-				tokens.add(new Token(oc, line));
+				tokens.add(new Token(oc.group, line));
 				i++;
 			}
 		}
@@ -341,11 +336,11 @@ public class ObjectClassesFile
 		if (tokens.size() > 1)
 			throw new ParseException("Unbalanced parenthesis.", tokens.get(0).lineNumber);
 		
-		// The last remaining token has our finished object class
-		ObjectClass ret = tokens.get(0).group;
-		ret = new ObjectClass(metadata.id, metadata.name, metadata.category).combineWith(ret);
-		ret.sort();
-		return ret;
+		// The last remaining token has our finished object group
+		ObjectGroup group = tokens.get(0).group;
+		group.sort();
+		group.setCreationKey(key);
+		return group;
 	}
 	
 	public ObjectClassesFile(Path ocFile) throws IOException, ParseException
@@ -380,7 +375,7 @@ public class ObjectClassesFile
 			
 			// Parse the header
 			i = header.indexOf('{');
-			ObjectClassMetadata groupID = parseHeader(header.substring(0, i), startLine);
+			ObjectClassMetadata metadata = parseHeader(header.substring(0, i), startLine);
 			
 			// Read until the next {
 			String body = header.substring(i + 1);
@@ -395,7 +390,8 @@ public class ObjectClassesFile
 			
 			// Parse the body
 			i = body.indexOf('}');
-			classes.add(buildObjectClass(groupID, body.substring(0, i), startLine));
+			ObjectGroup group = buildObjectGroup(body.substring(0, i), startLine);
+			classes.add(new ObjectClass(metadata.id, metadata.name, metadata.category, group));
 			line = body.substring(i + 1);
 		}
 		// Sort the groups alphabetically
@@ -410,7 +406,7 @@ public class ObjectClassesFile
 		classes.sort(new ObjectClass.ObjectClassComparator());
 	}
 	
-	public ObjectClass group(String groupStr) throws Exception
+/*	public ObjectClass group(String groupStr) throws Exception
 	{
 		ObjectClass result = null;
 		
@@ -431,7 +427,7 @@ public class ObjectClassesFile
 		}
 		
 		return result.addCreationKey(groupStr);
-	}
+	}*/
 	
 	public void printEverything()
 	{

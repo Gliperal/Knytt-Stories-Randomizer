@@ -15,7 +15,7 @@ import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.io.IOUtils;
 
-import core.ObjectClass;
+import core.ObjectGroup;
 
 public class KSMap
 {
@@ -184,9 +184,9 @@ public class KSMap
 			s.println();
 	}
 	
-	public ObjectClass allObjects(boolean includeEmpty)
+	public ObjectGroup allObjects(boolean includeEmpty)
 	{
-		ObjectClass objects = new ObjectClass('.', null);
+		ObjectGroup objects = new ObjectGroup();
 		for(Screen s : screens)
 			s.collectObjects(objects, includeEmpty);
 		return objects;

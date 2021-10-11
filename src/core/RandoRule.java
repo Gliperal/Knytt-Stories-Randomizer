@@ -5,8 +5,8 @@ import java.util.Random;
 
 public abstract class RandoRule
 {
-	protected ObjectClass input;
-	protected ObjectClass output;
+	protected ObjectGroup input;
+	protected ObjectGroup output;
 	private String creationKey;
 	
 	protected void readKey(String key, ObjectClassesFile classData) throws ParseException
@@ -14,13 +14,13 @@ public abstract class RandoRule
 		String[] split = key.split("->");
 		if (split.length == 1)
 		{
-			input = classData.buildObjectClass(key, -1).addCreationKey(key);
+			input = classData.buildObjectGroup(key, -1);
 			output = input;
 		}
 		else if (split.length == 2)
 		{
-			input = classData.buildObjectClass(split[0], -1).addCreationKey(split[0]);
-			output = classData.buildObjectClass(split[1], -1).addCreationKey(split[1]);
+			input = classData.buildObjectGroup(split[0], -1);
+			output = classData.buildObjectGroup(split[1], -1);
 		}
 		else
 			throw new ParseException("More than one -> in randomization rule.", -1);
@@ -74,16 +74,16 @@ public abstract class RandoRule
 		return obj;
 	}
 	
-	private String objectClassString(ObjectClass oc)
+	private static String objectGroupString(ObjectGroup group)
 	{
-		return oc.getCreationKey() + " (" + oc.size() + " objects)";
+		return group.getCreationKey() + " (" + group.size() + " objects)";
 	}
 	
 	public String toDisplayString()
 	{
-		String ruleStr = objectClassString(input);
+		String ruleStr = objectGroupString(input);
 		if (input != output)
-			ruleStr += " -> " + objectClassString(output);
+			ruleStr += " -> " + objectGroupString(output);
 		return "Randomization Rule [" + ruleStr + "]";
 	}
 }

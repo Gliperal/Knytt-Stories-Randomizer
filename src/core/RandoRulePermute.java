@@ -18,12 +18,12 @@ public class RandoRulePermute extends RandoRuleTransform
 	public void randomize(KSMap map, Random rand)
 	{
 		// Collect all the relevant objects
-		ObjectClass mapObjects = map.allObjects(input.hasObject(0));
+		ObjectGroup mapObjects = map.allObjects(input.hasObject(0));
 		mapObjects.sort();
 		
 		// Trim input and output down to only use those objects
 		input = input.overlapWith(mapObjects);
-		ObjectClass reducedOutput = output.overlapWith(mapObjects);
+		ObjectGroup reducedOutput = output.overlapWith(mapObjects);
 		if (reducedOutput.size() == 0)
 		{
 			Console.printWarning("Map contains no objects of the type " + output.getCreationKey() + ". Skipping rule.");

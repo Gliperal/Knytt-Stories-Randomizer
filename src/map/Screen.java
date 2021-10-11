@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.zip.GZIPOutputStream;
 
-import core.ObjectClass;
+import core.ObjectGroup;
 import util.Util;
 
 public class Screen
@@ -70,7 +70,7 @@ public class Screen
 		gos.write(data, 0, 3006);
 	}
 	
-	public void collectObjects(ObjectClass objects, boolean includeEmpty)
+	public void collectObjects(ObjectGroup objects, boolean includeEmpty)
 	{
 		for (int layer = 4; layer < 8; layer++)
 		{
