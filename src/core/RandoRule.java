@@ -6,7 +6,7 @@ import java.util.Random;
 public abstract class RandoRule
 {
 	protected ObjectGroup input;
-	protected ObjectGroup output;
+	protected WeightedObjectGroup output;
 	private String creationKey;
 	
 	protected void readKey(String key, ObjectClassesFile classData) throws ParseException
@@ -15,12 +15,12 @@ public abstract class RandoRule
 		if (split.length == 1)
 		{
 			input = classData.buildObjectGroup(key, -1);
-			output = input;
+			output = new WeightedObjectGroup(input);
 		}
 		else if (split.length == 2)
 		{
 			input = classData.buildObjectGroup(split[0], -1);
-			output = classData.buildObjectGroup(split[1], -1);
+			output = new WeightedObjectGroup(classData, split[1]);
 		}
 		else
 			throw new ParseException("More than one -> in randomization rule.", -1);
@@ -65,25 +65,30 @@ public abstract class RandoRule
 	public int conflictsWith(RandoRule that)
 	{
 		int obj = input.firstCommonObject(that.input);
-		if (obj == -1)
-			obj = input.firstCommonObject(that.output);
-		if (obj == -1)
-			obj = output.firstCommonObject(that.input);
-		if (obj == -1)
-			obj = output.firstCommonObject(that.output);
+//		if (obj == -1)
+//			obj = input.firstCommonObject(that.output);
+//		if (obj == -1)
+//			obj = output.firstCommonObject(that.input);
+//		if (obj == -1)
+//			obj = output.firstCommonObject(that.output);
 		return obj;
 	}
 	
-	private static String objectGroupString(ObjectGroup group)
-	{
-		return group.getCreationKey() + " (" + group.size() + " objects)";
-	}
+//	private static String objectGroupString(ObjectGroup group)
+//	{
+//		return group.getCreationKey() + " (" + group.size() + " objects)";
+//	}
+	
+//	public String toDisplayString()
+//	{
+//		String ruleStr = objectGroupString(input);
+//		if (input != output)
+//			ruleStr += " -> " + objectGroupString(output);
+//		return "Randomization Rule [" + ruleStr + "]";
+//	}
 	
 	public String toDisplayString()
 	{
-		String ruleStr = objectGroupString(input);
-		if (input != output)
-			ruleStr += " -> " + objectGroupString(output);
-		return "Randomization Rule [" + ruleStr + "]";
+		return "Randomization Rule [" + creationKey + "]";
 	}
 }

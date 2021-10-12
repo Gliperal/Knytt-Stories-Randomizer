@@ -137,7 +137,7 @@ public class UserSettings
 	private void setSeed(Scanner input)
 	{
 		seed = UserInput.getSeedInput(input, "Enter seed or leave blank for random.");
-		Console.printString("Seed entered.");
+		Console.printString("Seed entered: " + seed);
 	}
 	
 	private void setWorld(Scanner input)

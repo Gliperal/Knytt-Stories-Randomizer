@@ -1,11 +1,11 @@
 package core;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
 import map.KSMap;
-import util.Util;
 
 public class RandoRuleTransform extends RandoRule
 {
@@ -24,9 +24,7 @@ public class RandoRuleTransform extends RandoRule
 		Arrays.sort(inObjs);
 		
 		// Shuffle the output objects as many times as needed to match the size of input
-		int[] outObjs = {};
-		while (outObjs.length < inObjs.length)
-			outObjs = Util.mergeArrays(outObjs, output.toShuffle(rand));
+		ArrayList<Integer> outObjs = output.randomlyFillList(inObjs.length, rand);
 		
 		// Randomize
 		boolean includeEmpty = input.hasObject(0);
@@ -36,7 +34,7 @@ public class RandoRuleTransform extends RandoRule
 			int obj = mapObjects[i];
 			int objIndex = Arrays.binarySearch(inObjs, obj);
 			if (objIndex >= 0)
-				mapObjects[i] = outObjs[objIndex];
+				mapObjects[i] = outObjs.get(objIndex);
 		}
 		map.importObjects(mapObjects, includeEmpty);
 	}

@@ -216,7 +216,7 @@ public class ObjectGroup
 		return Arrays.copyOf(objects, objects.length);
 	}
 	
-	public int[] toShuffle(Random rand)
+/*	public int[] toShuffle(Random rand)
 	{
 		int len = objects.length;
 		ArrayList<Integer> indexes = new ArrayList<Integer>();
@@ -227,6 +227,20 @@ public class ObjectGroup
 		for (int i = 0; i < len; i++)
 			shuffle[i] = objects[indexes.get(i)];
 		return shuffle;
+	}*/
+	
+	public ArrayList<Integer> randomlyFillList(int length, Random rand)
+	{
+		ArrayList<Integer> shuffledObjects = new ArrayList<Integer>();
+		for (int i : objects)
+			shuffledObjects.add(i);
+		ArrayList<Integer> ret = new ArrayList<Integer>();
+		while (ret.size() < length)
+		{
+			Collections.shuffle(shuffledObjects);
+			ret.addAll(shuffledObjects);
+		}
+		return ret;
 	}
 	
 	public int firstCommonObject(ObjectGroup that)

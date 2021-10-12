@@ -23,7 +23,7 @@ public class RandoRulePermute extends RandoRuleTransform
 		
 		// Trim input and output down to only use those objects
 		input = input.overlapWith(mapObjects);
-		ObjectGroup reducedOutput = output.overlapWith(mapObjects);
+		WeightedObjectGroup reducedOutput = output.overlapWith(mapObjects);
 		if (reducedOutput.size() == 0)
 		{
 			Console.printWarning("Map contains no objects of the type " + output.getCreationKey() + ". Skipping rule.");

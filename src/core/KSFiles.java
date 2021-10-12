@@ -244,12 +244,12 @@ public class KSFiles
 	
 	public static KSMap readMap() throws Exception
 	{
+		if (mapFile == null)
+			getMapFile();
 		Path file = (originalMapFile != null) ? originalMapFile : mapFile;
 		try
 		{
-			if (file == null)
-				getMapFile();
-			return new KSMap(mapFile);
+			return new KSMap(file);
 		} catch (NoSuchFileException e)
 		{
 			throw new Exception("Unable to open file " + file);

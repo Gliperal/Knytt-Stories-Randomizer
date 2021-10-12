@@ -72,7 +72,7 @@ public class UserInput
 		// Numerical string is a raw seed
 		try
 		{
-			return Long.parseLong(rawSeed.substring(1));
+			return Long.parseLong(rawSeed);
 		}
 		catch (NumberFormatException e) {}
 		
