@@ -1,5 +1,8 @@
-========= VERSION 2.0.3 =========================================
+========= VERSION 2.0.4 =========================================
 
+Added some default presets.
+Added percentages (e.g. A->B<25>C<75>).
+Fixed a bug where randomizing the same level would not use the original map file.
 Moved WIN tile from All (A) to Essential ($).
 
 

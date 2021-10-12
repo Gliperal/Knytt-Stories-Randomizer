@@ -1,5 +1,9 @@
 package core;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,9 +24,12 @@ public class RulesPresets
 		presets = new HashMap<String, JSONArray>();
 	}
 	
-	public RulesPresets(JSONObject data) throws JSONException
+	public RulesPresets(Path file) throws JSONException, IOException
 	{
 		this();
+		byte[] settingsBytes = Files.readAllBytes(file);
+		String settingsString = new String(settingsBytes);
+		JSONObject data = new JSONObject(settingsString);
 		for (String key : data.keySet())
 			presets.put(key, data.getJSONArray(key));
 	}
@@ -80,7 +87,7 @@ public class RulesPresets
 		return rules;
 	}
 	
-	public JSONObject toJSON()
+	private JSONObject toJSON()
 	{
 		JSONObject presetsJSON = new JSONObject();
 		for (String key : presets.keySet())
@@ -105,5 +112,10 @@ public class RulesPresets
 	public boolean isEmpty()
 	{
 		return presets.isEmpty();
+	}
+	
+	public void saveToFile(Path file) throws IOException
+	{
+		Files.write(file, toJSON().toString().getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 	}
 }

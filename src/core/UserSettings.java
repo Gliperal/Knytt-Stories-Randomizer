@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ public class UserSettings
 			"'-------------------------'---------------------'------------------------'";
 	
 	private Path settingsFile;
+	private Path presetsFile = Paths.get("resources", "Presets.txt");
 	private String world;
 	private Long seed;
 	private ArrayList<RandoRule> randoRules;
@@ -59,7 +61,7 @@ public class UserSettings
 			// Load settings from last randomization by default
 			long time_ago = loadFromFile(classData);
 			if (time_ago < 0)
-				Console.printWarning("Could not load " + filename + ". Presets and previous randomization will not be available.");
+				Console.printWarning("Could not load " + filename + ". Previous randomization will not be available.");
 			else
 			{
 				if (time_ago > 0)
@@ -71,6 +73,16 @@ public class UserSettings
 		}
 		else
 			firstLaunch = true;
+		
+		// Try to load presets
+		try {
+			presets = new RulesPresets(presetsFile);
+		}
+		catch(JSONException e) {}
+		catch(IOException e)
+		{
+			Console.printWarning("Could not load " + presetsFile.getFileName() + ". Saved presets will not be available.");
+		}
 	}
 	
 	/**
@@ -116,12 +128,6 @@ public class UserSettings
 			Console.printRed("Error parsing rules: " + e.getMessage() + " (line " + e.getErrorOffset() + ")");
 			randoRules = null;
 		}
-		
-		// Presets
-		try {
-			JSONObject presetsJSON = data.getJSONObject("presets");
-			presets = new RulesPresets(presetsJSON);
-		} catch(JSONException e) {}
 		
 		// Loaded successfully
 		try
@@ -283,7 +289,7 @@ public class UserSettings
 			ArrayList<RandoRule> rules = presets.loadPreset(input, classData);
 			if (rules != null)
 			{
-				if (append)
+				if (append && randoRules != null)
 					randoRules.addAll(rules);
 				else
 					randoRules = rules;
@@ -456,17 +462,7 @@ public class UserSettings
 	
 	public void savePresetsToFile() throws IOException
 	{
-		JSONObject data;
-		if (Files.exists(settingsFile))
-		{
-			byte[] settingsBytes = Files.readAllBytes(settingsFile);
-			String settingsString = new String(settingsBytes);
-			data = new JSONObject(settingsString);
-		}
-		else
-			data = new JSONObject();
-		data.put("presets", presets.toJSON());
-		Files.write(settingsFile, data.toString().getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+		presets.saveToFile(presetsFile);
 	}
 	
 	public void saveSettingsToFile() throws IOException
@@ -478,8 +474,6 @@ public class UserSettings
 		for (RandoRule r : randoRules)
 			rulesJSON.put(r.saveToString());
 		data.put("rules", rulesJSON);
-		if (!presets.isEmpty())
-			data.put("presets", presets.toJSON());
 		data.put("timestamp", System.currentTimeMillis());
 		Files.write(settingsFile, data.toString().getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 	}

@@ -19,6 +19,7 @@ public class WeightedObjectGroup
 	
 	public WeightedObjectGroup(ObjectGroup group)
 	{
+		this();
 		creationKey = group.getCreationKey();
 		groups.add(group);
 		weights.add(1.0);
