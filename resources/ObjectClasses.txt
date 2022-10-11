@@ -293,7 +293,6 @@ A:all (except for gamebreaking stuff)
 	15:23,
 	15:24,
 	15:26,
-	16:1,
 }
 
 %:often mandatory to reach certain areas
@@ -318,7 +317,8 @@ $:these objects are essential for some maps to run properly
 	0:14,
 	0:15,
 	0:16,
-	0:20
+	0:20,
+	16:1,
 }
 
 !:literally everything
