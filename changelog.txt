@@ -1,3 +1,7 @@
+Object classes can now accept arbitrary-length ids.
+Added Knytt Stories Plus companion mod.
+	Settings to make invisible objects visible (springs, death tiles, etc.)
+	Noise removal for enemies stuck in walls.
 Moved springs into gamebreaking objects.
 
 

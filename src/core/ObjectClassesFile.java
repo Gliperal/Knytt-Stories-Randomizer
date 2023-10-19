@@ -31,10 +31,10 @@ public class ObjectClassesFile
 		return line;
 	}
 	
-	private ObjectClass getObjectClass(char id)
+	private ObjectClass getFirstObjectClass(String str)
 	{
 		for (ObjectClass oc : classes)
-			if (oc.hasID(id))
+			if (str.startsWith(oc.id))
 				return oc;
 		return null;
 	}
@@ -51,53 +51,43 @@ public class ObjectClassesFile
 			if (i == header.length())
 				throw new ParseException("Expected id for object class.", line);
 		}
-		
-		// Next character should be a char ID for the object class
-		char id = header.charAt(i);
-		
-		// Check that no other object classes have the same id
+
+		// TODO More accurate line information for errors
+
+		// Split header into id, name, and category
+		int count = Util.countCharOccurances(header, ':');
+		if (count > 2)
+			throw new ParseException("Too many \":\" in object class header.", line);
+		String[] split = header.split(":");
+
+		// First element: id
+		String id = split[0].strip();
+		if (id.isEmpty())
+			throw new ParseException("Expected object class id.", line);
+		int x = Util.firstIndexOf(id, "\n,&+-()");
+		if (x != -1)
+			throw new ParseException("Special character found in object class id: \"" + id.charAt(x) + "\"", line);
+
+		// Check for object class id conflicts
 		for (ObjectClass oc : classes)
-			if (oc.hasID(id))
-				throw new ParseException("Multiple object classes with id " + id + ".", line);
-		
-		// Read until the first non-whitespace (if none, the object class only has an id and no name)
-		i++;
-		while (Character.isWhitespace(header.charAt(i)))
-		{
-			if (header.charAt(i) == '\n')
-				line++;
-			i++;
-			if (i == header.length())
-				return new ObjectClassMetadata(id, null);
-		}
-		
-		// The next character should be a :
-		if (header.charAt(i) != ':')
-			throw new ParseException("Expected \":\" after object class id.", line);
-		
-		// Read until the first non-whitespace
-		i++;
-		while (Character.isWhitespace(header.charAt(i)))
-		{
-			if (header.charAt(i) == '\n')
-				line++;
-			i++;
-			if (i == header.length())
-				throw new ParseException("Expected name for object class after :", line);
-		}
-		
-		// Split on the next : (if it exists), separating name and category
-		int split = header.indexOf(':', i);
-		if (split != -1)
-		{
-			String name = header.substring(i, split).trim();
-			String category = header.substring(split + 1).trim();
-			return new ObjectClassMetadata(id, name, category);
-		}
-		
-		// If not, then just read the name
-		String name = header.substring(i).trim();
-		return new ObjectClassMetadata(id, name);
+			if (oc.id.startsWith(id) || id.startsWith(oc.id))
+				throw new ParseException("Object class id begins with the id of another class: " + oc.id + " and " + id + ".", line);
+
+		// One element: id only and no name
+		if (split.length == 1)
+			return new ObjectClassMetadata(id, null);
+
+		// Second element: name
+		String name = split[1].strip();
+		if (name.isEmpty())
+			return new ObjectClassMetadata(id, null);
+		if (split.length == 2)
+			return new ObjectClassMetadata(id, name);
+
+		// Third element: category
+		String category = split[2].strip();
+		// category should never be empty, because then split() would have ignored it
+		return new ObjectClassMetadata(id, name, category);
 	}
 	
 	private enum TokenType { group, and, minus, plus, openParen, closeParen };
@@ -318,14 +308,14 @@ public class ObjectClassesFile
 			}
 			else
 			{
-				ObjectClass oc = getObjectClass(c);
+				ObjectClass oc = getFirstObjectClass(key.substring(i));
 				if (oc == null)
 				{
 					String snippet = Util.trimStringForPrinting(key.substring(i));
 					throw new ParseException("Couldn't parse object format near \"" + snippet + "\"", line);
 				}
 				tokens.add(new Token(oc.group, line));
-				i++;
+				i += oc.id.length();
 			}
 		}
 		if (tokens.isEmpty())
@@ -405,29 +395,6 @@ public class ObjectClassesFile
 	{
 		classes.sort(new ObjectClass.ObjectClassComparator());
 	}
-	
-/*	public ObjectClass group(String groupStr) throws Exception
-	{
-		ObjectClass result = null;
-		
-		for (char classID : groupStr.toCharArray())
-		{
-			boolean badClassID = true;
-			for (ObjectClass oc : classes)
-				if (oc.hasID(classID))
-				{
-					badClassID = false;
-					if (result == null)
-						result = oc;
-					else
-						result = result.combineWith(oc);
-				}
-			if (badClassID)
-				throw new Exception("No object class matching ID " + classID);
-		}
-		
-		return result.addCreationKey(groupStr);
-	}*/
 	
 	public void printEverything()
 	{

@@ -4,34 +4,38 @@ import java.util.Comparator;
 
 public class ObjectClass
 {
-	public char id;
+	public String id;
 	public String name;
 	public String category;
 	public ObjectGroup group;
 	
-	// all base classes have a character id and optionally a name and category
-	// for combined classes, id is 0 and key is used instead
-	public ObjectClass(char id, String name, ObjectGroup group)
+	// all base classes have a string id and optionally a name and category
+	public ObjectClass(String id, String name, ObjectGroup group)
 	{
-		this.id = Character.toUpperCase(id);
+		this.id = formatID(id);
 		this.name = name;
 		this.group = group;
 	}
 	
-	public ObjectClass(char id, String name, String category, ObjectGroup group)
+	public ObjectClass(String id, String name, String category, ObjectGroup group)
 	{
 		this(id, name, group);
 		this.category = category;
 	}
-	
-	public boolean hasID(char id)
+
+	public static String formatID(String id)
 	{
-		return this.id == Character.toUpperCase(id);
+		return id.substring(0, 1).toUpperCase() + id.substring(1).toLowerCase();
+	}
+	
+	public boolean hasID(String id)
+	{
+		return this.id == formatID(id);
 	}
 	
 	public String indentifier()
 	{
-		return Character.toUpperCase(id) + ": " + name;
+		return id + ": " + name;
 	}
 	
 	public String getCategory()
@@ -60,6 +64,6 @@ public class ObjectClass
 	
 	public int cmp(ObjectClass b)
 	{
-		return id - b.id;
+		return id.compareTo(b.id);
 	}
 }
