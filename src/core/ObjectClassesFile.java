@@ -61,7 +61,7 @@ public class ObjectClassesFile
 		String[] split = header.split(":");
 
 		// First element: id
-		String id = split[0].strip();
+		String id = split[0].trim();
 		if (id.isEmpty())
 			throw new ParseException("Expected object class id.", line);
 		int x = Util.firstIndexOf(id, "\n,&+-()");
@@ -78,18 +78,18 @@ public class ObjectClassesFile
 			return new ObjectClassMetadata(id, null);
 
 		// Second element: name
-		String name = split[1].strip();
+		String name = split[1].trim();
 		if (name.isEmpty())
 			return new ObjectClassMetadata(id, null);
 		if (split.length == 2)
 			return new ObjectClassMetadata(id, name);
 
 		// Third element: category
-		String category = split[2].strip();
+		String category = split[2].trim();
 		// category should never be empty, because then split() would have ignored it
 		return new ObjectClassMetadata(id, name, category);
 	}
-	
+
 	private enum TokenType { group, and, minus, plus, openParen, closeParen };
 	private class Token
 	{
