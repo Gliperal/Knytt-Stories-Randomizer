@@ -14,12 +14,12 @@ public abstract class RandoRule
 		String[] split = key.split("->");
 		if (split.length == 1)
 		{
-			input = classData.buildObjectGroup(key, -1);
+			input = classData.buildObjectGroup(key);
 			output = new WeightedObjectGroup(input);
 		}
 		else if (split.length == 2)
 		{
-			input = classData.buildObjectGroup(split[0], -1);
+			input = classData.buildObjectGroup(split[0]);
 			output = new WeightedObjectGroup(classData, split[1]);
 		}
 		else

@@ -1,8 +1,6 @@
 package core;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -14,22 +12,7 @@ import util.Util;
 // TODO Make this into a singleton?
 public class ObjectClassesFile
 {
-	private int lineNumber; // For use with the constructor error messages
 	private ArrayList<ObjectClass> classes;
-	
-	private String readLine(BufferedReader br) throws IOException
-	{
-		String line = "";
-		while (line.isEmpty())
-		{
-			lineNumber++;
-			line = br.readLine();
-			if (line == null)
-				return line;
-			line = line.trim();
-		}
-		return line;
-	}
 	
 	private ObjectClass getFirstObjectClass(String str)
 	{
@@ -39,55 +22,48 @@ public class ObjectClassesFile
 		return null;
 	}
 	
-	private ObjectClassMetadata parseHeader(String header, int line) throws ParseException
+	private ObjectClassMetadata parseHeader(FilePiece header) throws ParseException
 	{
-		// Read until the first non-whitespace
-		int i = 0;
-		while (Character.isWhitespace(header.charAt(i)))
-		{
-			if (header.charAt(i) == '\n')
-				line++;
-			i++;
-			if (i == header.length())
-				throw new ParseException("Expected id for object class.", line);
-		}
-
-		// TODO More accurate line information for errors
+		// Strip whitespace
+		if (header.isBlank())
+			throw new ParseException("Expected id for object class.", header.getLine());
+		header = header.trim();
 
 		// Split header into id, name, and category
-		int count = Util.countCharOccurances(header, ':');
-		if (count > 2)
-			throw new ParseException("Too many \":\" in object class header.", line);
-		String[] split = header.split(":");
+		FilePiece[] split = header.split(':');
+		if (split.length > 3)
+			throw new ParseException("Too many \":\" in object class header.", header.getLine());
 
 		// First element: id
-		String id = split[0].trim();
-		if (id.isEmpty())
-			throw new ParseException("Expected object class id.", line);
+		FilePiece id = split[0].trim();
+		if (id.isBlank())
+			throw new ParseException("Expected object class id.", id.getLine());
 		int x = Util.firstIndexOf(id, "\n,&+-()");
 		if (x != -1)
-			throw new ParseException("Special character found in object class id: \"" + id.charAt(x) + "\"", line);
+			throw new ParseException("Special character found in object class id: \"" + id.charAt(x) + "\"", id.getLine());
 
 		// Check for object class id conflicts
 		for (ObjectClass oc : classes)
-			if (oc.id.startsWith(id) || id.startsWith(oc.id))
-				throw new ParseException("Object class id begins with the id of another class: " + oc.id + " and " + id + ".", line);
+			if (oc.id.startsWith(id.toString()) || id.startsWith(oc.id))
+				throw new ParseException("Object class id begins with the id of another class: " + oc.id + " and " + id + ".", id.getLine());
 
 		// One element: id only and no name
 		if (split.length == 1)
-			return new ObjectClassMetadata(id, null);
+			return new ObjectClassMetadata(id.toString(), null);
 
 		// Second element: name
-		String name = split[1].trim();
-		if (name.isEmpty())
-			return new ObjectClassMetadata(id, null);
+		FilePiece name = split[1].trim();
+		if (name.isBlank())
+			return new ObjectClassMetadata(id.toString(), null);
 		if (split.length == 2)
-			return new ObjectClassMetadata(id, name);
+			return new ObjectClassMetadata(id.toString(), name.toString());
 
 		// Third element: category
-		String category = split[2].trim();
-		// category should never be empty, because then split() would have ignored it
-		return new ObjectClassMetadata(id, name, category);
+		FilePiece category = split[2].trim();
+		if (category.isBlank())
+			return new ObjectClassMetadata(id.toString(), name.toString());
+		else
+			return new ObjectClassMetadata(id.toString(), name.toString(), category.toString());
 	}
 
 	private enum TokenType { group, and, minus, plus, openParen, closeParen };
@@ -96,18 +72,20 @@ public class ObjectClassesFile
 		public TokenType type;
 		public ObjectGroup group;
 		public int lineNumber;
-		
+
 		public Token(TokenType type, int lineNumber)
 		{
 			this.type = type;
+			this.lineNumber = lineNumber;
 		}
-		
+
 		public Token(ObjectGroup group, int lineNumber)
 		{
 			this.type = TokenType.group;
 			this.group = group;
+			this.lineNumber = lineNumber;
 		}
-		
+
 		public String toString()
 		{
 			switch(type)
@@ -242,7 +220,7 @@ public class ObjectClassesFile
 		tokens.remove(start + 1);
 	}
 	
-	public ObjectGroup buildObjectGroup(String key, int line) throws ParseException
+	public ObjectGroup buildObjectGroup(FilePiece key) throws ParseException
 	{
 		// Tokenize
 		int i = 0;
@@ -252,7 +230,6 @@ public class ObjectClassesFile
 			char c = key.charAt(i);
 			if (c == '\n')
 			{
-				line++;
 				i++;
 			}
 			else if (c == ',' || Character.isWhitespace(c))
@@ -261,27 +238,27 @@ public class ObjectClassesFile
 			}
 			else if (c == '&')
 			{
-				tokens.add(new Token(TokenType.and, line));
+				tokens.add(new Token(TokenType.and, key.lineOf(i)));
 				i++;
 			}
 			else if (c == '-')
 			{
-				tokens.add(new Token(TokenType.minus, line));
+				tokens.add(new Token(TokenType.minus, key.lineOf(i)));
 				i++;
 			}
 			else if (c == '+')
 			{
-				tokens.add(new Token(TokenType.plus, line));
+				tokens.add(new Token(TokenType.plus, key.lineOf(i)));
 				i++;
 			}
 			else if (c == '(')
 			{
-				tokens.add(new Token(TokenType.openParen, line));
+				tokens.add(new Token(TokenType.openParen, key.lineOf(i)));
 				i++;
 			}
 			else if (c == ')')
 			{
-				tokens.add(new Token(TokenType.closeParen, line));
+				tokens.add(new Token(TokenType.closeParen, key.lineOf(i)));
 				i++;
 			}
 			else if (Character.isDigit(c))
@@ -289,39 +266,39 @@ public class ObjectClassesFile
 				try
 				{
 					int j = key.indexOf(':', i);
-					int bank = Integer.parseInt(key.substring(i, j));
+					int bank = key.substring(i, j).toInt();
 					int k = j + 1;
 					while (k < key.length() && Character.isDigit(key.charAt(k)))
 						k++;
-					int object = Integer.parseInt(key.substring(j + 1, k));
+					int object = key.substring(j + 1, k).toInt();
 					// assign the same id and name to all the tokens (eventually they'll be merged down into one)
 					ObjectGroup group = new ObjectGroup();
 					group.add((byte) bank, (byte) object);
-					tokens.add(new Token(group, line));
+					tokens.add(new Token(group, key.lineOf(i)));
 					i = k;
 				}
 				catch (Exception e)
 				{
-					String snippet = Util.trimStringForPrinting(key.substring(i));
-					throw new ParseException("Couldn't parse object format near \"" + snippet + "\"", line);
+					String snippet = Util.trimStringForPrinting(key.substring(i).toString());
+					throw new ParseException("Couldn't parse object format near \"" + snippet + "\"", key.lineOf(i));
 				}
 			}
 			else
 			{
-				ObjectClass oc = getFirstObjectClass(key.substring(i));
+				ObjectClass oc = getFirstObjectClass(key.substring(i).toString());
 				if (oc == null)
 				{
-					String snippet = Util.trimStringForPrinting(key.substring(i));
-					throw new ParseException("Couldn't parse object format near \"" + snippet + "\"", line);
+					String snippet = Util.trimStringForPrinting(key.substring(i).toString());
+					throw new ParseException("Couldn't parse object format near \"" + snippet + "\"", key.lineOf(i));
 				}
-				tokens.add(new Token(oc.group, line));
+				tokens.add(new Token(oc.group, key.lineOf(i)));
 				i += oc.id.length();
 			}
 		}
 		if (tokens.isEmpty())
-			throw new ParseException("Empty object class.", line);
-		
-		tokens.add(new Token(TokenType.closeParen, line)); // add ) to indicate end of expression
+			throw new ParseException("Empty object class.", key.getLine());
+
+		tokens.add(new Token(TokenType.closeParen, key.lineOf(i))); // add ) to indicate end of expression
 		evaluateTokens(tokens, 0);
 		if (tokens.size() > 1)
 			throw new ParseException("Unbalanced parenthesis.", tokens.get(0).lineNumber);
@@ -329,66 +306,52 @@ public class ObjectClassesFile
 		// The last remaining token has our finished object group
 		ObjectGroup group = tokens.get(0).group;
 		group.sort();
-		group.setCreationKey(key);
+		group.setCreationKey(key.toString());
 		return group;
+	}
+	
+	public ObjectGroup buildObjectGroup(String key) throws ParseException
+	{
+		return buildObjectGroup(new FilePiece(key, -1, -1));
 	}
 	
 	public ObjectClassesFile(Path ocFile) throws IOException, ParseException
 	{
 		classes = new ArrayList<ObjectClass>();
-		BufferedReader br = Files.newBufferedReader(ocFile);
-		lineNumber = -1;
-		String line = "";
+		FilePiece contents = new FilePiece(ocFile);
 		int i;
-		int startLine;
+
 		while (true)
 		{
 			// Read until the next {
-			String header = line;
-			startLine = lineNumber;
-			while (header.indexOf('{') == -1)
+			i = contents.indexOf('{');
+			if (i == -1)
 			{
-				line = readLine(br);
-				if (line == null)
-					break;
-				header += "\n" + line;
-			}
-			
-			// End of file
-			if (line == null)
-			{
-				if (header.matches("\\s*"))
+				// End of file
+				if (contents.matches("\\s*"))
 					break;
 				else
-					throw new ParseException("Unexpected end of file.", lineNumber);
+					throw new ParseException("Unexpected text after last object group.", contents.getLine());
 			}
-			
+			FilePiece header = contents.substring(0, i);
+			contents = contents.substring(i + 1);
+
 			// Parse the header
-			i = header.indexOf('{');
-			ObjectClassMetadata metadata = parseHeader(header.substring(0, i), startLine);
-			
-			// Read until the next {
-			String body = header.substring(i + 1);
-			startLine = lineNumber;
-			while (body.indexOf('}') == -1)
-			{
-				line = readLine(br);
-				if (line == null)
-					throw new ParseException("Expected \"}\" to match \"}\"", startLine);
-				body += "\n" + line;
-			}
-			
+			ObjectClassMetadata metadata = parseHeader(header);
+
+			// Read until the next }
+			i = contents.indexOf('}');
+			if (i == -1)
+				throw new ParseException("Unmatched \"{\"", contents.getLine());
+			FilePiece body = contents.substring(0, i);
+			contents = contents.substring(i + 1);
+
 			// Parse the body
-			i = body.indexOf('}');
-			ObjectGroup group = buildObjectGroup(body.substring(0, i), startLine);
+			ObjectGroup group = buildObjectGroup(body);
 			classes.add(new ObjectClass(metadata.id, metadata.name, metadata.category, group));
-			line = body.substring(i + 1);
 		}
 		// Sort the groups alphabetically
 		sort();
-		
-		// Close the reader
-		br.close();
 	}
 	
 	private void sort()

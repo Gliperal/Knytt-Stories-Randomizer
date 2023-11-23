@@ -33,7 +33,7 @@ public class WeightedObjectGroup
 		// Standard object group
 		if (!creationKey.contains("<"))
 		{
-			groups.add(classData.buildObjectGroup(creationKey, -1));
+			groups.add(classData.buildObjectGroup(creationKey));
 			weights.add(1.0);
 			return;
 		}
@@ -50,7 +50,7 @@ public class WeightedObjectGroup
 			}
 			String groupKey = key.substring(0, i).trim();
 			key = key.substring(i + 1);
-			groups.add(classData.buildObjectGroup(groupKey, -1));
+			groups.add(classData.buildObjectGroup(groupKey));
 			i = key.indexOf('>');
 			if (i == -1)
 				throw new ParseException("Unmatched <", -1);

@@ -2,6 +2,8 @@ package util;
 
 import java.util.ArrayList;
 
+import core.FilePiece;
+
 public class Util
 {
 	public static ArrayList<Integer> keywordMatch(ArrayList<String> list, String[] keywords)
@@ -122,6 +124,11 @@ public class Util
 				return i;
 		return -1;
 	}
+
+	public static int firstIndexOf(FilePiece str, String chs)
+	{
+		return firstIndexOf(str.toString(), chs);
+	}
 	
 	public static int lastIndexOf(String str, String chs, int end)
 	{
@@ -129,14 +136,5 @@ public class Util
 			if (chs.indexOf(str.charAt(i)) != -1)
 				return i;
 		return -1;
-	}
-
-	public static int countCharOccurances(String str, char c)
-	{
-		int count = 0;
-		for (int i = 0; i < str.length(); i++)
-			if (str.charAt(i) == c)
-				count++;
-		return count;
 	}
 }
