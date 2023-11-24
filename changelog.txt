@@ -1,4 +1,6 @@
 TODO: Object classes revamp (thanks to DonDoli).
+Added various new toggles to make objects visible.
+Improved line number tracking for ObjectClasses file errors.
 Object classes can now accept arbitrary-length ids.
 Added Knytt Stories Plus companion mod.
 	Settings to make invisible objects visible (springs, death tiles, etc.)
