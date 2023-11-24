@@ -12,7 +12,7 @@ public class UserInput
 	{
 		for (int i = 0; i < chars.length; i++)
 			chars[i] = Character.toUpperCase(chars[i]);
-		
+
 		while (true)
 		{
 			if (prompt != null)
@@ -25,7 +25,7 @@ public class UserInput
 				for (char c : chars)
 					if (c == inputChar)
 						return c;
-			
+
 			Console.putString("Please respond with ");
 			for (int i = 0; i < chars.length; i++)
 			{
@@ -38,7 +38,7 @@ public class UserInput
 			Console.printString(".");
 		}
 	}
-	
+
 	public static boolean getBooleanInput(Scanner input, String prompt)
 	{
 		while (true)
@@ -58,24 +58,24 @@ public class UserInput
 			}
 		}
 	}
-	
+
 	public static Long getSeedInput(Scanner input, String prompt)
 	{
 		// Get user input
 		Console.printString(prompt);
 		String rawSeed = input.nextLine();
-		
+
 		// Empty string is a null seed (will be generated later)
 		if (rawSeed.isEmpty())
 			return null;
-		
+
 		// Numerical string is a raw seed
 		try
 		{
 			return Long.parseLong(rawSeed);
 		}
 		catch (NumberFormatException e) {}
-		
+
 		// Convert string seed into a long
 		long seed = 0;
 		for (char c : rawSeed.toCharArray())
@@ -83,21 +83,21 @@ public class UserInput
 			seed *= 127;
 			seed += c;
 		}
-		
+
 		// Generate a seed for the map based on the user's seed.
 		// (so that short strings won't generate low seed numbers)
 		Random rand = new Random(seed);
 		long mapSeed = rand.nextLong();
 		return mapSeed;
 	}
-	
+
 	public static void waitForEnter(Scanner input, String prompt)
 	{
 		if (prompt != null)
 			Console.printString(prompt);
 		input.nextLine();
 	}
-	
+
 	public static int getInputFromList(Scanner input, String prompt, String unit, ArrayList<String> list)
 	{
 		String inputStr;
@@ -121,12 +121,12 @@ public class UserInput
 				showDisplay = false;
 			}
 			Console.printString(prompt + " Enter " + unit + " ID. Enter a string to search or ##-## to see all " + unit + "s in a range. Leave blank to cancel.");
-			
+
 			// Get user input
 			inputStr = input.nextLine();
 			if (inputStr.isEmpty())
 				return -1;
-			
+
 			// Change page
 			if (inputStr.toLowerCase().equals("u"))
 			{
@@ -144,7 +144,7 @@ public class UserInput
 				showDisplay = true;
 				continue;
 			}
-			
+
 			// input = ID (return)
 			Integer choice = Util.stringToInteger(inputStr);
 			if (choice != null)
@@ -155,7 +155,7 @@ public class UserInput
 					Console.printString(choice + " is out of the range of available options.");
 				continue;
 			}
-			
+
 			// input = ##-## (range)
 			int[] range = Util.stringToRange(inputStr);
 			if (range != null)
@@ -169,7 +169,7 @@ public class UserInput
 						Console.printString("\t" + i + ". " + list.get(i));
 				continue;
 			}
-			
+
 			// input = string (search)
 			ArrayList<Integer> matches = Util.keywordMatch(list, inputStr.split("\\s+"));
 			if (matches.size() == 0)

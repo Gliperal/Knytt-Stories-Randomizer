@@ -13,7 +13,7 @@ public class Screen
 	private byte[] data;
 	// Corresponds to the byte sequence 0 190 11 0 0, or 0 [3006 in little endian] 0 0
 	private static final String endOfHeader = "\u0000\uFFBE\u000B\u0000\u0000";
-	
+
 	public Screen(String location, byte[] data)
 	{
 		this.header = location;
@@ -21,19 +21,19 @@ public class Screen
 		for (int i = 0; i < 3006; i++)
 			this.data[i] = data[i];
 	}
-	
+
 	public byte tileAt(int layer, int x, int y)
 	{
 		return data[layer*250 + y*25 + x];
 	}
-	
+
 	public byte[] objectAt(int layer, int x, int y)
 	{
 		byte obj = data[layer*500 - 1000 + y*25 + x];
 		byte bank = data[layer*500 - 750 + y*25 + x];
 		return new byte[] {bank, obj};
 	}
-	
+
 	public void println()
 	{
 		System.out.println("Screen " + header);
@@ -55,7 +55,7 @@ public class Screen
 			System.out.println();
 		}
 	}
-	
+
 	public void writeTo(GZIPOutputStream gos) throws IOException
 	{
 		// Write header
@@ -65,11 +65,11 @@ public class Screen
 		for (int i = 0; i < headerSize; i++)
 			headerBytes[i] = (byte) combinedHeader.charAt(i);
 		gos.write(headerBytes, 0, headerSize);
-		
+
 		// Write data
 		gos.write(data, 0, 3006);
 	}
-	
+
 	public void collectObjects(ObjectGroup objects, boolean includeEmpty)
 	{
 		for (int layer = 4; layer < 8; layer++)
@@ -85,7 +85,7 @@ public class Screen
 			}
 		}
 	}
-	
+
 	public void exportObjects(ArrayList<Integer> list, boolean includeEmpty)
 	{
 		for (int layer = 4; layer < 8; layer++)
@@ -101,7 +101,7 @@ public class Screen
 			}
 		}
 	}
-	
+
 	public int importObjects(int[] arr, int offset, boolean includeEmpty)
 	{
 		for (int layer = 4; layer < 8; layer++)
@@ -120,12 +120,12 @@ public class Screen
 		}
 		return offset;
 	}
-	
+
 	public byte getMusic()
 	{
 		return data[3004];
 	}
-	
+
 	public void setMusic(byte value)
 	{
 		data[3004] = value;

@@ -5,7 +5,7 @@ import util.Util;
 public class Console
 {
 	public static final int MAX_LENGTH = 79;
-	
+
 	public static void putString(String string)
 	{
 		while (string.length() > MAX_LENGTH)
@@ -22,32 +22,32 @@ public class Console
 		}
 		System.out.print(string);
 	}
-	
+
 	public static void printString(String str)
 	{
 		putString(str + "\n");
 	}
-	
+
 	public static void printf(String format, Object... args)
 	{
 		putString(String.format(format, args));
 	}
-	
+
 	public static void printWarning(String str)
 	{
 		printString("WARNING: " + str);
 	}
-	
+
 	public static void printRed(String err)
 	{
 		printString(err);
 	}
-	
+
 	public static void printError(String err)
 	{
 		printRed("ERROR: " + err);
 	}
-	
+
 	public static void debug(String str, int foo)
 	{
 		System.out.println("DEBUG>>> " + str);

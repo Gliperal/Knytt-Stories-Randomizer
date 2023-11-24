@@ -8,7 +8,7 @@ public abstract class RandoRule
 	protected ObjectGroup input;
 	protected WeightedObjectGroup output;
 	private String creationKey;
-	
+
 	protected void readKey(String key, ObjectClassesFile classData) throws ParseException
 	{
 		String[] split = key.split("->");
@@ -26,7 +26,7 @@ public abstract class RandoRule
 			throw new ParseException("More than one -> in randomization rule.", -1);
 		creationKey = key;
 	}
-	
+
 	public static RandoRule create(char type, String key, ObjectClassesFile classData) throws ParseException
 	{
 		switch(type)
@@ -43,7 +43,7 @@ public abstract class RandoRule
 			return null;
 		}
 	}
-	
+
 	public static RandoRule loadFromString(String str, ObjectClassesFile classData) throws ParseException
 	{
 		if (str.length() < 1)
@@ -52,16 +52,16 @@ public abstract class RandoRule
 		String key = str.substring(1);
 		return create(type, key, classData);
 	}
-	
+
 	public abstract void randomize(map.KSMap map, Random rand);
-	
+
 	protected abstract char getID();
-	
+
 	public String saveToString()
 	{
 		return getID() + creationKey;
 	}
-	
+
 	public int conflictsWith(RandoRule that)
 	{
 		int obj = input.firstCommonObject(that.input);
@@ -73,12 +73,12 @@ public abstract class RandoRule
 //			obj = output.firstCommonObject(that.output);
 		return obj;
 	}
-	
+
 //	private static String objectGroupString(ObjectGroup group)
 //	{
 //		return group.getCreationKey() + " (" + group.size() + " objects)";
 //	}
-	
+
 //	public String toDisplayString()
 //	{
 //		String ruleStr = objectGroupString(input);
@@ -86,7 +86,7 @@ public abstract class RandoRule
 //			ruleStr += " -> " + objectGroupString(output);
 //		return "Randomization Rule [" + ruleStr + "]";
 //	}
-	
+
 	public String toDisplayString()
 	{
 		return "Randomization Rule [" + creationKey + "]";

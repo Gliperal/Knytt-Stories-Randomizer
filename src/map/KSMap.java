@@ -20,12 +20,12 @@ import core.ObjectGroup;
 public class KSMap
 {
 	private ArrayList<Screen> screens;
-	
+
 	public KSMap()
 	{
 		screens = new ArrayList<Screen>();
 	}
-	
+
 	private static String readScreenHeader(GZIPInputStream gis) throws Exception
 	{
 		byte[] buffer = new byte[1];
@@ -37,18 +37,18 @@ public class KSMap
 			bytesRead = gis.read(buffer);
 			if (bytesRead == -1)
 				return null;
-			
+
 			// null character denotes end of header
 			if (buffer[0] == 0)
 				return header;
-			
+
 			// Append character
 			header += (char) buffer[0];
 			if (header.length() > 20) // No header should realistically be this long
 				throw new Exception("Unable to parse headers.");
 		}
 	}
-	
+
 	private static boolean discardBytes(GZIPInputStream gis, int bytesToDiscard) throws IOException
 	{
 		byte[] dump = new byte[1024];
@@ -69,14 +69,14 @@ public class KSMap
 		}
 		return true;
 	}
-	
+
 	private static byte[] readScreenData(GZIPInputStream gis) throws Exception
 	{
 		byte[] screenData = new byte[3006];
 		byte[] buffer = new byte[1];
 		int bytesSoFar;
 		int bytesRead;
-		
+
 		// Read size of screen data
 		int size = 0;
 		int currentPlace = 0;
@@ -87,7 +87,7 @@ public class KSMap
 			bytesRead = gis.read(buffer);
 			if (bytesRead == -1)
 				throw new Exception("Unexpected end of file (2).");
-			
+
 			// two zeros in a row denotes end of size
 			if (buffer[0] == 0)
 			{
@@ -97,13 +97,13 @@ public class KSMap
 			}
 			else
 				lastByteWasZero = false;
-			
+
 			// Add to the size
 			int unsignedValue = (buffer[0] < 0) ? buffer[0] + 256 : buffer[0];
 			size += Math.pow(256, currentPlace) * unsignedValue;
 			currentPlace++;
 		}
-		
+
 		// Evaluate the size: 3006 is the normal size of a screen
 		if (size != 3006)
 		{
@@ -127,17 +127,17 @@ public class KSMap
 			return screenData;
 		}
 	}
-	
+
 	public KSMap(Path mapFile) throws Exception
 	{
 		screens = new ArrayList<Screen>();
-		
+
 		// Setup GZip for map reading
 		InputStream is = Files.newInputStream(mapFile);
 		byte[] ba = IOUtils.toByteArray(is);
 		ByteArrayInputStream bis = new ByteArrayInputStream(ba);
 		GZIPInputStream gis = new GZIPInputStream(bis);
-		
+
 		// Read map data, one screen at a time
 		String header;
 		byte[] screenData;
@@ -147,43 +147,43 @@ public class KSMap
 			header = readScreenHeader(gis);
 			if (header == null)
 				break;
-			
+
 			// Read screen data (will always be the next 3006 bytes)
 			screenData = readScreenData(gis);
 			if (screenData == null)
 				continue;
-			
+
 			// Package information into screen
 			Screen s = new Screen(header, screenData);
 			screens.add(s);
 		}
-		
+
 		// Close resources
 		bis.close();
 		is.close();
 		gis.close();
 	}
-	
+
 	public void saveToFile(Path mapFile) throws IOException
 	{
 		// Setup GZip for map writing
 		OutputStream os = Files.newOutputStream(mapFile);
 		GZIPOutputStream gos = new GZIPOutputStream(os);
-		
+
 		// Write data one screen at a time
 		for (Screen screen : screens)
 			screen.writeTo(gos);
-		
+
 		// Finalize
 		gos.close();
 	}
-	
+
 	public void printScreens()
 	{
 		for(Screen s : screens)
 			s.println();
 	}
-	
+
 	public ObjectGroup allObjects(boolean includeEmpty)
 	{
 		ObjectGroup objects = new ObjectGroup();
@@ -191,7 +191,7 @@ public class KSMap
 			s.collectObjects(objects, includeEmpty);
 		return objects;
 	}
-	
+
 	/**
 	 * Creates an array containing the integer representation of every object in the level, in the order they are stored in the file.
 	 * @param includeEmpty True if the empty space object (0:0) should be included in the list. As many maps have a lot of empty space, this can significantly increase memory use.
@@ -208,7 +208,7 @@ public class KSMap
 			ret[i] = list.get(i);
 		return ret;
 	}
-	
+
 	/**
 	 * Replaces all the objects in the level with those from an array. Ideally this array should match one from a call to {@link #exportObjects(boolean) exportObjects}, using the same value of includeEmpty.
 	 * @param arr An array of objects to replace the existing objects in the level.
@@ -221,7 +221,7 @@ public class KSMap
 		for(Screen s : screens)
 			offset = s.importObjects(arr, offset, includeEmpty);
 	}
-	
+
 	public void randomizeMusic(Random rand)
 	{
 		// Collect music
@@ -232,7 +232,7 @@ public class KSMap
 			if (music != 0 && !musics.contains(music))
 				musics.add(music);
 		}
-		
+
 		// Create randomization hashmap
 		ArrayList<Byte> remainingMusics = (ArrayList<Byte>) musics.clone();
 		int numRemaining = remainingMusics.size();
@@ -243,7 +243,7 @@ public class KSMap
 			musicRando.put(music, remainingMusics.remove(i));
 			numRemaining--;
 		}
-		
+
 		// Randomize the music
 		for(Screen s : screens)
 		{

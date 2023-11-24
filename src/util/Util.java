@@ -26,7 +26,7 @@ public class Util
 		}
 		return matches;
 	}
-	
+
 	public static String trimStringForPrinting(String msg)
 	{
 		// replace newlines
@@ -36,7 +36,7 @@ public class Util
 			msg = msg.substring(0, 29).trim() + "...";
 		return msg;
 	}
-	
+
 	public static void displayListConsicesly(ArrayList<String> list, int maxLines, int maxLinesIfNotAll)
 	{
 		int size = list.size();
@@ -46,22 +46,22 @@ public class Util
 		if (displaySize < size)
 			System.out.println("\t+ " + (size - displaySize) + " more");
 	}
-	
+
 	public static int combineBankObj(int bank, int obj)
 	{
 		return ((bank & 255) << 8) | (obj & 255);
 	}
-	
+
 	public static byte separateBank(int object)
 	{
 		return (byte) (object >> 8);
 	}
-	
+
 	public static byte separateObj(int object)
 	{
 		return (byte) object;
 	}
-	
+
 	public static int[] mergeArrays(int[] a, int[] b)
 	{
 		int alen = a.length;
@@ -74,7 +74,7 @@ public class Util
 			ret[alen + i] = b[i];
 		return ret;
 	}
-	
+
 	public static String millisecondsToTimeString(long time)
 	{
 		if (time < 1000)
@@ -94,7 +94,7 @@ public class Util
 		time /= 365;
 		return time + ((time == 1) ? " year" : " years");
 	}
-	
+
 	public static Integer stringToInteger(String s)
 	{
 		try
@@ -106,7 +106,7 @@ public class Util
 			return null;
 		}
 	}
-	
+
 	public static int[] stringToRange(String str)
 	{
 		String[] split = str.split("-");
@@ -116,7 +116,7 @@ public class Util
 		int end = Integer.parseInt(split[1]);
 		return new int[] {start, end};
 	}
-	
+
 	public static int firstIndexOf(String str, String chs)
 	{
 		for (int i = 0; i < str.length(); i++)
@@ -129,7 +129,7 @@ public class Util
 	{
 		return firstIndexOf(str.toString(), chs);
 	}
-	
+
 	public static int lastIndexOf(String str, String chs, int end)
 	{
 		for (int i = end-1; i >= 0; i--)

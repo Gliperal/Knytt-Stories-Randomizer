@@ -130,7 +130,7 @@ public class WindowsShortcut
     private static byte[] getBytes(final InputStream in) throws IOException {
         return getBytes(in, null);
     }
-    
+
     /**
      * Gets up to max bytes from an InputStream
      * @param in the InputStream from which to read bytes

@@ -12,42 +12,42 @@ public class ObjectGroup
 	private String creationKey;
 	private int[] objects;
 	private boolean isSorted = false;
-	
+
 	public ObjectGroup()
 	{
 		objects = new int[0];
 	}
-	
+
 	public void setCreationKey(String key)
 	{
 		creationKey = key;
 	}
-	
+
 	public String getCreationKey()
 	{
 		return creationKey;
 	}
-	
+
 	public void add(int bank, int obj)
 	{
 		// Check if object already exists in this class
 		if (hasObject(bank, obj))
 			return;
-		
+
 		// Copy data to new array
 		int oldLength = objects.length;
 		int[] updatedObjects = new int[oldLength + 1];
 		for (int i = 0; i < oldLength; i++)
 			updatedObjects[i] = objects[i];
-		
+
 		// Add new data
 		updatedObjects[oldLength] = Util.combineBankObj(bank, obj);
-		
+
 		// Copy back
 		objects = updatedObjects;
 		isSorted = false;
 	}
-	
+
 	public boolean add(String objectStr)
 	{
 		String[] split = objectStr.split(":", 2);
@@ -58,7 +58,7 @@ public class ObjectGroup
 			// Retrieve data
 			int bank = Integer.parseInt(split[0]);
 			int obj = Integer.parseInt(split[1]);
-			
+
 			// Add to objects
 			add(bank, obj);
 			return true;
@@ -68,7 +68,7 @@ public class ObjectGroup
 			return false;
 		}
 	}
-	
+
 	public void sort()
 	{
 		if (!isSorted)
@@ -77,7 +77,7 @@ public class ObjectGroup
 			isSorted = true;
 		}
 	}
-	
+
 	/**
 	 * Returns a new ObjectGroup that contains all of the objects from this ObjectGroup and the one passed as an argument. Neither of the inputs are modified.
 	 * @param that The ObjectGroup to be combined with.
@@ -88,7 +88,7 @@ public class ObjectGroup
 		// Sort both classes if they aren't already, so that we can perform a merge with uniqueness
 		sort();
 		that.sort();
-		
+
 		// Merge object arrays
 		int[] combinedObjects = new int[objects.length + that.objects.length];
 		int i = 0, j = 0, k = 0;
@@ -106,13 +106,13 @@ public class ObjectGroup
 			combinedObjects[k++] = objects[i++];
 		while (j < that.objects.length)
 			combinedObjects[k++] = that.objects[j++];
-		
+
 		// Create result group
 		ObjectGroup group = new ObjectGroup();
 		group.objects = Arrays.copyOf(combinedObjects, k);
 		return group;
 	}
-	
+
 	/**
 	 * Returns a new ObjectGroup that contains all of the objects that are common to both this ObjectGroup and the one passed as an argument. Neither of the inputs are modified.
 	 * @param that The ObjectGroup to be overlapped with.
@@ -123,7 +123,7 @@ public class ObjectGroup
 		// Sort both classes if they aren't already, so that we can perform a linear search
 		sort();
 		that.sort();
-		
+
 		// Merge object arrays
 		int[] commonObjects = new int[Integer.min(objects.length, that.objects.length)];
 		int i = 0, j = 0, k = 0;
@@ -141,13 +141,13 @@ public class ObjectGroup
 			else
 				j++;
 		}
-		
+
 		// Create result group
 		ObjectGroup group = new ObjectGroup();
 		group.objects = Arrays.copyOf(commonObjects, k);
 		return group;
 	}
-	
+
 	/**
 	 * Returns a clone of the ObjectGroup, but stripped of all objects that are present in the ObjectGroup passed as an argument. Neither of the inputs are modified.
 	 * @param that The ObjectGroup containing forbidden objects.
@@ -158,7 +158,7 @@ public class ObjectGroup
 		// Sort both classes if they aren't already, so that we can perform a linear search
 		sort();
 		that.sort();
-		
+
 		// Merge object arrays
 		int[] uniqueObjects = new int[objects.length];
 		int i = 0, j = 0, k = 0;
@@ -178,13 +178,13 @@ public class ObjectGroup
 			else
 				j++;
 		}
-		
+
 		// Create result group
 		ObjectGroup group = new ObjectGroup();
 		group.objects = Arrays.copyOf(uniqueObjects, k);
 		return group;
 	}
-	
+
 	public String toString()
 	{
 		String result = "ObjectGroup(" + creationKey + ")[";
@@ -192,7 +192,7 @@ public class ObjectGroup
 			result += (objects[i] >> 8) + ":" + (objects[i] & 0xFF) + ",";
 		return result + "]";
 	}
-	
+
 	public boolean hasObject(int bankObj)
 	{
 		for (int i = 0; i < objects.length; i++)
@@ -200,22 +200,22 @@ public class ObjectGroup
 				return true;
 		return false;
 	}
-	
+
 	public boolean hasObject(int bank, int obj)
 	{
 		return hasObject(Util.combineBankObj(bank, obj));
 	}
-	
+
 	public int randomObject(Random rand)
 	{
 		return objects[rand.nextInt(objects.length)];
 	}
-	
+
 	public int[] toList()
 	{
 		return Arrays.copyOf(objects, objects.length);
 	}
-	
+
 /*	public int[] toShuffle(Random rand)
 	{
 		int len = objects.length;
@@ -228,7 +228,7 @@ public class ObjectGroup
 			shuffle[i] = objects[indexes.get(i)];
 		return shuffle;
 	}*/
-	
+
 	public ArrayList<Integer> randomlyFillList(int length, Random rand)
 	{
 		ArrayList<Integer> shuffledObjects = new ArrayList<Integer>();
@@ -242,7 +242,7 @@ public class ObjectGroup
 		}
 		return ret;
 	}
-	
+
 	public int firstCommonObject(ObjectGroup that)
 	{
 		sort();
@@ -259,7 +259,7 @@ public class ObjectGroup
 		}
 		return -1;
 	}
-	
+
 	public int size()
 	{
 		return objects.length;

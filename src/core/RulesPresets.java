@@ -18,12 +18,12 @@ import util.AlphabeticalComparator;
 public class RulesPresets
 {
 	private HashMap<String, JSONArray> presets;
-	
+
 	public RulesPresets()
 	{
 		presets = new HashMap<String, JSONArray>();
 	}
-	
+
 	public RulesPresets(Path file) throws JSONException, IOException
 	{
 		this();
@@ -33,7 +33,7 @@ public class RulesPresets
 		for (String key : data.keySet())
 			presets.put(key, data.getJSONArray(key));
 	}
-	
+
 	private String selectPreset(Scanner input, String prompt)
 	{
 		ArrayList<String> presetNames = new ArrayList<String>(presets.keySet());
@@ -43,7 +43,7 @@ public class RulesPresets
 			return null;
 		return presetNames.get(id);
 	}
-	
+
 	public boolean addPreset(Scanner input, ArrayList<RandoRule> rules)
 	{
 		String name;
@@ -64,7 +64,7 @@ public class RulesPresets
 		presets.put(name, preset);
 		return true;
 	}
-	
+
 	public ArrayList<RandoRule> loadPreset(Scanner input, ObjectClassesFile classData) throws ParseException
 	{
 		if (presets.isEmpty())
@@ -86,7 +86,7 @@ public class RulesPresets
 		Console.printString("Preset loaded.");
 		return rules;
 	}
-	
+
 	private JSONObject toJSON()
 	{
 		JSONObject presetsJSON = new JSONObject();
@@ -108,12 +108,12 @@ public class RulesPresets
 		presets.remove(name);
 		return true;
 	}
-	
+
 	public boolean isEmpty()
 	{
 		return presets.isEmpty();
 	}
-	
+
 	public void saveToFile(Path file) throws IOException
 	{
 		Files.write(file, toJSON().toString().getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);

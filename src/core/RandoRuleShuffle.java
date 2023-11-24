@@ -11,12 +11,12 @@ public class RandoRuleShuffle extends RandoRule
 {
 	public final static char ID = 'S';
 	protected char getID() { return ID; }
-	
+
 	public RandoRuleShuffle(String key, ObjectClassesFile classData) throws ParseException
 	{
 		super.readKey(key, classData);
 	}
-	
+
 	public void randomize(KSMap map, Random rand)
 	{
 		// Collect a list of all the output objects in the map (including duplicates)
@@ -25,14 +25,14 @@ public class RandoRuleShuffle extends RandoRule
 		for (int obj : outObjects)
 			if (output.hasObject(obj))
 				outShuffle.add(obj);
-		
+
 		// Shuffle said list
 		Collections.shuffle(outShuffle, rand);
-		
+
 		// If there are no objects that match, just make it the deletion object.
 		if (outShuffle.isEmpty())
 			outShuffle.add(0);
-		
+
 		// Randomize
 		boolean includeEmpty = input.hasObject(0);
 		int[] mapObjects = map.exportObjects(includeEmpty);
@@ -51,7 +51,7 @@ public class RandoRuleShuffle extends RandoRule
 			}
 		map.importObjects(mapObjects, includeEmpty);
 	}
-	
+
 	public String toString()
 	{
 		return "Shuffle " + super.toDisplayString();

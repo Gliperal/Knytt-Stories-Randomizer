@@ -1,3 +1,4 @@
+TODO: Object classes revamp (thanks to DonDoli).
 Object classes can now accept arbitrary-length ids.
 Added Knytt Stories Plus companion mod.
 	Settings to make invisible objects visible (springs, death tiles, etc.)

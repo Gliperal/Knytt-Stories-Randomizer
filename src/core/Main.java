@@ -15,16 +15,16 @@ import map.KSMap;
 public class Main
 {
 	private static final String RANDOMIZER_HEADER =
-			"                          ,--------------------------,\n" + 
-			"                          | KNYTT STORIES RANDOMIZER |\n" + 
-			"                          |      version  2.0.4      |\n" + 
+			"                          ,--------------------------,\n" +
+			"                          | KNYTT STORIES RANDOMIZER |\n" +
+			"                          |      version  2.0.4      |\n" +
 			"                          '--------------------------'";
-	
+
 	public static void main(String[] args)
 	{
 		// Get user input
 		Scanner input = new Scanner(System.in);
-		
+
 		// Do everything in a sub method, so if an error gets free we can catch it before the program exits
 		try
 		{
@@ -38,7 +38,7 @@ public class Main
 			UserInput.waitForEnter(input, null);
 		}
 	}
-	
+
 	public static void randoMain(Scanner input)
 	{
 		// Load Knytt Stories location
@@ -49,7 +49,7 @@ public class Main
 			Console.printError("Unable to locate Knytt Stories directory.");
 			return;
 		}
-		
+
 		// Load object classes
 		ObjectClassesFile classData;
 		try
@@ -60,17 +60,17 @@ public class Main
 			Console.printError(e.getMessage());
 			return;
 		}
-		
+
 		// Display header
 		Console.printString(RANDOMIZER_HEADER);
-		
+
 		// Obtain user settings
 		UserSettings settings = new UserSettings(Paths.get("resources", "UserSettings.txt"), classData);
 		if (settings.firstLaunch() && UserInput.getBooleanInput(input, "It looks like it's your first time using the randomizer. Would you like to be guided through it?"))
 			settings.ezEdit(input, classData);
 		else
 			settings.edit(input, classData);
-		
+
 		// Make sure the map exists and is backed up
 		try
 		{
@@ -80,7 +80,7 @@ public class Main
 		{
 			Console.printError(e.getMessage());
 		}
-		
+
 		// Load map
 		KSMap map;
 		try
@@ -91,16 +91,16 @@ public class Main
 			Console.printError(e.getMessage());
 			return;
 		}
-		
+
 		// Begin randomization
 		Console.printString("Randomizing...");
 		Random rand = settings.getRandomFromSeed();
 		for (RandoRule rule : settings.getRandoRules())
 			rule.randomize(map, rand);
-		
+
 		// Randomize music
 		map.randomizeMusic(rand);
-		
+
 		// Save map
 		Console.printString("Saving...");
 		try
@@ -111,7 +111,7 @@ public class Main
 		{
 			Console.printError(e.getMessage());
 		}
-		
+
 		// Save user settings
 		try
 		{
@@ -121,7 +121,7 @@ public class Main
 		{
 			Console.printError("Failed to save settings: " + e.getMessage());
 		}
-		
+
 		// Launch Knytt Stories
 		Console.printString("Press enter to exit. Type any letter to launch Knytt Stories and exit.");
 		if (!input.nextLine().isEmpty())
@@ -136,7 +136,7 @@ public class Main
 			}
 		}
 	}
-	
+
 	private static ObjectClassesFile loadObjectClasses() throws Exception
 	{
 		// Load object classes file
@@ -144,7 +144,7 @@ public class Main
 		Path ocFile = Paths.get("resources", "ObjectClasses.txt");
 		if (!Files.exists(ocFile))
 			throw new Exception("Unable to open resources/ObjectClasses.txt.");
-		
+
 		// Load object classes
 		try
 		{
@@ -157,13 +157,13 @@ public class Main
 			throw new Exception("Failed to parse resources/ObjectClasses.txt: Line " + e.getErrorOffset() + ": " + e.getMessage());
 		}
 	}
-	
+
 	private static void restoreMain(Scanner input)
 	{
 		// Confirm
 		if (!UserInput.getBooleanInput(input, "This will restore all your randomized levels to their original states. Are you sure you wish to continue?"))
 			return;
-		
+
 		// Load Knytt Stories location
 		Console.printString("Loading Knytt Stories directory...");
 		boolean validKSDir = KSFiles.loadKSDirectory();
@@ -172,7 +172,7 @@ public class Main
 			Console.printError("Unable to locate Knytt Stories directory.");
 			return;
 		}
-		
+
 		// Load restorable worlds
 		ArrayList<String> restorableWorlds;
 		try
@@ -188,7 +188,7 @@ public class Main
 			Console.printString("Found nothing to restore.");
 			return;
 		}
-		
+
 		// Iterate over the worlds
 		ArrayList<String> restoredWorlds = new ArrayList<String>();
 		ArrayList<String> failedWorlds = new ArrayList<String>();
@@ -207,7 +207,7 @@ public class Main
 			Console.printError(e.getMessage());
 			return;
 		}
-		
+
 		// Status
 		if (!restoredWorlds.isEmpty())
 		{

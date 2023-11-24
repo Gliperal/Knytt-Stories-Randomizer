@@ -28,11 +28,11 @@ public class KSFiles
 	private static Path worldFolder = null;
 	private static Path mapFile = null;
 	private static Path originalMapFile = null;
-	
+
 	public static boolean loadKSDirectory()
 	{
 		Path workingDir = Paths.get(System.getProperty("user.dir"));
-		
+
 		// If the jar is being run from a subfolder of the KS directory
 		Console.printString("Checking local files...");
 		ksDir = workingDir.getParent();
@@ -42,7 +42,7 @@ public class KSFiles
 			return true;
 		}
 		Console.printString(" No.");
-		
+
 		// If there is a symbolic link in the working directory called "KS"
 		System.out.print("Checking for a KS symbolic link...");
 		ksDir = workingDir.resolve("KS");
@@ -52,7 +52,7 @@ public class KSFiles
 			return true;
 		}
 		Console.printString(" No.");
-		
+
 		// If there is a Windows link in the working directory called "KS"
 		System.out.print("Checking for a KS.lnk Windows link...");
 		ksDir = workingDir.resolve("KS.lnk");
@@ -70,7 +70,7 @@ public class KSFiles
 			} catch (Exception e) {}
 		}
 		Console.printString(" No.");
-		
+
 		// If there is a text file in the working directory called KS.txt, containing the Knytt Stories directory
 		System.out.print("Checking in KS.txt...");
 		Path ksTxt = workingDir.resolve("KS.txt");
@@ -91,7 +91,7 @@ public class KSFiles
 		Console.printString(" No.");
 		return false;
 	}
-	
+
 	private static Path getExecutable(Path dir)
 	{
 		if (!Files.isDirectory(dir))
@@ -104,19 +104,19 @@ public class KSFiles
 		}
 		return null;
 	}
-	
+
 	private static boolean isKSDirectory(Path dir)
 	{
 		return getExecutable(dir) != null;
 	}
-	
+
 	public static String haveUserSelectWorld(Scanner input, String prompt) throws FileNotFoundException, IOException
 	{
 		// Load worlds directory
 		Path worldsDir = ksDir.resolve("Worlds");
 		if (!Files.exists(worldsDir))
 			throw new FileNotFoundException("Missing Worlds directory.");
-		
+
 		// Collect worlds
 		ArrayList<Path> worlds = new ArrayList<Path>();
 		ArrayList<String> worldStrings = new ArrayList<String>();
@@ -133,7 +133,7 @@ public class KSFiles
 		{
 			throw new IOException("IOException loading worlds: " + e.getMessage());
 		}
-		
+
 		// Get user choice
 		int worldID = UserInput.getInputFromList(input, prompt, "world", worldStrings);
 		if (worldID == -1)
@@ -141,14 +141,14 @@ public class KSFiles
 		worldFolder = worlds.get(worldID);
 		return worldFolder.getFileName().toString();
 	}
-	
+
 	public static void specifyWorld(String worldName) throws FileNotFoundException
 	{
 		// Load worlds directory
 		Path worldsDir = ksDir.resolve("Worlds");
 		if (!Files.exists(worldsDir))
 			throw new FileNotFoundException("Missing Worlds directory.");
-		
+
 		// Attempt to set world
 		worldFolder = worldsDir.resolve(worldName);
 		if (!Files.exists(worldFolder.resolve("Map.bin")))
@@ -157,7 +157,7 @@ public class KSFiles
 			throw new FileNotFoundException(worldName + " is not a valid world.");
 		}
 	}
-	
+
 	private static void getMapFile() throws FileNotFoundException
 	{
 		if (mapFile == null)
@@ -169,13 +169,13 @@ public class KSFiles
 				throw new FileNotFoundException("Unable to locate file " + mapFile);
 		}
 	}
-	
+
 	public static boolean backupMapFile(Scanner input) throws FileNotFoundException
 	{
 		// Make sure we have a map loaded
 		if (mapFile == null)
 			getMapFile();
-		
+
 		// Back it up (the backup is also the file we'll be reading in)
 		originalMapFile = worldFolder.resolve("MapBackup.rando.bin");
 		if (!Files.exists(originalMapFile))
@@ -193,14 +193,14 @@ public class KSFiles
 		}
 		return true;
 	}
-	
+
 	public static ArrayList<String> backedUpWorlds() throws IOException
 	{
 		// Load worlds directory
 		Path worldsDir = ksDir.resolve("Worlds");
 		if (!Files.exists(worldsDir))
 			throw new FileNotFoundException("Missing Worlds directory.");
-		
+
 		// Collect worlds
 		ArrayList<String> result = new ArrayList<String>();
 		for (Path world : Files.newDirectoryStream(worldsDir))
@@ -215,19 +215,19 @@ public class KSFiles
 		}
 		return result;
 	}
-	
+
 	public static boolean restoreMapFile(String worldName) throws FileNotFoundException
 	{
 		// Load worlds directory
 		Path worldsDir = ksDir.resolve("Worlds");
 		if (!Files.exists(worldsDir))
 			throw new FileNotFoundException("Missing Worlds directory.");
-		
+
 		// Load paths
 		Path world = worldsDir.resolve(worldName);
 		Path originalMap = world.resolve("MapBackup.rando.bin");
 		Path mapLocation = world.resolve("Map.bin");
-		
+
 		// Attempt to restore map file
 		try
 		{
@@ -241,7 +241,7 @@ public class KSFiles
 			return false;
 		}
 	}
-	
+
 	public static KSMap readMap() throws Exception
 	{
 		if (mapFile == null)
@@ -261,7 +261,7 @@ public class KSFiles
 			throw new Exception("Unable to parse map file: " + e.getMessage());
 		}
 	}
-	
+
 	public static void writeMap(KSMap map) throws Exception
 	{
 		try

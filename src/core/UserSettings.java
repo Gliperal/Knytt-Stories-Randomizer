@@ -20,25 +20,25 @@ import util.Util;
 public class UserSettings
 {
 	private static final String HELP_MESSAGE =
-			"==========--  W: Select world    R: Specify rules    S: Enter seed  --=========\n" + 
+			"==========--  W: Select world    R: Specify rules    S: Enter seed  --=========\n" +
 			"=======================--  P: Preset menu    B: Begin  --======================";
 	private static final String PRESET_PROMPT =
-			"============--  L: Load preset    A: Add preset to current rules  --===========\n" + 
-			"===========--  S: Save current rules as preset   D: Delete preset  --==========\n" + 
+			"============--  L: Load preset    A: Add preset to current rules  --===========\n" +
+			"===========--  S: Save current rules as preset   D: Delete preset  --==========\n" +
 			"==========================-  Leave blank to return.  -=========================";
-	public static final String RANDO_TYPE_TABLE = 
-			"                          ,---------------------,------------------------,\n" + 
-			"                          | Objects of the same | Objects are randomized |\n" + 
-			"                          | type get randomized | independent of similar |\n" + 
-			"                          | together            | objects                |\n" + 
-			",-------------------------+---------------------+------------------------|\n" + 
-			"|        Only use objects |       Permute       |        Shuffle         |\n" + 
-			"|    present in the level |                     |                        |\n" + 
-			"|-------------------------+---------------------+------------------------|\n" + 
-			"|    Use any objects from |      Transform      |      True random       |\n" + 
-			"| the randomization group |                     |                        |\n" + 
+	public static final String RANDO_TYPE_TABLE =
+			"                          ,---------------------,------------------------,\n" +
+			"                          | Objects of the same | Objects are randomized |\n" +
+			"                          | type get randomized | independent of similar |\n" +
+			"                          | together            | objects                |\n" +
+			",-------------------------+---------------------+------------------------|\n" +
+			"|        Only use objects |       Permute       |        Shuffle         |\n" +
+			"|    present in the level |                     |                        |\n" +
+			"|-------------------------+---------------------+------------------------|\n" +
+			"|    Use any objects from |      Transform      |      True random       |\n" +
+			"| the randomization group |                     |                        |\n" +
 			"'-------------------------'---------------------'------------------------'";
-	
+
 	private Path settingsFile;
 	private Path presetsFile = Paths.get("resources", "Presets.txt");
 	private String world;
@@ -46,14 +46,14 @@ public class UserSettings
 	private ArrayList<RandoRule> randoRules;
 	private RulesPresets presets;
 	private boolean firstLaunch;
-	
+
 	public UserSettings(Path file, ObjectClassesFile classData)
 	{
 		if (file == null)
 			throw new NullPointerException();
 		settingsFile = file;
 		presets = new RulesPresets();
-		
+
 		// Try to load settings file
 		String filename = file.toString();
 		if (Files.exists(settingsFile))
@@ -73,7 +73,7 @@ public class UserSettings
 		}
 		else
 			firstLaunch = true;
-		
+
 		// Try to load presets
 		try {
 			presets = new RulesPresets(presetsFile);
@@ -84,7 +84,7 @@ public class UserSettings
 			Console.printWarning("Could not load " + presetsFile.getFileName() + ". Saved presets will not be available.");
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @param classData
@@ -103,7 +103,7 @@ public class UserSettings
 		{
 			return -1;
 		}
-		
+
 		// World
 		try {
 			world = data.getString("world");
@@ -111,7 +111,7 @@ public class UserSettings
 		} catch(JSONException | FileNotFoundException e) {
 			world = null;
 		}
-		
+
 		// Rules
 		try {
 			randoRules = new ArrayList<RandoRule>();
@@ -128,7 +128,7 @@ public class UserSettings
 			Console.printRed("Error parsing rules: " + e.getMessage() + " (line " + e.getErrorOffset() + ")");
 			randoRules = null;
 		}
-		
+
 		// Loaded successfully
 		try
 		{
@@ -139,13 +139,13 @@ public class UserSettings
 			return 0;
 		}
 	}
-	
+
 	private void setSeed(Scanner input)
 	{
 		seed = UserInput.getSeedInput(input, "Enter seed or leave blank for random.");
 		Console.printString("Seed entered: " + seed);
 	}
-	
+
 	private void setWorld(Scanner input)
 	{
 		try
@@ -163,7 +163,7 @@ public class UserSettings
 			world = null;
 		}
 	}
-	
+
 	private String setRandoTypes(Scanner input, ObjectClassesFile classData)
 	{
 		String randoTypes;
@@ -191,7 +191,7 @@ public class UserSettings
 			randoTypes = Character.toString(RandoRulePermute.ID);
 		return randoTypes;
 	}
-	
+
 	private void setRandoRules(Scanner input, ObjectClassesFile classData, String randoTypes)
 	{
 		Console.printString("Randomizable groups:");
@@ -245,7 +245,7 @@ public class UserSettings
 			}
 		}
 	}
-	
+
 	private void saveRulesAsPreset(Scanner input)
 	{
 		if (randoRules == null)
@@ -265,7 +265,7 @@ public class UserSettings
 		else
 			Console.printString("Preset saving cancelled.");
 	}
-	
+
 	private void deletePreset(Scanner input)
 	{
 		if (presets.deletePreset(input))
@@ -281,7 +281,7 @@ public class UserSettings
 			}
 		}
 	}
-	
+
 	private void loadRandoPreset(Scanner input, ObjectClassesFile classData, boolean append)
 	{
 		try
@@ -303,7 +303,7 @@ public class UserSettings
 			Console.printRed("Error loading preset: " + e.getMessage() + " (line " + e.getErrorOffset() + ")");
 		}
 	}
-	
+
 	private void presetMenu(Scanner input, ObjectClassesFile classData)
 	{
 		while (true)
@@ -328,7 +328,7 @@ public class UserSettings
 			}
 		}
 	}
-	
+
 	private void displaySettings()
 	{
 		String worldStr = (world == null) ? "[use W to select world]" : world;
@@ -343,7 +343,7 @@ public class UserSettings
 				Console.printString("\t" + r.toString());
 		}
 	}
-	
+
 	private boolean checkForErrors()
 	{
 		// Check for fatal errors
@@ -376,7 +376,7 @@ public class UserSettings
 		}
 		return ok;
 	}
-	
+
 	public void edit(Scanner input, ObjectClassesFile classData)
 	{
 		// Main input loop
@@ -427,7 +427,7 @@ public class UserSettings
 			}
 		}
 	}
-	
+
 	public void ezEdit(Scanner input, ObjectClassesFile classData)
 	{
 		do
@@ -442,29 +442,29 @@ public class UserSettings
 		}
 		while (checkForErrors() == false);
 	}
-	
+
 	public Random getRandomFromSeed()
 	{
 		if (seed == null)
 			seed = System.nanoTime();
 		return new Random(seed);
 	}
-	
+
 	public ArrayList<RandoRule> getRandoRules()
 	{
 		return randoRules;
 	}
-	
+
 	public boolean firstLaunch()
 	{
 		return firstLaunch;
 	}
-	
+
 	public void savePresetsToFile() throws IOException
 	{
 		presets.saveToFile(presetsFile);
 	}
-	
+
 	public void saveSettingsToFile() throws IOException
 	{
 		JSONObject data = new JSONObject();

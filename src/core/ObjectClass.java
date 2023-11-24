@@ -8,7 +8,7 @@ public class ObjectClass
 	public String name;
 	public String category;
 	public ObjectGroup group;
-	
+
 	// all base classes have a string id and optionally a name and category
 	public ObjectClass(String id, String name, ObjectGroup group)
 	{
@@ -16,7 +16,7 @@ public class ObjectClass
 		this.name = name;
 		this.group = group;
 	}
-	
+
 	public ObjectClass(String id, String name, String category, ObjectGroup group)
 	{
 		this(id, name, group);
@@ -27,22 +27,22 @@ public class ObjectClass
 	{
 		return id.substring(0, 1).toUpperCase() + id.substring(1).toLowerCase();
 	}
-	
+
 	public boolean hasID(String id)
 	{
 		return this.id == formatID(id);
 	}
-	
+
 	public String indentifier()
 	{
 		return id + ": " + name;
 	}
-	
+
 	public String getCategory()
 	{
 		return category;
 	}
-	
+
 	public String toString()
 	{
 		String result;
@@ -52,7 +52,7 @@ public class ObjectClass
 				result = "ObjectClass(Base: " + id + ", " + name + ", " + category + ") with ";
 		return result + group.toString() + "]";
 	}
-	
+
 	public static class ObjectClassComparator implements Comparator<ObjectClass>
 	{
 		@Override
@@ -61,7 +61,7 @@ public class ObjectClass
 			return a.cmp(b);
 		}
 	}
-	
+
 	public int cmp(ObjectClass b)
 	{
 		return id.compareTo(b.id);

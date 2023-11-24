@@ -13,7 +13,7 @@ import util.Util;
 public class ObjectClassesFile
 {
 	private ArrayList<ObjectClass> classes;
-	
+
 	private ObjectClass getFirstObjectClass(String str)
 	{
 		for (ObjectClass oc : classes)
@@ -21,7 +21,7 @@ public class ObjectClassesFile
 				return oc;
 		return null;
 	}
-	
+
 	private ObjectClassMetadata parseHeader(FilePiece header) throws ParseException
 	{
 		// Strip whitespace
@@ -107,7 +107,7 @@ public class ObjectClassesFile
 			}
 		}
 	}
-	
+
 	private void evaluateTokens(ArrayList<Token> tokens, int start) throws ParseException
 	{
 		// Evaluate parenthesis
@@ -124,7 +124,7 @@ public class ObjectClassesFile
 				tokens.remove(i);		// remove open parenthesis (closing will be removed by evaluation)
 			}
 		}
-		
+
 		// Resolve all adjacencies
 		for (int i = start; i < tokens.size() - 1;)
 		{
@@ -140,7 +140,7 @@ public class ObjectClassesFile
 			else
 				i++;
 		}
-		
+
 		// Resolve all ANDs
 		for (int i = start; i < tokens.size();)
 		{
@@ -162,7 +162,7 @@ public class ObjectClassesFile
 			else
 				i++;
 		}
-		
+
 		// Resolve all subtractions
 		for (int i = start; i < tokens.size();)
 		{
@@ -184,7 +184,7 @@ public class ObjectClassesFile
 			else
 				i++;
 		}
-		
+
 		// Resolve all additions
 		for (int i = start; i < tokens.size();)
 		{
@@ -206,7 +206,7 @@ public class ObjectClassesFile
 			else
 				i++;
 		}
-		
+
 		// Error checking before return
 		if (tokens.size() <= start)
 			throw new ParseException("Unknown error processing group.", -1);
@@ -215,11 +215,11 @@ public class ObjectClassesFile
 			throw new ParseException("Empty group.", first.lineNumber);
 		if (tokens.size() == start + 1 || tokens.get(start + 1).type != TokenType.closeParen)
 			throw new ParseException("Unbalanced parenthesis.", first.lineNumber);
-		
+
 		// Remove ) and return
 		tokens.remove(start + 1);
 	}
-	
+
 	public ObjectGroup buildObjectGroup(FilePiece key) throws ParseException
 	{
 		// Tokenize
@@ -302,19 +302,19 @@ public class ObjectClassesFile
 		evaluateTokens(tokens, 0);
 		if (tokens.size() > 1)
 			throw new ParseException("Unbalanced parenthesis.", tokens.get(0).lineNumber);
-		
+
 		// The last remaining token has our finished object group
 		ObjectGroup group = tokens.get(0).group;
 		group.sort();
 		group.setCreationKey(key.toString());
 		return group;
 	}
-	
+
 	public ObjectGroup buildObjectGroup(String key) throws ParseException
 	{
 		return buildObjectGroup(new FilePiece(key, -1, -1));
 	}
-	
+
 	public ObjectClassesFile(Path ocFile) throws IOException, ParseException
 	{
 		classes = new ArrayList<ObjectClass>();
@@ -353,18 +353,18 @@ public class ObjectClassesFile
 		// Sort the groups alphabetically
 		sort();
 	}
-	
+
 	private void sort()
 	{
 		classes.sort(new ObjectClass.ObjectClassComparator());
 	}
-	
+
 	public void printEverything()
 	{
 		for (ObjectClass oc : classes)
 			Console.printString(oc.toString());
 	}
-	
+
 	public void tabPrintClasses()
 	{
 		Map<String, ArrayList<ObjectClass>> categories = new HashMap<String, ArrayList<ObjectClass>>();

@@ -10,13 +10,13 @@ public class WeightedObjectGroup
 	private String creationKey;
 	private ArrayList<ObjectGroup> groups;
 	private ArrayList<Double> weights;
-	
+
 	private WeightedObjectGroup()
 	{
 		groups = new ArrayList<ObjectGroup>();
 		weights = new ArrayList<Double>();
 	}
-	
+
 	public WeightedObjectGroup(ObjectGroup group)
 	{
 		this();
@@ -24,12 +24,12 @@ public class WeightedObjectGroup
 		groups.add(group);
 		weights.add(1.0);
 	}
-	
+
 	public WeightedObjectGroup(ObjectClassesFile classData, String creationKey) throws ParseException
 	{
 		this();
 		this.creationKey = creationKey;
-		
+
 		// Standard object group
 		if (!creationKey.contains("<"))
 		{
@@ -56,7 +56,7 @@ public class WeightedObjectGroup
 				throw new ParseException("Unmatched <", -1);
 			String groupWeight = key.substring(0, i).trim();
 			key = key.substring(i + 1);
-			try 
+			try
 			{
 				weights.add(Double.parseDouble(groupWeight));
 			}
@@ -65,7 +65,7 @@ public class WeightedObjectGroup
 				throw new ParseException("Could not interpret group weight \"" + groupWeight + "\" as a number.", -1);
 			}
 		}
-		
+
 		// Normalize weights
 		float total = 0;
 		for (Double weight : weights)
@@ -73,12 +73,12 @@ public class WeightedObjectGroup
 		for (int i = 0; i < weights.size(); i++)
 			weights.set(i, weights.get(i) / total);
 	}
-	
+
 	public String getCreationKey()
 	{
 		return creationKey;
 	}
-	
+
 	public boolean hasObject(int bankObj)
 	{
 		for (ObjectGroup group : groups)
@@ -86,7 +86,7 @@ public class WeightedObjectGroup
 				return true;
 		return false;
 	}
-	
+
 	public int size()
 	{
 		ObjectGroup all = new ObjectGroup();
@@ -94,7 +94,7 @@ public class WeightedObjectGroup
 			all = all.combineWith(group);
 		return all.size();
 	}
-	
+
 	public WeightedObjectGroup overlapWith(ObjectGroup mask)
 	{
 		WeightedObjectGroup ret = new WeightedObjectGroup();
@@ -103,7 +103,7 @@ public class WeightedObjectGroup
 		ret.weights = weights;
 		return ret;
 	}
-	
+
 	public int randomObject(Random rand)
 	{
 		double roll = rand.nextDouble();
@@ -116,7 +116,7 @@ public class WeightedObjectGroup
 		}
 		return groups.get(groups.size() - 1).randomObject(rand);
 	}
-	
+
 	public ArrayList<Integer> randomlyFillList(int length, Random rand)
 	{
 		// Calculate scale required on the weights to ensure every object appears at least once
@@ -127,7 +127,7 @@ public class WeightedObjectGroup
 			if (s > scale)
 				scale = s;
 		}
-		
+
 		// Generate weighted array of objects
 		ArrayList<Integer> weightedObjects = new ArrayList<Integer>();
 		for (int i = 0; i < weights.size(); i++)
@@ -135,7 +135,7 @@ public class WeightedObjectGroup
 			int size = (int) Math.round(weights.get(i) * scale);
 			weightedObjects.addAll(groups.get(i).randomlyFillList(size, rand));
 		}
-		
+
 		// Fill array of desired length
 		ArrayList<Integer> ret = new ArrayList<Integer>();
 		while (ret.size() < length)
