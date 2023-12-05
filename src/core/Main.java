@@ -17,7 +17,7 @@ public class Main
 	private static final String RANDOMIZER_HEADER =
 			"                          ,--------------------------,\n" +
 			"                          | KNYTT STORIES RANDOMIZER |\n" +
-			"                          |      version  2.0.4      |\n" +
+			"                          |      version  3.0.0      |\n" +
 			"                          '--------------------------'";
 
 	public static void main(String[] args)
@@ -28,18 +28,20 @@ public class Main
 		// Do everything in a sub method, so if an error gets free we can catch it before the program exits
 		try
 		{
+			int exitCode;
 			if (args.length > 0 && args[0].equals("restore"))
-				restoreMain(input);
+				exitCode = restoreMain(input);
 			else
-				randoMain(input);
+				exitCode = randoMain(input);
+			System.exit(exitCode);
 		} catch(Exception e)
 		{
 			e.printStackTrace();
-			UserInput.waitForEnter(input, null);
+			System.exit(1);
 		}
 	}
 
-	public static void randoMain(Scanner input)
+	public static int randoMain(Scanner input)
 	{
 		// Load Knytt Stories location
 		Console.printString("Loading Knytt Stories directory...");
@@ -47,7 +49,7 @@ public class Main
 		if (!validKSDir)
 		{
 			Console.printError("Unable to locate Knytt Stories directory.");
-			return;
+			return 1;
 		}
 
 		// Load object classes
@@ -58,7 +60,7 @@ public class Main
 		} catch (Exception e)
 		{
 			Console.printError(e.getMessage());
-			return;
+			return 1;
 		}
 
 		// Display header
@@ -75,7 +77,7 @@ public class Main
 		try
 		{
 			if (!KSFiles.backupMapFile(input))
-				return;
+				return 1;
 		} catch (FileNotFoundException e)
 		{
 			Console.printError(e.getMessage());
@@ -89,7 +91,7 @@ public class Main
 		} catch (Exception e)
 		{
 			Console.printError(e.getMessage());
-			return;
+			return 1;
 		}
 
 		// Begin randomization
@@ -132,9 +134,10 @@ public class Main
 			} catch (IOException e)
 			{
 				Console.printError("Could not launch Knytt Stories: " + e.getMessage());
-				UserInput.waitForEnter(input, "Press enter to exit.");
+				return 1;
 			}
 		}
+		return 0;
 	}
 
 	private static ObjectClassesFile loadObjectClasses() throws Exception
@@ -158,11 +161,11 @@ public class Main
 		}
 	}
 
-	private static void restoreMain(Scanner input)
+	private static int restoreMain(Scanner input)
 	{
 		// Confirm
 		if (!UserInput.getBooleanInput(input, "This will restore all your randomized levels to their original states. Are you sure you wish to continue?"))
-			return;
+			return 0;
 
 		// Load Knytt Stories location
 		Console.printString("Loading Knytt Stories directory...");
@@ -170,7 +173,7 @@ public class Main
 		if (!validKSDir)
 		{
 			Console.printError("Unable to locate Knytt Stories directory.");
-			return;
+			return 1;
 		}
 
 		// Load restorable worlds
@@ -181,12 +184,12 @@ public class Main
 		} catch (IOException e)
 		{
 			Console.printError("Unable to load worlds: " + e.getMessage());
-			return;
+			return 1;
 		}
 		if (restorableWorlds.isEmpty())
 		{
 			Console.printString("Found nothing to restore.");
-			return;
+			return 1;
 		}
 
 		// Iterate over the worlds
@@ -205,7 +208,7 @@ public class Main
 		catch(FileNotFoundException e)
 		{
 			Console.printError(e.getMessage());
-			return;
+			return 1;
 		}
 
 		// Status
@@ -221,5 +224,6 @@ public class Main
 			for (String w : failedWorlds)
 				Console.printString(w);
 		}
+		return 0;
 	}
 }
