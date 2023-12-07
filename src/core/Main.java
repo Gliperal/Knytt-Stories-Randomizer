@@ -59,6 +59,25 @@ public class Main
 				exitCode = restoreMain(input);
 			else
 				exitCode = randoMain(input, rerun);
+
+			// Launch Knytt Stories
+			switch (exitBehavior)
+			{
+			case ASK:
+				Console.printString("Press enter to exit. Type any letter to launch Knytt Stories and exit.");
+				if (input.nextLine().isEmpty())
+					break;
+			case KS:
+				try
+				{
+					KSFiles.launchKS();
+				} catch (IOException e)
+				{
+					Console.printError("Could not launch Knytt Stories: " + e.getMessage());
+					System.exit(1);
+				}
+			case NONE:
+			}
 			System.exit(exitCode);
 		} catch(Exception e)
 		{
@@ -162,20 +181,6 @@ public class Main
 		} catch (IOException e)
 		{
 			Console.printError("Failed to save settings: " + e.getMessage());
-		}
-
-		// Launch Knytt Stories
-		Console.printString("Press enter to exit. Type any letter to launch Knytt Stories and exit.");
-		if (!input.nextLine().isEmpty())
-		{
-			try
-			{
-				KSFiles.launchKS();
-			} catch (IOException e)
-			{
-				Console.printError("Could not launch Knytt Stories: " + e.getMessage());
-				return 1;
-			}
 		}
 		return 0;
 	}
