@@ -337,7 +337,6 @@ public class UserSettings
 	{
 		String worldStr = (world == null) ? "[use W to select world]" : world;
 		String seedStr = (seed == null) ? "[will be randomly generated; use S to set seed]" : seed.toString();
-		Console.printString("World: " + worldStr + "\nSeed: " + seedStr);
 		if (randoRules == null)
 			Console.printString("Randomization rules: [use R to set rules]");
 		else
@@ -346,6 +345,7 @@ public class UserSettings
 			for (RandoRule r : randoRules)
 				Console.printString("\t" + r.toString());
 		}
+		Console.printString("Seed: " + seedStr + "\nWorld: " + worldStr);
 	}
 
 	private boolean checkForErrors()
