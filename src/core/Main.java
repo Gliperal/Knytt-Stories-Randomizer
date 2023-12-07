@@ -45,22 +45,20 @@ public class Main
 			for (int i = 0; i < args.length; i++)
 			{
 				String arg = args[i];
-				if (arg == "--restore")
+				if (arg.equals("--restore"))
 					restore = true;
-				else if (arg == "--exit=none")
+				else if (arg.equals("--exit=none"))
 					exitBehavior = ExitBehavior.NONE;
-				else if (arg == "--exit=ks")
+				else if (arg.equals("--exit=ks"))
 					exitBehavior = ExitBehavior.KS;
-				else if (arg == "--rerun")
+				else if (arg.equals("--rerun"))
 					rerun = true;
 			}
 			int exitCode;
 			if (restore)
 				exitCode = restoreMain(input);
-//			else if (rerun)
-//				exitCode = rerunMain(input);
 			else
-				exitCode = randoMain(input);
+				exitCode = randoMain(input, rerun);
 			System.exit(exitCode);
 		} catch(Exception e)
 		{
@@ -69,7 +67,7 @@ public class Main
 		}
 	}
 
-	public static int randoMain(Scanner input)
+	public static int randoMain(Scanner input, boolean rerun)
 	{
 		// Load Knytt Stories location
 		Console.printString("Loading Knytt Stories directory...");
@@ -98,7 +96,8 @@ public class Main
 
 		// Obtain user settings
 		UserSettings settings = new UserSettings(Paths.get("resources", "UserSettings.txt"), classData);
-		if (settings.firstLaunch() && UserInput.getBooleanInput(input, "It looks like it's your first time using the randomizer. Would you like to be guided through it?"))
+		if (rerun) {}
+		else if (settings.firstLaunch() && UserInput.getBooleanInput(input, "It looks like it's your first time using the randomizer. Would you like to be guided through it?"))
 			settings.ezEdit(input, classData);
 		else
 			settings.edit(input, classData);
