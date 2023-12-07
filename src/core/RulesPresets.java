@@ -14,6 +14,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import util.AlphabeticalComparator;
+import util.Console;
+import util.UserInput;
 
 public class RulesPresets
 {

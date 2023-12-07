@@ -5,6 +5,8 @@ import java.util.Random;
 
 import map.KSMap;
 
+import util.Console;
+
 public class RandoRulePermute extends RandoRuleTransform
 {
 	public final static char ID = 'P';

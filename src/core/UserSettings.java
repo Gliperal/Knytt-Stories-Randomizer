@@ -15,6 +15,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import map.KSFiles;
+import map.LoadException;
+import util.Console;
+import util.UserInput;
 import util.Util;
 
 public class UserSettings
@@ -107,8 +111,8 @@ public class UserSettings
 		// World
 		try {
 			world = data.getString("world");
-			KSFiles.specifyWorld(world);
-		} catch(JSONException | FileNotFoundException e) {
+			KSFiles.getWorld(world);
+		} catch(JSONException | FileNotFoundException | LoadException e) {
 			world = null;
 		}
 
@@ -156,7 +160,7 @@ public class UserSettings
 			else
 				Console.printString("World specified: " + world);
 		}
-		catch (IOException e)
+		catch (IOException | LoadException e)
 		{
 			Console.printError(e.getMessage());
 			Console.printString("Failed to select world.");
@@ -448,6 +452,11 @@ public class UserSettings
 		if (seed == null)
 			seed = System.nanoTime();
 		return new Random(seed);
+	}
+
+	public String getWorld()
+	{
+		return world;
 	}
 
 	public ArrayList<RandoRule> getRandoRules()

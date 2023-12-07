@@ -1,10 +1,8 @@
-package core;
+package util;
 
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
-
-import util.Util;
 
 public class UserInput
 {

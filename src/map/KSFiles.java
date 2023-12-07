@@ -1,35 +1,46 @@
-package core;
+package map;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 import org.stackoverflowusers.file.WindowsShortcut;
 
-import map.KSMap;
+import util.Console;
+import util.UserInput;
 
 public class KSFiles
 {
 	private static final String[] EXECUTABLES = {
 			"Knytt Stories Plus.exe",
 			"knytt stories ex.exe",
-			"Knytt Stories Speedrun Edition 0.2.2.exe",
 			"Knytt Stories Speedrun Edition 0.3.1.exe",
+			"Knytt Stories Speedrun Edition 0.2.2.exe",
 			"Knytt Stories.exe"
 	};
 	private static Path ksDir = null;
-	private static Path worldFolder = null;
-	private static Path mapFile = null;
-	private static Path originalMapFile = null;
+	private static Path worldsDir = null;
 
-	public static boolean loadKSDirectory()
+	public static void init() throws LoadException
+	{
+		if (ksDir != null)
+			return;
+
+		// Load KS directory
+		loadKSDirectory();
+
+		// Load worlds directory
+		worldsDir = ksDir.resolve("Worlds");
+		if (!Files.exists(worldsDir))
+			throw new LoadException("Missing Worlds directory.");
+	}
+
+	private static void loadKSDirectory() throws LoadException
 	{
 		Path workingDir = Paths.get(System.getProperty("user.dir"));
 
@@ -39,7 +50,7 @@ public class KSFiles
 		if (isKSDirectory(ksDir))
 		{
 			Console.printString(" Yes.");
-			return true;
+			return;
 		}
 		Console.printString(" No.");
 
@@ -49,7 +60,7 @@ public class KSFiles
 		if (isKSDirectory(ksDir))
 		{
 			Console.printString(" Yes.");
-			return true;
+			return;
 		}
 		Console.printString(" No.");
 
@@ -65,7 +76,7 @@ public class KSFiles
 				if (isKSDirectory(ksDir))
 				{
 					Console.printString(" Yes.");
-					return true;
+					return;
 				}
 			} catch (Exception e) {}
 		}
@@ -84,12 +95,12 @@ public class KSFiles
 				if (isKSDirectory(ksDir))
 				{
 					Console.printString(" Yes.");
-					return true;
+					return;
 				}
 			} catch (IOException e) {}
 		}
 		Console.printString(" No.");
-		return false;
+		throw new LoadException();
 	}
 
 	private static Path getExecutable(Path dir)
@@ -110,12 +121,9 @@ public class KSFiles
 		return getExecutable(dir) != null;
 	}
 
-	public static String haveUserSelectWorld(Scanner input, String prompt) throws FileNotFoundException, IOException
+	public static String haveUserSelectWorld(Scanner input, String prompt) throws IOException, LoadException
 	{
-		// Load worlds directory
-		Path worldsDir = ksDir.resolve("Worlds");
-		if (!Files.exists(worldsDir))
-			throw new FileNotFoundException("Missing Worlds directory.");
+		init();
 
 		// Collect worlds
 		ArrayList<Path> worlds = new ArrayList<Path>();
@@ -138,69 +146,18 @@ public class KSFiles
 		int worldID = UserInput.getInputFromList(input, prompt, "world", worldStrings);
 		if (worldID == -1)
 			return null;
-		worldFolder = worlds.get(worldID);
+		Path worldFolder = worlds.get(worldID);
 		return worldFolder.getFileName().toString();
 	}
 
-	public static void specifyWorld(String worldName) throws FileNotFoundException
+	public static World getWorld(String worldName) throws LoadException, FileNotFoundException
 	{
-		// Load worlds directory
-		Path worldsDir = ksDir.resolve("Worlds");
-		if (!Files.exists(worldsDir))
-			throw new FileNotFoundException("Missing Worlds directory.");
-
-		// Attempt to set world
-		worldFolder = worldsDir.resolve(worldName);
-		if (!Files.exists(worldFolder.resolve("Map.bin")))
-		{
-			worldFolder = null;
-			throw new FileNotFoundException(worldName + " is not a valid world.");
-		}
-	}
-
-	private static void getMapFile() throws FileNotFoundException
-	{
-		if (mapFile == null)
-		{
-			// Load map file
-			Console.printString("Loading map file...");
-			mapFile = worldFolder.resolve("Map.bin");
-			if (!Files.exists(mapFile))
-				throw new FileNotFoundException("Unable to locate file " + mapFile);
-		}
-	}
-
-	public static boolean backupMapFile(Scanner input) throws FileNotFoundException
-	{
-		// Make sure we have a map loaded
-		if (mapFile == null)
-			getMapFile();
-
-		// Back it up (the backup is also the file we'll be reading in)
-		originalMapFile = worldFolder.resolve("MapBackup.rando.bin");
-		if (!Files.exists(originalMapFile))
-		{
-			try
-			{
-				Files.copy(mapFile, originalMapFile);
-			} catch (IOException e)
-			{
-				if (UserInput.getBooleanInput(input, "Unable to make a backup of the map file. The original map will be overwritten. Are you sure you wish to continue?"))
-					originalMapFile = mapFile;
-				else
-					return false;
-			}
-		}
-		return true;
+		init();
+		return new World(worldsDir, worldName);
 	}
 
 	public static ArrayList<String> backedUpWorlds() throws IOException
 	{
-		// Load worlds directory
-		Path worldsDir = ksDir.resolve("Worlds");
-		if (!Files.exists(worldsDir))
-			throw new FileNotFoundException("Missing Worlds directory.");
-
 		// Collect worlds
 		ArrayList<String> result = new ArrayList<String>();
 		for (Path world : Files.newDirectoryStream(worldsDir))
@@ -209,7 +166,7 @@ public class KSFiles
 			if (!Files.isDirectory(world))
 				continue;
 			// If the world contains a rando backup file, it's backed up
-			Path mapBackup = world.resolve("MapBackup.rando.bin");
+			Path mapBackup = world.resolve(World.BACKUPFILE);
 			if (Files.exists(mapBackup))
 				result.add(world.getFileName().toString());
 		}
@@ -218,66 +175,17 @@ public class KSFiles
 
 	public static boolean restoreMapFile(String worldName) throws FileNotFoundException
 	{
-		// Load worlds directory
-		Path worldsDir = ksDir.resolve("Worlds");
-		if (!Files.exists(worldsDir))
-			throw new FileNotFoundException("Missing Worlds directory.");
-
-		// Load paths
-		Path world = worldsDir.resolve(worldName);
-		Path originalMap = world.resolve("MapBackup.rando.bin");
-		Path mapLocation = world.resolve("Map.bin");
-
-		// Attempt to restore map file
+		World world = new World(worldsDir, worldName);
 		try
 		{
 			// Successfully restored map
-			Files.move(originalMap, mapLocation, StandardCopyOption.REPLACE_EXISTING);
+			world.restoreMapFile();
 			return true;
 		}
 		catch(IOException e)
 		{
 			// Failed to restore map
 			return false;
-		}
-	}
-
-	public static KSMap readMap() throws Exception
-	{
-		if (mapFile == null)
-			getMapFile();
-		Path file = (originalMapFile != null) ? originalMapFile : mapFile;
-		try
-		{
-			return new KSMap(file);
-		} catch (NoSuchFileException e)
-		{
-			throw new Exception("Unable to open file " + file);
-		} catch (IOException e)
-		{
-			throw new Exception("IOException reading file " + file);
-		} catch (Exception e)
-		{
-			throw new Exception("Unable to parse map file: " + e.getMessage());
-		}
-	}
-
-	public static void writeMap(KSMap map) throws Exception
-	{
-		try
-		{
-			if (mapFile == null)
-				getMapFile();
-			map.saveToFile(mapFile);
-		} catch (NoSuchFileException e)
-		{
-			throw new Exception("Unable to open file " + mapFile);
-		} catch (IOException e)
-		{
-			throw new Exception("IOException writing to file " + mapFile);
-		} catch (Exception e)
-		{
-			throw new Exception("Unable to write screen data: " + e.getMessage());
 		}
 	}
 

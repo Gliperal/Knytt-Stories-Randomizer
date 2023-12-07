@@ -1,6 +1,4 @@
-package core;
-
-import util.Util;
+package util;
 
 public class Console
 {

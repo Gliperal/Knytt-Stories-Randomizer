@@ -10,10 +10,21 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
+import map.KSFiles;
 import map.KSMap;
+import map.LoadException;
+import map.World;
+import util.Console;
+import util.UserInput;
 
 public class Main
 {
+	public enum ExitBehavior {
+		ASK,
+		NONE,
+		KS,
+	}
+
 	private static final String RANDOMIZER_HEADER =
 			"                          ,--------------------------,\n" +
 			"                          | KNYTT STORIES RANDOMIZER |\n" +
@@ -28,9 +39,26 @@ public class Main
 		// Do everything in a sub method, so if an error gets free we can catch it before the program exits
 		try
 		{
+			boolean restore = false;
+			boolean rerun = false;
+			ExitBehavior exitBehavior = ExitBehavior.ASK;
+			for (int i = 0; i < args.length; i++)
+			{
+				String arg = args[i];
+				if (arg == "--restore")
+					restore = true;
+				else if (arg == "--exit=none")
+					exitBehavior = ExitBehavior.NONE;
+				else if (arg == "--exit=ks")
+					exitBehavior = ExitBehavior.KS;
+				else if (arg == "--rerun")
+					rerun = true;
+			}
 			int exitCode;
-			if (args.length > 0 && args[0].equals("restore"))
+			if (restore)
 				exitCode = restoreMain(input);
+//			else if (rerun)
+//				exitCode = rerunMain(input);
 			else
 				exitCode = randoMain(input);
 			System.exit(exitCode);
@@ -45,8 +73,10 @@ public class Main
 	{
 		// Load Knytt Stories location
 		Console.printString("Loading Knytt Stories directory...");
-		boolean validKSDir = KSFiles.loadKSDirectory();
-		if (!validKSDir)
+		try
+		{
+			KSFiles.init();
+		} catch (LoadException e)
 		{
 			Console.printError("Unable to locate Knytt Stories directory.");
 			return 1;
@@ -73,21 +103,32 @@ public class Main
 		else
 			settings.edit(input, classData);
 
-		// Make sure the map exists and is backed up
+		// Load world
+		World world;
 		try
 		{
-			if (!KSFiles.backupMapFile(input))
-				return 1;
-		} catch (FileNotFoundException e)
+			world = KSFiles.getWorld(settings.getWorld());
+		} catch (FileNotFoundException | LoadException e)
 		{
 			Console.printError(e.getMessage());
+			return 1;
+		}
+
+		// Backup map file
+		try
+		{
+			world.backupMapFile();
+		} catch (IOException e)
+		{
+			if (!UserInput.getBooleanInput(input, "Unable to make a backup of the map file. The original map will be overwritten. Are you sure you wish to continue?"))
+				return 1;
 		}
 
 		// Load map
 		KSMap map;
 		try
 		{
-			map = KSFiles.readMap();
+			map = world.readOriginalMap();
 		} catch (Exception e)
 		{
 			Console.printError(e.getMessage());
@@ -107,7 +148,7 @@ public class Main
 		Console.printString("Saving...");
 		try
 		{
-			KSFiles.writeMap(map);
+			world.writeMap(map);
 			Console.printString("Saved successfully.");
 		} catch (Exception e)
 		{
@@ -169,8 +210,10 @@ public class Main
 
 		// Load Knytt Stories location
 		Console.printString("Loading Knytt Stories directory...");
-		boolean validKSDir = KSFiles.loadKSDirectory();
-		if (!validKSDir)
+		try
+		{
+			KSFiles.init();
+		} catch (LoadException e)
 		{
 			Console.printError("Unable to locate Knytt Stories directory.");
 			return 1;
@@ -189,7 +232,7 @@ public class Main
 		if (restorableWorlds.isEmpty())
 		{
 			Console.printString("Found nothing to restore.");
-			return 1;
+			return 0;
 		}
 
 		// Iterate over the worlds
