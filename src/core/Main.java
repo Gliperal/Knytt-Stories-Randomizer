@@ -25,10 +25,11 @@ public class Main
 		KS,
 	}
 
+	private static final String VERSION_NUMBER = "3.0.0";
 	private static final String RANDOMIZER_HEADER =
 			"                          ,--------------------------,\n" +
 			"                          | KNYTT STORIES RANDOMIZER |\n" +
-			"                          |      version  3.0.0      |\n" +
+			"                          |      version  " + VERSION_NUMBER + "      |\n" +
 			"                          '--------------------------'";
 
 	public static void main(String[] args)
@@ -166,6 +167,13 @@ public class Main
 		Console.printString("Saving...");
 		try
 		{
+			map.addAdditionalInfo("Randomizer Version", VERSION_NUMBER);
+			map.addAdditionalInfo("Randomizer Seed", settings.getSeed().toString());
+			ArrayList<RandoRule> rules = settings.getRandoRules();
+			String rulesString = "";
+			for (RandoRule rule : rules)
+				rulesString += rule + "\n";
+			map.addAdditionalInfo("Randomizer Rules", rulesString);
 			world.writeMap(map);
 			Console.printString("Saved successfully.");
 		} catch (Exception e)

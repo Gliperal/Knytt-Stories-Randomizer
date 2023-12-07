@@ -454,6 +454,11 @@ public class UserSettings
 		return new Random(seed);
 	}
 
+	public Long getSeed()
+	{
+		return seed;
+	}
+
 	public String getWorld()
 	{
 		return world;

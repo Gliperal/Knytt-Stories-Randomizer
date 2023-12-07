@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 
 import core.ObjectGroup;
@@ -12,15 +12,17 @@ import core.ObjectGroup;
 public class KSMap
 {
 	private ArrayList<Screen> screens;
+	private HashMap<String, String> additionalInfo;
 
 	public KSMap()
 	{
 		screens = new ArrayList<Screen>();
+		additionalInfo = new HashMap<String, String>();
 	}
 
 	public KSMap(Path mapFile) throws IOException
 	{
-		screens = new ArrayList<Screen>();
+		this();
 
 		// Unpack binary file
 		MMFBinaryArray mapData = new MMFBinaryArray(mapFile);
@@ -46,8 +48,29 @@ public class KSMap
 		for (Screen screen : screens)
 			screen.writeTo(mapData);
 
+		// Write additional information
+		for (Entry<String, String> entry : additionalInfo.entrySet())
+		{
+			String info = entry.getValue();
+			int size = info.length();
+			byte[] bytes = new byte[size < 3006 ? 3006 : size + 1];
+			for (int i = 0; i < size; i++)
+				bytes[i] = (byte) info.charAt(i);
+			mapData.set(entry.getKey(), bytes);
+		}
+
 		// Finalize
 		mapData.writeToFile(mapFile);
+	}
+
+	public void addAdditionalInfo(String key, String info)
+	{
+		additionalInfo.put(key, info);
+	}
+
+	public void clearAdditionalInfo(String key)
+	{
+		additionalInfo.remove(key);
 	}
 
 	public void printScreens()
@@ -108,7 +131,7 @@ public class KSMap
 		// Create randomization hashmap
 		ArrayList<Byte> remainingMusics = (ArrayList<Byte>) musics.clone();
 		int numRemaining = remainingMusics.size();
-		Map<Byte, Byte> musicRando = new HashMap<Byte, Byte>();
+		HashMap<Byte, Byte> musicRando = new HashMap<Byte, Byte>();
 		for (Byte music : musics)
 		{
 			int i = rand.nextInt(numRemaining);
