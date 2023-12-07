@@ -1,19 +1,11 @@
 package map;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
-
-import org.apache.commons.io.IOUtils;
 
 import core.ObjectGroup;
 
@@ -26,156 +18,36 @@ public class KSMap
 		screens = new ArrayList<Screen>();
 	}
 
-	private static String readScreenHeader(GZIPInputStream gis) throws Exception
-	{
-		byte[] buffer = new byte[1];
-		int bytesRead;
-		String header = "";
-		while (true)
-		{
-			// Read next character
-			bytesRead = gis.read(buffer);
-			if (bytesRead == -1)
-				return null;
-
-			// null character denotes end of header
-			if (buffer[0] == 0)
-				return header;
-
-			// Append character
-			header += (char) buffer[0];
-			if (header.length() > 20) // No header should realistically be this long
-				throw new Exception("Unable to parse headers.");
-		}
-	}
-
-	private static boolean discardBytes(GZIPInputStream gis, int bytesToDiscard) throws IOException
-	{
-		byte[] dump = new byte[1024];
-		int bytesRead;
-		while (bytesToDiscard > 1024)
-		{
-			bytesRead = gis.read(dump, 0, 1024);
-			if (bytesRead == -1)
-				return false;
-			bytesToDiscard -= bytesRead;
-		}
-		while (bytesToDiscard > 0)
-		{
-			bytesRead = gis.read(dump, 0, bytesToDiscard);
-			if (bytesRead == -1)
-				return false;
-			bytesToDiscard -= bytesRead;
-		}
-		return true;
-	}
-
-	private static byte[] readScreenData(GZIPInputStream gis) throws Exception
-	{
-		byte[] screenData = new byte[3006];
-		byte[] buffer = new byte[1];
-		int bytesSoFar;
-		int bytesRead;
-
-		// Read size of screen data
-		int size = 0;
-		int currentPlace = 0;
-		boolean lastByteWasZero = false;
-		while (true)
-		{
-			// Read next character
-			bytesRead = gis.read(buffer);
-			if (bytesRead == -1)
-				throw new Exception("Unexpected end of file (2).");
-
-			// two zeros in a row denotes end of size
-			if (buffer[0] == 0)
-			{
-				if (lastByteWasZero)
-					break;
-				lastByteWasZero = true;
-			}
-			else
-				lastByteWasZero = false;
-
-			// Add to the size
-			int unsignedValue = (buffer[0] < 0) ? buffer[0] + 256 : buffer[0];
-			size += Math.pow(256, currentPlace) * unsignedValue;
-			currentPlace++;
-		}
-
-		// Evaluate the size: 3006 is the normal size of a screen
-		if (size != 3006)
-		{
-			// Discard erroneous screens
-			boolean status = discardBytes(gis, size);
-			if (!status)
-				throw new Exception("Unexpected end of file.");
-			return null;
-		}
-		else
-		{
-			// Read screen data
-			bytesSoFar = 0;
-			while (bytesSoFar < 3006)
-			{
-				bytesRead = gis.read(screenData, bytesSoFar, 3006 - bytesSoFar);
-				if (bytesRead == -1)
-					throw new Exception("Unexpected end of file.");
-				bytesSoFar += bytesRead;
-			}
-			return screenData;
-		}
-	}
-
-	public KSMap(Path mapFile) throws Exception
+	public KSMap(Path mapFile) throws IOException
 	{
 		screens = new ArrayList<Screen>();
 
-		// Setup GZip for map reading
-		InputStream is = Files.newInputStream(mapFile);
-		byte[] ba = IOUtils.toByteArray(is);
-		ByteArrayInputStream bis = new ByteArrayInputStream(ba);
-		GZIPInputStream gis = new GZIPInputStream(bis);
+		// Unpack binary file
+		MMFBinaryArray mapData = new MMFBinaryArray(mapFile);
 
 		// Read map data, one screen at a time
-		String header;
-		byte[] screenData;
-		while(true)
+		for (String key : mapData.keys())
 		{
-			// Read screen header (and write screen header)
-			header = readScreenHeader(gis);
-			if (header == null)
-				break;
-
-			// Read screen data (will always be the next 3006 bytes)
-			screenData = readScreenData(gis);
-			if (screenData == null)
-				continue;
-
-			// Package information into screen
-			Screen s = new Screen(header, screenData);
-			screens.add(s);
+			try
+			{
+				// Package information into screen
+				Screen s = new Screen(key, mapData.get(key));
+				screens.add(s);
+			}
+			catch (Screen.NotAScreenException e) {}
 		}
-
-		// Close resources
-		bis.close();
-		is.close();
-		gis.close();
 	}
 
 	public void saveToFile(Path mapFile) throws IOException
 	{
-		// Setup GZip for map writing
-		OutputStream os = Files.newOutputStream(mapFile);
-		GZIPOutputStream gos = new GZIPOutputStream(os);
+		MMFBinaryArray mapData = new MMFBinaryArray(mapFile);
 
 		// Write data one screen at a time
 		for (Screen screen : screens)
-			screen.writeTo(gos);
+			screen.writeTo(mapData);
 
 		// Finalize
-		gos.close();
+		mapData.writeToFile(mapFile);
 	}
 
 	public void printScreens()

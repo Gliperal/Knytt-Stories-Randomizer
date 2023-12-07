@@ -66,7 +66,7 @@ public class World
 		}
 	}
 
-	public KSMap readModifiedMap() throws Exception
+	public KSMap readMap() throws Exception
 	{
 		return readMap(mapFile);
 	}

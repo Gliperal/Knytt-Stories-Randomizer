@@ -17,6 +17,7 @@ import util.UserInput;
 public class KSFiles
 {
 	private static final String[] EXECUTABLES = {
+			"Knytt Stories Plus 1.3.6 for Randomizer.exe",
 			"Knytt Stories Plus.exe",
 			"knytt stories ex.exe",
 			"Knytt Stories Speedrun Edition 0.3.1.exe",

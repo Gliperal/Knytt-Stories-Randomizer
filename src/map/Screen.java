@@ -2,21 +2,23 @@ package map;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.zip.GZIPOutputStream;
 
 import core.ObjectGroup;
 import util.Util;
 
 public class Screen
 {
-	private String header;
-	private byte[] data;
-	// Corresponds to the byte sequence 0 190 11 0 0, or 0 [3006 in little endian] 0 0
-	private static final String endOfHeader = "\u0000\uFFBE\u000B\u0000\u0000";
+	@SuppressWarnings("serial")
+	public class NotAScreenException extends Exception {}
 
-	public Screen(String location, byte[] data)
+	private String location;
+	private byte[] data;
+
+	public Screen(String location, byte[] data) throws NotAScreenException
 	{
-		this.header = location;
+		if (!location.matches("x-?\\d+y-?\\d+"))
+			throw new NotAScreenException();
+		this.location = location;
 		this.data = new byte[3006];
 		for (int i = 0; i < 3006; i++)
 			this.data[i] = data[i];
@@ -36,7 +38,7 @@ public class Screen
 
 	public void println()
 	{
-		System.out.println("Screen " + header);
+		System.out.println("Screen " + location);
 		for(int y = 0; y < 10; y++)
 		{
 			for (int x = 0; x < 25; x++)
@@ -56,18 +58,9 @@ public class Screen
 		}
 	}
 
-	public void writeTo(GZIPOutputStream gos) throws IOException
+	public void writeTo(MMFBinaryArray mapData) throws IOException
 	{
-		// Write header
-		String combinedHeader = header + endOfHeader;
-		int headerSize = combinedHeader.length();
-		byte[] headerBytes = new byte[headerSize];
-		for (int i = 0; i < headerSize; i++)
-			headerBytes[i] = (byte) combinedHeader.charAt(i);
-		gos.write(headerBytes, 0, headerSize);
-
-		// Write data
-		gos.write(data, 0, 3006);
+		mapData.set(location, data);
 	}
 
 	public void collectObjects(ObjectGroup objects, boolean includeEmpty)
@@ -149,6 +142,6 @@ public class Screen
 
 	public String toString()
 	{
-		return "Screen[" + header + "]";
+		return "Screen[" + location + "]";
 	}
 }
