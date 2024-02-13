@@ -1,11 +1,17 @@
-TODO: Object classes revamp (thanks to DonDoli).
-Added various new toggles to make objects visible.
-Improved line number tracking for ObjectClasses file errors.
+========= VERSION 3.0.0 =========================================
+
+Complete object classes and presets revamp (courtesy of DonDoli).
+Added batch file to quickly rerandomize.
 Object classes can now accept arbitrary-length ids.
+Improved line number tracking for ObjectClasses file errors.
+Improved batch file exit behavior on errors.
 Added Knytt Stories Plus companion mod.
+	Randomization info displayed when loading into the level
 	Settings to make invisible objects visible (springs, death tiles, etc.)
-	Noise removal for enemies stuck in walls.
-Moved springs into gamebreaking objects.
+	Setting to make springs work in floors
+	Setting to reduce certain objects' hitboxes to mitigate softlocks
+	Quickload hotkey (F3)
+	Noise removal for enemies stuck in walls
 
 
 ========= VERSION 2.0.4 =========================================
