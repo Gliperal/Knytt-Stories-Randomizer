@@ -13,7 +13,8 @@ public class FilePiece
 
 	public FilePiece(Path file) throws IOException
 	{
-		data = Files.readString(file).replaceAll("\r\n", "\n");
+		//data = Files.readString(file).replaceAll("\r\n", "\n");
+		data = new String(Files.readAllBytes(file)).replaceAll("\r\n", "\n");
 		line = 0;
 		col = 0;
 	}
@@ -81,7 +82,8 @@ public class FilePiece
 
 	public boolean isBlank()
 	{
-		return data.isBlank();
+		//return data.isBlank();
+		return data.trim().isEmpty();
 	}
 
 	public int length()
