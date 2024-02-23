@@ -196,6 +196,6 @@ public class KSFiles
 		Path exe = getExecutable(ksDir);
 		if (exe == null)
 			throw new FileNotFoundException("Unable to locate Knytt Stories executable.");
-		run.exec(exe.toString());
+		run.exec("\"" + exe.toString() + "\"");
 	}
 }
