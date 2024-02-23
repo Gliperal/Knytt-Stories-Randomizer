@@ -33,7 +33,7 @@ public class ObjectClass
 		return this.id == formatID(id);
 	}
 
-	public String indentifier()
+	public String identifier()
 	{
 		return id + ": " + name;
 	}

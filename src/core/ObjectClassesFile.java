@@ -391,7 +391,7 @@ public class ObjectClassesFile
 				str += '-';
 			Console.printString(str);
 			for (ObjectClass oc : categoryObjs)
-				Console.printString("\t" + oc.indentifier());
+				Console.printString("\t" + oc.identifier());
 		}
 	}
 }
