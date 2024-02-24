@@ -47,7 +47,22 @@ public class KSFiles
 
 		// If the jar is being run from a subfolder of the KS directory
 		Console.printString("Checking local files...");
+		// Dumping all the files into the KS dir (why would you do this?)
+		ksDir = workingDir;
+		if (isKSDirectory(ksDir))
+		{
+			Console.printString(" Yes.");
+			return;
+		}
+		// Putting the randomizer folder in the KS dir
 		ksDir = workingDir.getParent();
+		if (isKSDirectory(ksDir))
+		{
+			Console.printString(" Yes.");
+			return;
+		}
+		// Putting the randomizer folder in 3rd Party Tools
+		ksDir = workingDir.getParent().getParent();
 		if (isKSDirectory(ksDir))
 		{
 			Console.printString(" Yes.");

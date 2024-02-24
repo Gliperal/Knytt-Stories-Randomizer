@@ -1,5 +1,6 @@
 ========= VERSION 3.0.1 =========================================
 
+Option to link to KS directory by placing randomizer in 3rd Party Tools folder.
 Fixed a bug in which the randomizer would launch the wrong executable if there were spaces in the filename.
 
 
