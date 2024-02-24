@@ -140,7 +140,7 @@ public class WeightedObjectGroup
 		ArrayList<Integer> ret = new ArrayList<Integer>();
 		while (ret.size() < length)
 		{
-			Collections.shuffle(weightedObjects);
+			Collections.shuffle(weightedObjects, rand);
 			ret.addAll(weightedObjects);
 		}
 		return ret;

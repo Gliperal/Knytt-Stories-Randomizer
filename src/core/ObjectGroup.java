@@ -237,7 +237,7 @@ public class ObjectGroup
 		ArrayList<Integer> ret = new ArrayList<Integer>();
 		while (ret.size() < length)
 		{
-			Collections.shuffle(shuffledObjects);
+			Collections.shuffle(shuffledObjects, rand);
 			ret.addAll(shuffledObjects);
 		}
 		return ret;
