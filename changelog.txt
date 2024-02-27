@@ -1,5 +1,6 @@
 ========= VERSION 3.0.1 =========================================
 
+Added warning for users running older version of Java.
 Option to link to KS directory by placing randomizer in 3rd Party Tools folder.
 Fixed a bug in which the randomizer would launch the wrong executable if there were spaces in the filename.
 KS+ mod: Fixed a bug where quick reload would flicker at window scale 2 and 3.
