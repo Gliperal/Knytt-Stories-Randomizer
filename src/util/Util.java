@@ -137,4 +137,13 @@ public class Util
 				return i;
 		return -1;
 	}
+
+	public static byte[] condenseHash(byte[] hash, int length)
+	{
+		byte[] r = new byte[length];
+		for (int i = 0; i < length; i++)
+			for (int j = i; j < hash.length; j += length)
+				r[i] ^= hash[j];
+		return r;
+	}
 }

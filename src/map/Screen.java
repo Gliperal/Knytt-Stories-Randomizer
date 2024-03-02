@@ -1,6 +1,8 @@
 package map;
 
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 import core.ObjectGroup;
@@ -138,6 +140,22 @@ public class Screen
 			}
 		}
 		return count;
+	}
+
+	public void hash(MessageDigest md)
+	{
+		md.update(data);
+	}
+
+	public byte[] hash()
+	{
+
+		try {
+			MessageDigest md = MessageDigest.getInstance("SHA-256");
+			return md.digest(data);
+		} catch (NoSuchAlgorithmException e) {
+			return null;
+		}
 	}
 
 	public String toString()

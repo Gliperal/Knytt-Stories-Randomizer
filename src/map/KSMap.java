@@ -2,7 +2,10 @@ package map;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -12,12 +15,12 @@ import core.ObjectGroup;
 public class KSMap
 {
 	private ArrayList<Screen> screens;
-	private HashMap<String, String> additionalInfo;
+	private HashMap<String, byte[]> additionalInfo;
 
 	public KSMap()
 	{
 		screens = new ArrayList<Screen>();
-		additionalInfo = new HashMap<String, String>();
+		additionalInfo = new HashMap<String, byte[]>();
 	}
 
 	public KSMap(Path mapFile) throws IOException
@@ -49,23 +52,31 @@ public class KSMap
 			screen.writeTo(mapData);
 
 		// Write additional information
-		for (Entry<String, String> entry : additionalInfo.entrySet())
-		{
-			String info = entry.getValue();
-			int size = info.length();
-			byte[] bytes = new byte[size < 3006 ? 3006 : size + 1];
-			for (int i = 0; i < size; i++)
-				bytes[i] = (byte) info.charAt(i);
-			mapData.set(entry.getKey(), bytes);
-		}
+		for (Entry<String, byte[]> entry : additionalInfo.entrySet())
+			mapData.set(entry.getKey(), entry.getValue());
 
 		// Finalize
 		mapData.writeToFile(mapFile);
 	}
 
-	public void addAdditionalInfo(String key, String info)
+	public boolean addAdditionalInfo(String key, byte[] info, boolean truncate)
 	{
-		additionalInfo.put(key, info);
+		if (info.length > 3006 && !truncate)
+			return false;
+		additionalInfo.put(key, Arrays.copyOf(info, 3006));
+		return true;
+	}
+
+	public boolean addAdditionalInfo(String key, String info, boolean truncate)
+	{
+		if (info.length() >= 3006)
+		{
+			if (!truncate)
+				return false;
+			info = info.substring(0, 3002) + "...";
+		}
+		additionalInfo.put(key, Arrays.copyOf(info.getBytes(), 3006));
+		return true;
 	}
 
 	public void clearAdditionalInfo(String key)
@@ -158,6 +169,24 @@ public class KSMap
 			if (count > 0)
 				// TODO return something instead
 				System.out.println(count + " on screen " + s.toString());
+		}
+	}
+
+	public void hash(MessageDigest md)
+	{
+		// order screens before hashing?
+		for (Screen s : screens)
+			s.hash(md);
+	}
+
+	public byte[] hash()
+	{
+		try {
+			MessageDigest md = MessageDigest.getInstance("SHA-256");
+			hash(md);
+			return md.digest();
+		} catch (NoSuchAlgorithmException e) {
+			return null;
 		}
 	}
 }
