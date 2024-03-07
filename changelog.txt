@@ -1,3 +1,12 @@
+========= VERSION 3.0.2 =========================================
+
+KS+ mod: Fixed ForceKey blocks not functioning when reduced.
+KS+ mod: Various improvements to the randomizer info screen
+	Fixed the -> button effects and sounds.
+	Only show when first entering the level (including loading a save).
+	Added randomization hash that is unique for the randomized version of the level.
+
+
 ========= VERSION 3.0.1 =========================================
 
 Tweaked ObjectClasses file.
