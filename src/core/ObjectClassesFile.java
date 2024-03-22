@@ -135,7 +135,7 @@ public class ObjectClassesFile
 				break;
 			if (token.type == TokenType.group && next.type == TokenType.group)
 			{
-				token.group = token.group.combineWith(next.group);
+				token.group = token.group.or(next.group);
 				tokens.remove(i + 1);
 			}
 			else
@@ -156,7 +156,7 @@ public class ObjectClassesFile
 					throw new ParseException("& with no right side", token.lineNumber);
 				Token left = tokens.get(i - 1);
 				Token right = tokens.get(i + 1);
-				left.group = left.group.overlapWith(right.group);
+				left.group = left.group.and(right.group);
 				tokens.remove(i + 1);
 				tokens.remove(i);
 			}
@@ -178,7 +178,7 @@ public class ObjectClassesFile
 					throw new ParseException("Minus with no right side", token.lineNumber);
 				Token left = tokens.get(i - 1);
 				Token right = tokens.get(i + 1);
-				left.group = left.group.eliminateFrom(right.group);
+				left.group = left.group.subtract(right.group);
 				tokens.remove(i + 1);
 				tokens.remove(i);
 			}
@@ -200,7 +200,7 @@ public class ObjectClassesFile
 					throw new ParseException("+ with no right side", token.lineNumber);
 				Token left = tokens.get(i - 1);
 				Token right = tokens.get(i + 1);
-				left.group = left.group.combineWith(right.group);
+				left.group = left.group.or(right.group);
 				tokens.remove(i + 1);
 				tokens.remove(i);
 			}
@@ -307,7 +307,6 @@ public class ObjectClassesFile
 		// The last remaining token has our finished object group
 		ObjectGroup group = tokens.get(0).group;
 		group.sort();
-		group.setCreationKey(key.toString());
 		return group;
 	}
 

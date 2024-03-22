@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.Random;
 
 import map.KSMap;
+import map.MapObject;
+import util.Util;
 
 public class RandoRuleShuffle extends RandoRule
 {
@@ -20,11 +22,10 @@ public class RandoRuleShuffle extends RandoRule
 	public void randomize(KSMap map, Random rand)
 	{
 		// Collect a list of all the output objects in the map (including duplicates)
-		int[] outObjects = map.exportObjects(output.hasObject(0));
+		ArrayList<MapObject> outObjects = output.findAll(map);
 		ArrayList<Integer> outShuffle = new ArrayList<Integer>();
-		for (int obj : outObjects)
-			if (output.hasObject(obj))
-				outShuffle.add(obj);
+		for (MapObject obj : outObjects)
+			outShuffle.add(Util.combineBankObj(obj.bank, obj.object));
 
 		// Shuffle said list
 		Collections.shuffle(outShuffle, rand);
@@ -34,22 +35,19 @@ public class RandoRuleShuffle extends RandoRule
 			outShuffle.add(0);
 
 		// Randomize
-		boolean includeEmpty = input.hasObject(0);
-		int[] mapObjects = map.exportObjects(includeEmpty);
+		ArrayList<MapObject> targets = map.find(input);
 		int next = 0;
-		for (int i = 0; i < mapObjects.length; i++)
-			if (input.hasObject(mapObjects[i]))
+		for (int i = 0; i < targets.size(); i++)
+		{
+			// If we reach the end of the shuffled output items, shuffle again and start from the beginning
+			if (next >= outShuffle.size())
 			{
-				// If we reach the end of the shuffled output items, shuffle again and start from the beginning
-				if (next >= outShuffle.size())
-				{
-					Collections.shuffle(outShuffle, rand);
-					next = 0;
-				}
-				mapObjects[i] = outShuffle.get(next);
-				next++;
+				Collections.shuffle(outShuffle, rand);
+				next = 0;
 			}
-		map.importObjects(mapObjects, includeEmpty);
+			targets.get(i).replace(outShuffle.get(next));
+			next++;
+		}
 	}
 
 	public String toString()

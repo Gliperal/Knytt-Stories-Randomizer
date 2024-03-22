@@ -3,10 +3,13 @@ package core;
 import java.text.ParseException;
 import java.util.Random;
 
+import map.Pattern;
+
 public abstract class RandoRule
 {
-	protected ObjectGroup input;
+	public Pattern input; // TODO Protected
 	protected WeightedObjectGroup output;
+	protected String outputCreationKey;
 	private String creationKey;
 
 	protected void readKey(String key, ObjectClassesFile classData) throws ParseException
@@ -16,11 +19,13 @@ public abstract class RandoRule
 		{
 			input = classData.buildObjectGroup(key);
 			output = new WeightedObjectGroup(input);
+			outputCreationKey = key;
 		}
 		else if (split.length == 2)
 		{
 			input = classData.buildObjectGroup(split[0]);
 			output = new WeightedObjectGroup(classData, split[1]);
+			outputCreationKey = split[1];
 		}
 		else
 			throw new ParseException("More than one -> in randomization rule.", -1);
@@ -64,28 +69,10 @@ public abstract class RandoRule
 
 	public int conflictsWith(RandoRule that)
 	{
-		int obj = input.firstCommonObject(that.input);
-//		if (obj == -1)
-//			obj = input.firstCommonObject(that.output);
-//		if (obj == -1)
-//			obj = output.firstCommonObject(that.input);
-//		if (obj == -1)
-//			obj = output.firstCommonObject(that.output);
-		return obj;
+		// TODO
+		return 0;
+		//return input.firstCommonObject(that.input);
 	}
-
-//	private static String objectGroupString(ObjectGroup group)
-//	{
-//		return group.getCreationKey() + " (" + group.size() + " objects)";
-//	}
-
-//	public String toDisplayString()
-//	{
-//		String ruleStr = objectGroupString(input);
-//		if (input != output)
-//			ruleStr += " -> " + objectGroupString(output);
-//		return "Randomization Rule [" + ruleStr + "]";
-//	}
 
 	public String toDisplayString()
 	{

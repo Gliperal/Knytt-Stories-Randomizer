@@ -146,4 +146,16 @@ public class Util
 				r[i] ^= hash[j];
 		return r;
 	}
+
+	public static <T extends Object> String join(CharSequence delimiter, ArrayList<T> elements)
+	{
+		String str = "";
+		for (int i = 0; i < elements.size(); i++)
+		{
+			str += elements.get(i);
+			if (i != 0)
+				str += delimiter;
+		}
+		return str;
+	}
 }
