@@ -1,5 +1,5 @@
 @echo off
-java --version > NUL 2>&1
+java -version > NUL 2>&1
 if %errorlevel% NEQ 0 (
 	echo You must install Java to run this program.
 	set /p "tmp="
