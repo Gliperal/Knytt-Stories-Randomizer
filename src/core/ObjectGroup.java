@@ -72,16 +72,22 @@ public class ObjectGroup implements Pattern
 
 	public Pattern and(Pattern that)
 	{
+		if (that instanceof ObjectGroup)
+			return and((ObjectGroup)that);
 		return new CombinedPattern('&', this, that);
 	}
 
 	public Pattern or(Pattern that)
 	{
+		if (that instanceof ObjectGroup)
+			return or((ObjectGroup)that); // there's got to be a better way to do it than this...
 		return new CombinedPattern('|', this, that);
 	}
 
 	public Pattern subtract(Pattern that)
 	{
+		if (that instanceof ObjectGroup)
+			return subtract((ObjectGroup)that);
 		return new CombinedPattern('-', this, that);
 	}
 
