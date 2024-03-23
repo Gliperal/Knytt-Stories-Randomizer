@@ -13,7 +13,6 @@ import java.util.Scanner;
 import map.KSFiles;
 import map.KSMap;
 import map.LoadException;
-import map.OffsetPattern;
 import map.World;
 import util.Console;
 import util.UserInput;

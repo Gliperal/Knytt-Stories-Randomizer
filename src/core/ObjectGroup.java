@@ -215,16 +215,19 @@ public class ObjectGroup implements Pattern
 
 	public int randomObject(Random rand)
 	{
+		sort();
 		return objects[rand.nextInt(objects.length)];
 	}
 
 	public int[] toList()
 	{
+		sort();
 		return Arrays.copyOf(objects, objects.length);
 	}
 
 	public ArrayList<Integer> randomlyFillList(int length, Random rand)
 	{
+		sort();
 		ArrayList<Integer> shuffledObjects = new ArrayList<Integer>();
 		for (int i : objects)
 			shuffledObjects.add(i);

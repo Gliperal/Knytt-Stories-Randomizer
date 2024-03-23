@@ -7,6 +7,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import map.OffsetPattern;
+import map.Pattern;
 import util.Console;
 import util.Util;
 
@@ -71,7 +76,7 @@ public class ObjectClassesFile
 	private class Token
 	{
 		public TokenType type;
-		public ObjectGroup group;
+		public Pattern group;
 		public int lineNumber;
 
 		public Token(TokenType type, int lineNumber)
@@ -80,7 +85,7 @@ public class ObjectClassesFile
 			this.lineNumber = lineNumber;
 		}
 
-		public Token(ObjectGroup group, int lineNumber)
+		public Token(Pattern group, int lineNumber)
 		{
 			this.type = TokenType.group;
 			this.group = group;
@@ -221,7 +226,35 @@ public class ObjectClassesFile
 		tokens.remove(start + 1);
 	}
 
-	public ObjectGroup buildObjectGroup(FilePiece key) throws ParseException
+	public Pattern buildSpecialPattern(String key, int lineNumber) throws ParseException
+	{
+		JSONObject json;
+		try
+		{
+			json = new JSONObject(key);
+		}
+		catch (JSONException e)
+		{
+			throw new ParseException("Invalid JSON for pattern: " + e.getMessage(), lineNumber);
+		}
+
+		if (!json.has("type"))
+			throw new ParseException("Pattern with missing type", lineNumber);
+		String type = json.getString("type");
+
+		switch(type)
+		{
+		case "tile":
+			int x = json.has("x") ? json.getInt("x") : 0;
+			int y = json.has("y") ? json.getInt("y") : 0;
+			boolean solid = json.has("solid") ? json.getBoolean("solid") : true;
+			return new OffsetPattern(x, y, solid ? 'S' : 'N');
+		default:
+			throw new ParseException("Unrecognized pattern type: \"" + type + "\"", lineNumber);
+		}
+	}
+
+	public Pattern buildObjectGroup(FilePiece key) throws ParseException
 	{
 		// Tokenize
 		int i = 0;
@@ -229,11 +262,7 @@ public class ObjectClassesFile
 		while (i < key.length())
 		{
 			char c = key.charAt(i);
-			if (c == '\n')
-			{
-				i++;
-			}
-			else if (c == ',' || Character.isWhitespace(c))
+			if (c == ',' || Character.isWhitespace(c))
 			{
 				i++;
 			}
@@ -262,6 +291,16 @@ public class ObjectClassesFile
 				tokens.add(new Token(TokenType.closeParen, key.lineOf(i)));
 				i++;
 			}
+			else if (c == '{')
+			{
+				int j = Util.findMatchingBracket(key, i);
+				if (j == -1)
+					throw new ParseException("Unbalanced brackets", key.lineOf(i));
+				String json = key.toString().substring(i, j + 1).replaceAll("\r?\n", "").trim();
+				Pattern pattern = buildSpecialPattern(json, key.lineOf(i));
+				tokens.add(new Token(pattern, key.lineOf(i)));
+				i = j + 1;
+			}
 			else if (Character.isDigit(c))
 			{
 				try
@@ -272,7 +311,6 @@ public class ObjectClassesFile
 					while (k < key.length() && Character.isDigit(key.charAt(k)))
 						k++;
 					int object = key.substring(j + 1, k).toInt();
-					// assign the same id and name to all the tokens (eventually they'll be merged down into one)
 					ObjectGroup group = new ObjectGroup();
 					group.add((byte) bank, (byte) object);
 					tokens.add(new Token(group, key.lineOf(i)));
@@ -304,13 +342,11 @@ public class ObjectClassesFile
 		if (tokens.size() > 1)
 			throw new ParseException("Unbalanced parenthesis.", tokens.get(0).lineNumber);
 
-		// The last remaining token has our finished object group
-		ObjectGroup group = tokens.get(0).group;
-		group.sort();
-		return group;
+		// The last remaining token has our finished pattern
+		return tokens.get(0).group;
 	}
 
-	public ObjectGroup buildObjectGroup(String key) throws ParseException
+	public Pattern buildObjectGroup(String key) throws ParseException
 	{
 		return buildObjectGroup(new FilePiece(key, -1, -1));
 	}
@@ -333,22 +369,23 @@ public class ObjectClassesFile
 				else
 					throw new ParseException("Unexpected text after last object group.", contents.getLine());
 			}
-			FilePiece header = contents.substring(0, i);
-			contents = contents.substring(i + 1);
+
+			// Read until the matching }
+			int end = Util.findMatchingBracket(contents, i);
+			if (end == -1)
+				throw new ParseException("Unmatched \"{\"", contents.getLine());
 
 			// Parse the header
+			FilePiece header = contents.substring(0, i);
 			ObjectClassMetadata metadata = parseHeader(header);
 
-			// Read until the next }
-			i = contents.indexOf('}');
-			if (i == -1)
-				throw new ParseException("Unmatched \"{\"", contents.getLine());
-			FilePiece body = contents.substring(0, i);
-			contents = contents.substring(i + 1);
-
 			// Parse the body
-			ObjectGroup group = buildObjectGroup(body);
+			FilePiece body = contents.substring(i + 1, end);
+			Pattern group = buildObjectGroup(body);
 			classes.add(new ObjectClass(metadata.id, metadata.name, metadata.category, group));
+
+			// Continue from there
+			contents = contents.substring(end + 1);
 		}
 		// Sort the groups alphabetically
 		sort();

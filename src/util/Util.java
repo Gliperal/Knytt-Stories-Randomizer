@@ -158,4 +158,21 @@ public class Util
 		}
 		return str;
 	}
+
+	public static int findMatchingBracket(FilePiece s, int i)
+	{
+		int len = s.length();
+		int detph = 0;
+		for (; i < len; i++)
+		{
+			char c = s.charAt(i);
+			if (c == '{')
+				detph++;
+			if (c == '}')
+				detph--;
+			if (detph <= 0)
+				return i;
+		}
+		return -1;
+	}
 }
