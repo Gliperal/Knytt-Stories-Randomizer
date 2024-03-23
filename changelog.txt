@@ -1,5 +1,7 @@
-========= VERSION 3.0.2 =========================================
+========= VERSION 3.1.0 =========================================
 
+Added Patterns.
+Removed warnings on conflicting rules (it's a feature now).
 KS+ mod: Fixed ForceKey blocks not functioning when reduced.
 KS+ mod: Various improvements to the randomizer info screen
 	Fixed the -> button effects and sounds.
