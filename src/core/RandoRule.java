@@ -7,7 +7,7 @@ import map.Pattern;
 
 public abstract class RandoRule
 {
-	public Pattern input; // TODO Protected
+	protected Pattern input;
 	protected WeightedObjectGroup output;
 	protected String outputCreationKey;
 	private String creationKey;
@@ -65,13 +65,6 @@ public abstract class RandoRule
 	public String saveToString()
 	{
 		return getID() + creationKey;
-	}
-
-	public int conflictsWith(RandoRule that)
-	{
-		// TODO
-		return 0;
-		//return input.firstCommonObject(that.input);
 	}
 
 	public String toDisplayString()

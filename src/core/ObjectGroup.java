@@ -264,12 +264,9 @@ public class ObjectGroup implements Pattern
 
 	public boolean matches(Screen s, int layer, int x, int y)
 	{
-		// TODO actual variable names
-		byte[] a = s.objectAt(layer, x, y);
-		int b = Util.combineBankObj(a[0], a[1]);
-		for (int c : objects)
-			if (b == c)
-				return true;
-		return false;
+		sort();
+		byte[] bankObj = s.objectAt(layer, x, y);
+		int object = Util.combineBankObj(bankObj[0], bankObj[1]);
+		return Arrays.binarySearch(objects, object) >= 0;
 	}
 }

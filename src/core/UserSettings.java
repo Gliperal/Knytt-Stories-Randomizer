@@ -362,22 +362,6 @@ public class UserSettings
 			Console.printError("No randomization rules specified! Use R to set rules.");
 			ok = false;
 		}
-		else
-		{
-			// Check for the same object in multiple rule inputs
-			// (TODO update to just the inputs when rules can all happen at once)
-			for (int a = 0; a < randoRules.size(); a++)
-			{
-				RandoRule ruleA = randoRules.get(a);
-				for (int b = a + 1; b < randoRules.size(); b++)
-				{
-					RandoRule ruleB = randoRules.get(b);
-					int obj = ruleA.conflictsWith(ruleB);
-					if (obj != -1)
-						Console.printWarning("Bank " + Util.separateBank(obj) + " object " + Util.separateObj(obj) + " found in more than one randomization rule. Overlap between rules may lead to undefined behavior.");
-				}
-			}
-		}
 		return ok;
 	}
 
