@@ -161,15 +161,12 @@ public class KSMap
 		}
 	}
 
-	public void findObject(byte bank, byte obj)
+	public ArrayList<MapObject> find(Pattern p)
 	{
+		ArrayList<MapObject> result = new ArrayList<MapObject>();
 		for(Screen s : screens)
-		{
-			int count = s.countObject(bank, obj);
-			if (count > 0)
-				// TODO return something instead
-				System.out.println(count + " on screen " + s.toString());
-		}
+			s.find(p, result);
+		return result;
 	}
 
 	public void hash(MessageDigest md)

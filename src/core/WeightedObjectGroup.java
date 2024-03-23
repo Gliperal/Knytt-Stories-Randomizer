@@ -5,22 +5,25 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
+import map.KSMap;
+import map.MapObject;
+import map.Pattern;
+
 public class WeightedObjectGroup
 {
-	private String creationKey;
-	private ArrayList<ObjectGroup> groups;
+	public ArrayList<Pattern> groups;
+	private ArrayList<ObjectGroup> objectsThatMatchForEachGroup;
 	private ArrayList<Double> weights;
 
 	private WeightedObjectGroup()
 	{
-		groups = new ArrayList<ObjectGroup>();
+		groups = new ArrayList<Pattern>();
 		weights = new ArrayList<Double>();
 	}
 
-	public WeightedObjectGroup(ObjectGroup group)
+	public WeightedObjectGroup(Pattern group)
 	{
 		this();
-		creationKey = group.getCreationKey();
 		groups.add(group);
 		weights.add(1.0);
 	}
@@ -28,7 +31,6 @@ public class WeightedObjectGroup
 	public WeightedObjectGroup(ObjectClassesFile classData, String creationKey) throws ParseException
 	{
 		this();
-		this.creationKey = creationKey;
 
 		// Standard object group
 		if (!creationKey.contains("<"))
@@ -74,34 +76,40 @@ public class WeightedObjectGroup
 			weights.set(i, weights.get(i) / total);
 	}
 
-	public String getCreationKey()
-	{
-		return creationKey;
-	}
-
-	public boolean hasObject(int bankObj)
-	{
-		for (ObjectGroup group : groups)
-			if (group.hasObject(bankObj))
-				return true;
-		return false;
-	}
-
-	public int size()
-	{
-		ObjectGroup all = new ObjectGroup();
-		for (ObjectGroup group : groups)
-			all = all.combineWith(group);
-		return all.size();
-	}
-
 	public WeightedObjectGroup overlapWith(ObjectGroup mask)
 	{
+		// TODO Delete any groups that become empty? Return null if it deletes all the groups?
 		WeightedObjectGroup ret = new WeightedObjectGroup();
-		for (ObjectGroup group : groups)
-			ret.groups.add(group.overlapWith(mask));
+		for (Pattern group : groups)
+			ret.groups.add(group.and(mask));
 		ret.weights = weights;
 		return ret;
+	}
+
+	public ArrayList<MapObject> findAll(KSMap map)
+	{
+		// TODO Weight this somehow (for shuffle)?
+		Pattern allPatterns = groups.get(0);
+		for (int i = 1; i < groups.size(); i++)
+			allPatterns = allPatterns.and(groups.get(i));
+		return map.find(allPatterns);
+	}
+
+	public void populateWithMapObjects(KSMap map)
+	{
+		objectsThatMatchForEachGroup = new ArrayList<ObjectGroup>();
+		for (int i = 0; i < groups.size(); i++)
+		{
+			if (groups.get(i) instanceof ObjectGroup)
+			{
+				objectsThatMatchForEachGroup.add((ObjectGroup) groups.get(i));
+				continue;
+			}
+			ObjectGroup mapObjects = new ObjectGroup();
+			for (MapObject obj : map.find(groups.get(i)))
+				mapObjects.add(obj.bank, obj.object);
+			objectsThatMatchForEachGroup.add(mapObjects);
+		}
 	}
 
 	public int randomObject(Random rand)
@@ -112,9 +120,18 @@ public class WeightedObjectGroup
 		{
 			total += weights.get(i);
 			if (total > roll)
-				return groups.get(i).randomObject(rand);
+				try
+			{
+					return objectsThatMatchForEachGroup.get(i).randomObject(rand);
+			}
+			catch (Exception e)
+			{
+				for (ObjectGroup f : objectsThatMatchForEachGroup)
+					System.out.println(f);
+				throw e;
+			}
 		}
-		return groups.get(groups.size() - 1).randomObject(rand);
+		return objectsThatMatchForEachGroup.get(objectsThatMatchForEachGroup.size() - 1).randomObject(rand);
 	}
 
 	public ArrayList<Integer> randomlyFillList(int length, Random rand)
@@ -123,7 +140,7 @@ public class WeightedObjectGroup
 		double scale = 1.0;
 		for (int i = 0; i < weights.size(); i++)
 		{
-			double s = ((double) groups.get(i).size()) / weights.get(i);
+			double s = ((double) objectsThatMatchForEachGroup.get(i).size()) / weights.get(i);
 			if (s > scale)
 				scale = s;
 		}
@@ -133,7 +150,7 @@ public class WeightedObjectGroup
 		for (int i = 0; i < weights.size(); i++)
 		{
 			int size = (int) Math.round(weights.get(i) * scale);
-			weightedObjects.addAll(groups.get(i).randomlyFillList(size, rand));
+			weightedObjects.addAll(objectsThatMatchForEachGroup.get(i).randomlyFillList(size, rand));
 		}
 
 		// Fill array of desired length

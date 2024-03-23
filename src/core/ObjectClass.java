@@ -2,22 +2,24 @@ package core;
 
 import java.util.Comparator;
 
+import map.Pattern;
+
 public class ObjectClass
 {
 	public String id;
 	public String name;
 	public String category;
-	public ObjectGroup group;
+	public Pattern group;
 
 	// all base classes have a string id and optionally a name and category
-	public ObjectClass(String id, String name, ObjectGroup group)
+	public ObjectClass(String id, String name, Pattern group)
 	{
 		this.id = formatID(id);
 		this.name = name;
 		this.group = group;
 	}
 
-	public ObjectClass(String id, String name, String category, ObjectGroup group)
+	public ObjectClass(String id, String name, String category, Pattern group)
 	{
 		this(id, name, group);
 		this.category = category;

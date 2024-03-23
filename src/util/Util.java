@@ -146,4 +146,33 @@ public class Util
 				r[i] ^= hash[j];
 		return r;
 	}
+
+	public static <T extends Object> String join(CharSequence delimiter, ArrayList<T> elements)
+	{
+		String str = "";
+		for (int i = 0; i < elements.size(); i++)
+		{
+			str += elements.get(i);
+			if (i != 0)
+				str += delimiter;
+		}
+		return str;
+	}
+
+	public static int findMatchingBracket(FilePiece s, int i)
+	{
+		int len = s.length();
+		int detph = 0;
+		for (; i < len; i++)
+		{
+			char c = s.charAt(i);
+			if (c == '{')
+				detph++;
+			if (c == '}')
+				detph--;
+			if (detph <= 0)
+				return i;
+		}
+		return -1;
+	}
 }

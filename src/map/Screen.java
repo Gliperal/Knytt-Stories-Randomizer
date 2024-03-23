@@ -38,6 +38,17 @@ public class Screen
 		return new byte[] {bank, obj};
 	}
 
+	public void setTile(int layer, int x, int y, byte tile)
+	{
+		data[layer*250 + y*25 + x] = tile;
+	}
+
+	public void setObject(int layer, int x, int y, byte bank, byte obj)
+	{
+		data[layer*500 - 750 + y*25 + x] = bank;
+		data[layer*500 - 1000 + y*25 + x] = obj;
+	}
+
 	public void println()
 	{
 		System.out.println("Screen " + location);
@@ -126,18 +137,20 @@ public class Screen
 		data[3004] = value;
 	}
 
-	public int countObject(byte bank, byte obj)
+	public int find(Pattern p, ArrayList<MapObject> list)
 	{
 		int count = 0;
 		for (int layer = 4; layer < 8; layer++)
 		{
 			int bankOffset = layer*500 - 750;
 			int objOffset = layer*500 - 1000;
-			for (int tile = 0; tile < 250; tile++)
-			{
-				if ((int)data[bankOffset + tile] == bank && (int)data[objOffset + tile] == obj)
-					count++;
-			}
+			for (int y = 0; y < 10; y++)
+				for (int x = 0; x < 25; x++)
+					if (p.matches(this, layer, x, y))
+					{
+						list.add(new MapObject(this, layer, x, y, data[bankOffset + y*25 + x], data[objOffset + y*25 + x]));
+						count++;
+					}
 		}
 		return count;
 	}

@@ -26,7 +26,7 @@ public class Main
 		KS,
 	}
 
-	private static final String VERSION_NUMBER = "3.0.1";
+	private static final String VERSION_NUMBER = "3.1.0";
 	private static final String RANDOMIZER_HEADER =
 			"                          ,--------------------------,\n" +
 			"                          | KNYTT STORIES RANDOMIZER |\n" +
@@ -158,7 +158,8 @@ public class Main
 		// Begin randomization
 		Console.printString("Randomizing...");
 		Random rand = settings.getRandomFromSeed();
-		for (RandoRule rule : settings.getRandoRules())
+		ArrayList<RandoRule> rules = settings.getRandoRules();
+		for (RandoRule rule : rules)
 			rule.randomize(map, rand);
 
 		// Randomize music
@@ -170,7 +171,6 @@ public class Main
 		{
 			map.addAdditionalInfo("Randomizer Version", VERSION_NUMBER, true);
 			map.addAdditionalInfo("Randomizer Seed", settings.getSeed().toString(), true);
-			ArrayList<RandoRule> rules = settings.getRandoRules();
 			map.addAdditionalInfo("Randomizer Rules", Util.join("\n", rules), true);
 			map.addAdditionalInfo("Randomizer Hash", Util.condenseHash(map.hash(), 8), true);
 			world.writeMap(map);

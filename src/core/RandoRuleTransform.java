@@ -2,10 +2,11 @@ package core;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 
 import map.KSMap;
+import map.MapObject;
+import util.Util;
 
 public class RandoRuleTransform extends RandoRule
 {
@@ -20,23 +21,27 @@ public class RandoRuleTransform extends RandoRule
 	public void randomize(KSMap map, Random rand)
 	{
 		// Get a list of the input objects, and sort for later
-		int[] inObjs = input.toList();
-		Arrays.sort(inObjs);
+		ArrayList<MapObject> targets = map.find(input);
+		ArrayList<Integer> inObjs = new ArrayList<Integer>();
+		for (MapObject mo : targets)
+		{
+			int object = Util.combineBankObj(mo.bank, mo.object);
+			if (inObjs.indexOf(object) == -1)
+				inObjs.add(object);
+		}
+		inObjs.sort(null);
 
 		// Shuffle the output objects as many times as needed to match the size of input
-		ArrayList<Integer> outObjs = output.randomlyFillList(inObjs.length, rand);
+		output.populateWithMapObjects(map);
+		ArrayList<Integer> outObjs = output.randomlyFillList(inObjs.size(), rand);
 
 		// Randomize
-		boolean includeEmpty = input.hasObject(0);
-		int[] mapObjects = map.exportObjects(includeEmpty);
-		for (int i = 0; i < mapObjects.length; i++)
+		for (MapObject target : targets)
 		{
-			int obj = mapObjects[i];
-			int objIndex = Arrays.binarySearch(inObjs, obj);
-			if (objIndex >= 0)
-				mapObjects[i] = outObjs.get(objIndex);
+			int obj = Util.combineBankObj(target.bank, target.object);
+			int objIndex = inObjs.indexOf(obj);
+			target.replace(outObjs.get(objIndex));
 		}
-		map.importObjects(mapObjects, includeEmpty);
 	}
 
 	public String toString()

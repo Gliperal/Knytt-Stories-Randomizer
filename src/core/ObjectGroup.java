@@ -5,27 +5,19 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Random;
 
+import map.CombinedPattern;
+import map.Pattern;
+import map.Screen;
 import util.Util;
 
-public class ObjectGroup
+public class ObjectGroup implements Pattern
 {
-	private String creationKey;
 	private int[] objects;
 	private boolean isSorted = false;
 
 	public ObjectGroup()
 	{
 		objects = new int[0];
-	}
-
-	public void setCreationKey(String key)
-	{
-		creationKey = key;
-	}
-
-	public String getCreationKey()
-	{
-		return creationKey;
 	}
 
 	public void add(int bank, int obj)
@@ -78,12 +70,27 @@ public class ObjectGroup
 		}
 	}
 
+	public Pattern and(Pattern that)
+	{
+		return new CombinedPattern('&', this, that);
+	}
+
+	public Pattern or(Pattern that)
+	{
+		return new CombinedPattern('|', this, that);
+	}
+
+	public Pattern subtract(Pattern that)
+	{
+		return new CombinedPattern('-', this, that);
+	}
+
 	/**
 	 * Returns a new ObjectGroup that contains all of the objects from this ObjectGroup and the one passed as an argument. Neither of the inputs are modified.
 	 * @param that The ObjectGroup to be combined with.
 	 * @return The union of the two inputs.
 	 */
-	public ObjectGroup combineWith(ObjectGroup that)
+	public ObjectGroup or(ObjectGroup that)
 	{
 		// Sort both classes if they aren't already, so that we can perform a merge with uniqueness
 		sort();
@@ -118,7 +125,7 @@ public class ObjectGroup
 	 * @param that The ObjectGroup to be overlapped with.
 	 * @return The intersection of the two inputs.
 	 */
-	public ObjectGroup overlapWith(ObjectGroup that)
+	public ObjectGroup and(ObjectGroup that)
 	{
 		// Sort both classes if they aren't already, so that we can perform a linear search
 		sort();
@@ -153,7 +160,7 @@ public class ObjectGroup
 	 * @param that The ObjectGroup containing forbidden objects.
 	 * @return The difference of the two inputs.
 	 */
-	public ObjectGroup eliminateFrom(ObjectGroup that)
+	public ObjectGroup subtract(ObjectGroup that)
 	{
 		// Sort both classes if they aren't already, so that we can perform a linear search
 		sort();
@@ -187,7 +194,7 @@ public class ObjectGroup
 
 	public String toString()
 	{
-		String result = "ObjectGroup(" + creationKey + ")[";
+		String result = "ObjectGroup[";
 		for (int i = 0; i < objects.length; i++)
 			result += (objects[i] >> 8) + ":" + (objects[i] & 0xFF) + ",";
 		return result + "]";
@@ -208,29 +215,19 @@ public class ObjectGroup
 
 	public int randomObject(Random rand)
 	{
+		sort();
 		return objects[rand.nextInt(objects.length)];
 	}
 
 	public int[] toList()
 	{
+		sort();
 		return Arrays.copyOf(objects, objects.length);
 	}
 
-/*	public int[] toShuffle(Random rand)
-	{
-		int len = objects.length;
-		ArrayList<Integer> indexes = new ArrayList<Integer>();
-		for (int i = 0; i < len; i++)
-			indexes.add(i);
-		Collections.shuffle(indexes, rand);
-		int[] shuffle = new int[len];
-		for (int i = 0; i < len; i++)
-			shuffle[i] = objects[indexes.get(i)];
-		return shuffle;
-	}*/
-
 	public ArrayList<Integer> randomlyFillList(int length, Random rand)
 	{
+		sort();
 		ArrayList<Integer> shuffledObjects = new ArrayList<Integer>();
 		for (int i : objects)
 			shuffledObjects.add(i);
@@ -263,5 +260,13 @@ public class ObjectGroup
 	public int size()
 	{
 		return objects.length;
+	}
+
+	public boolean matches(Screen s, int layer, int x, int y)
+	{
+		sort();
+		byte[] bankObj = s.objectAt(layer, x, y);
+		int object = Util.combineBankObj(bankObj[0], bankObj[1]);
+		return Arrays.binarySearch(objects, object) >= 0;
 	}
 }

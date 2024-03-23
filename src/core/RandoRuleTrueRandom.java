@@ -1,9 +1,11 @@
 package core;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Random;
 
 import map.KSMap;
+import map.MapObject;
 
 public class RandoRuleTrueRandom extends RandoRule
 {
@@ -17,12 +19,10 @@ public class RandoRuleTrueRandom extends RandoRule
 
 	public void randomize(KSMap map, Random rand)
 	{
-		boolean includeEmpty = input.hasObject(0);
-		int[] mapObjects = map.exportObjects(includeEmpty);
-		for (int i = 0; i < mapObjects.length; i++)
-			if (input.hasObject(mapObjects[i]))
-				mapObjects[i] = output.randomObject(rand);
-		map.importObjects(mapObjects, includeEmpty);
+		ArrayList<MapObject> targets = map.find(input);
+		output.populateWithMapObjects(map);
+		for (MapObject target : targets)
+			target.replace(output.randomObject(rand));
 	}
 
 	public String toString()
