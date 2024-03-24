@@ -7,12 +7,13 @@ import java.util.Random;
 
 import map.KSMap;
 import map.MapObject;
+import map.ObjectPattern;
 import map.Pattern;
 
 public class WeightedObjectGroup
 {
 	public ArrayList<Pattern> groups;
-	private ArrayList<ObjectGroup> objectsThatMatchForEachGroup;
+	private ArrayList<ObjectPattern> objectsThatMatchForEachGroup;
 	private ArrayList<Double> weights;
 
 	private WeightedObjectGroup()
@@ -76,9 +77,8 @@ public class WeightedObjectGroup
 			weights.set(i, weights.get(i) / total);
 	}
 
-	public WeightedObjectGroup overlapWith(ObjectGroup mask)
+	public WeightedObjectGroup overlapWith(ObjectPattern mask)
 	{
-		// TODO Delete any groups that become empty? Return null if it deletes all the groups?
 		WeightedObjectGroup ret = new WeightedObjectGroup();
 		for (Pattern group : groups)
 			ret.groups.add(group.and(mask));
@@ -95,21 +95,30 @@ public class WeightedObjectGroup
 		return map.find(allPatterns);
 	}
 
-	public void populateWithMapObjects(KSMap map)
+	/**
+	 * Simplifies all of the Patterns into ObjectPatterns. Must be called before randomObject or randomlyFillList.
+	 * @param map The map to use for the pattern simplification.
+	 * @return 0 if successful, 1 if successful but some empty groups were deleted, -1 if all groups were deleted
+	 */
+	public int prepForRandomization(KSMap map)
 	{
-		objectsThatMatchForEachGroup = new ArrayList<ObjectGroup>();
+		objectsThatMatchForEachGroup = new ArrayList<ObjectPattern>();
 		for (int i = 0; i < groups.size(); i++)
 		{
-			if (groups.get(i) instanceof ObjectGroup)
+			if (groups.get(i) instanceof ObjectPattern)
 			{
-				objectsThatMatchForEachGroup.add((ObjectGroup) groups.get(i));
+				// Object patterns are special: treat them as purely a list of object ids
+				objectsThatMatchForEachGroup.add((ObjectPattern) groups.get(i));
 				continue;
 			}
-			ObjectGroup mapObjects = new ObjectGroup();
+			// For all other patterns, search the map for all objects that match
+			ObjectPattern mapObjects = new ObjectPattern();
 			for (MapObject obj : map.find(groups.get(i)))
 				mapObjects.add(obj.bank, obj.object);
 			objectsThatMatchForEachGroup.add(mapObjects);
 		}
+		// TODO Delete any groups that become empty. Return 1 if some were deleted or -1 if all were deleted
+		return 0;
 	}
 
 	public int randomObject(Random rand)
@@ -120,16 +129,7 @@ public class WeightedObjectGroup
 		{
 			total += weights.get(i);
 			if (total > roll)
-				try
-			{
-					return objectsThatMatchForEachGroup.get(i).randomObject(rand);
-			}
-			catch (Exception e)
-			{
-				for (ObjectGroup f : objectsThatMatchForEachGroup)
-					System.out.println(f);
-				throw e;
-			}
+				return objectsThatMatchForEachGroup.get(i).randomObject(rand);
 		}
 		return objectsThatMatchForEachGroup.get(objectsThatMatchForEachGroup.size() - 1).randomObject(rand);
 	}

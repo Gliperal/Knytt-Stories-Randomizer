@@ -34,6 +34,14 @@ public class OffsetPattern implements Pattern
 		return objects.matches(s, layer, x, y);
 	}
 
+	public ObjectPattern simplify(KSMap map)
+	{
+		ObjectPattern objects = new ObjectPattern();
+		for (MapObject obj : map.find(this))
+			objects.add(obj.bank, obj.object);
+		return objects;
+	}
+
 	public Pattern subtract(Pattern that)
 	{
 		return new CombinedPattern('-', this, that);

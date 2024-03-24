@@ -62,6 +62,15 @@ public class Util
 		return (byte) object;
 	}
 
+	public static String bankObjectString(int object)
+	{
+		int bank = separateBank(object);
+		int obj = separateObj(object);
+		if (bank < 0) bank += 256;
+		if (obj < 0) obj += 256;
+		return bank + ":" + obj;
+	}
+
 	public static int[] mergeArrays(int[] a, int[] b)
 	{
 		int alen = a.length;

@@ -4,8 +4,7 @@ import java.text.ParseException;
 import java.util.Random;
 
 import map.KSMap;
-
-import util.Console;
+import map.ObjectPattern;
 
 public class RandoRulePermute extends RandoRuleTransform
 {
@@ -20,17 +19,10 @@ public class RandoRulePermute extends RandoRuleTransform
 	public void randomize(KSMap map, Random rand)
 	{
 		// Collect all the relevant objects
-		ObjectGroup mapObjects = map.allObjects(true);
-		mapObjects.sort();
+		ObjectPattern mapObjects = map.allObjects(true);
 
 		// Trim output down to only use those objects
-		WeightedObjectGroup reducedOutput = output.overlapWith(mapObjects);
-		if (reducedOutput == null)
-		{
-			Console.printWarning("Map contains no objects of the type " + outputCreationKey + ". Skipping rule.");
-			return;
-		}
-		output = reducedOutput;
+		output = output.overlapWith(mapObjects);
 
 		// Continue as with Transform
 		super.randomize(map, rand);

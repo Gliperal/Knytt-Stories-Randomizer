@@ -20,7 +20,7 @@ public class RandoRuleTrueRandom extends RandoRule
 	public void randomize(KSMap map, Random rand)
 	{
 		ArrayList<MapObject> targets = map.find(input);
-		output.populateWithMapObjects(map);
+		output.prepForRandomization(map);
 		for (MapObject target : targets)
 			target.replace(output.randomObject(rand));
 	}

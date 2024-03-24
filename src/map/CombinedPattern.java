@@ -52,4 +52,24 @@ public class CombinedPattern implements Pattern
 			return false;
 		}
 	}
+
+	public ObjectPattern simplify(KSMap map)
+	{
+		ObjectPattern p = patterns.get(0).simplify(map);
+		switch (operator)
+		{
+		case '|':
+			for (int i = 1; i < patterns.size(); i++)
+				p = p.or(patterns.get(i).simplify(map));
+			return p;
+		case '&':
+			for (int i = 1; i < patterns.size(); i++)
+				p = p.and(patterns.get(i).simplify(map));
+			return p;
+		case '-':
+			return p.subtract(patterns.get(1).simplify(map));
+		default:
+			return null;
+		}
+	}
 }

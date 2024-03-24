@@ -1,21 +1,18 @@
-package core;
+package map;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Random;
 
-import map.CombinedPattern;
-import map.Pattern;
-import map.Screen;
 import util.Util;
 
-public class ObjectGroup implements Pattern
+public class ObjectPattern implements Pattern
 {
 	private int[] objects;
 	private boolean isSorted = false;
 
-	public ObjectGroup()
+	public ObjectPattern()
 	{
 		objects = new int[0];
 	}
@@ -72,31 +69,31 @@ public class ObjectGroup implements Pattern
 
 	public Pattern and(Pattern that)
 	{
-		if (that instanceof ObjectGroup)
-			return and((ObjectGroup)that);
+		if (that instanceof ObjectPattern)
+			return and((ObjectPattern)that);
 		return new CombinedPattern('&', this, that);
 	}
 
 	public Pattern or(Pattern that)
 	{
-		if (that instanceof ObjectGroup)
-			return or((ObjectGroup)that); // there's got to be a better way to do it than this...
+		if (that instanceof ObjectPattern)
+			return or((ObjectPattern)that); // there's got to be a better way to do it than this...
 		return new CombinedPattern('|', this, that);
 	}
 
 	public Pattern subtract(Pattern that)
 	{
-		if (that instanceof ObjectGroup)
-			return subtract((ObjectGroup)that);
+		if (that instanceof ObjectPattern)
+			return subtract((ObjectPattern)that);
 		return new CombinedPattern('-', this, that);
 	}
 
 	/**
-	 * Returns a new ObjectGroup that contains all of the objects from this ObjectGroup and the one passed as an argument. Neither of the inputs are modified.
-	 * @param that The ObjectGroup to be combined with.
+	 * Returns a new ObjectPattern that contains all of the objects from this ObjectPattern and the one passed as an argument. Neither of the inputs are modified.
+	 * @param that The ObjectPattern to be combined with.
 	 * @return The union of the two inputs.
 	 */
-	public ObjectGroup or(ObjectGroup that)
+	public ObjectPattern or(ObjectPattern that)
 	{
 		// Sort both classes if they aren't already, so that we can perform a merge with uniqueness
 		sort();
@@ -121,17 +118,17 @@ public class ObjectGroup implements Pattern
 			combinedObjects[k++] = that.objects[j++];
 
 		// Create result group
-		ObjectGroup group = new ObjectGroup();
+		ObjectPattern group = new ObjectPattern();
 		group.objects = Arrays.copyOf(combinedObjects, k);
 		return group;
 	}
 
 	/**
-	 * Returns a new ObjectGroup that contains all of the objects that are common to both this ObjectGroup and the one passed as an argument. Neither of the inputs are modified.
-	 * @param that The ObjectGroup to be overlapped with.
+	 * Returns a new ObjectPattern that contains all of the objects that are common to both this ObjectPattern and the one passed as an argument. Neither of the inputs are modified.
+	 * @param that The ObjectPattern to be overlapped with.
 	 * @return The intersection of the two inputs.
 	 */
-	public ObjectGroup and(ObjectGroup that)
+	public ObjectPattern and(ObjectPattern that)
 	{
 		// Sort both classes if they aren't already, so that we can perform a linear search
 		sort();
@@ -156,17 +153,17 @@ public class ObjectGroup implements Pattern
 		}
 
 		// Create result group
-		ObjectGroup group = new ObjectGroup();
+		ObjectPattern group = new ObjectPattern();
 		group.objects = Arrays.copyOf(commonObjects, k);
 		return group;
 	}
 
 	/**
-	 * Returns a clone of the ObjectGroup, but stripped of all objects that are present in the ObjectGroup passed as an argument. Neither of the inputs are modified.
-	 * @param that The ObjectGroup containing forbidden objects.
+	 * Returns a clone of the ObjectPattern, but stripped of all objects that are present in the ObjectPattern passed as an argument. Neither of the inputs are modified.
+	 * @param that The ObjectPattern containing forbidden objects.
 	 * @return The difference of the two inputs.
 	 */
-	public ObjectGroup subtract(ObjectGroup that)
+	public ObjectPattern subtract(ObjectPattern that)
 	{
 		// Sort both classes if they aren't already, so that we can perform a linear search
 		sort();
@@ -193,7 +190,7 @@ public class ObjectGroup implements Pattern
 		}
 
 		// Create result group
-		ObjectGroup group = new ObjectGroup();
+		ObjectPattern group = new ObjectPattern();
 		group.objects = Arrays.copyOf(uniqueObjects, k);
 		return group;
 	}
@@ -246,7 +243,7 @@ public class ObjectGroup implements Pattern
 		return ret;
 	}
 
-	public int firstCommonObject(ObjectGroup that)
+	public int firstCommonObject(ObjectPattern that)
 	{
 		sort();
 		that.sort();
@@ -274,5 +271,10 @@ public class ObjectGroup implements Pattern
 		byte[] bankObj = s.objectAt(layer, x, y);
 		int object = Util.combineBankObj(bankObj[0], bankObj[1]);
 		return Arrays.binarySearch(objects, object) >= 0;
+	}
+
+	public ObjectPattern simplify(KSMap map)
+	{
+		return this;
 	}
 }

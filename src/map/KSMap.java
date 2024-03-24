@@ -10,8 +10,6 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Random;
 
-import core.ObjectGroup;
-
 public class KSMap
 {
 	private ArrayList<Screen> screens;
@@ -90,9 +88,9 @@ public class KSMap
 			s.println();
 	}
 
-	public ObjectGroup allObjects(boolean includeEmpty)
+	public ObjectPattern allObjects(boolean includeEmpty)
 	{
-		ObjectGroup objects = new ObjectGroup();
+		ObjectPattern objects = new ObjectPattern();
 		for(Screen s : screens)
 			s.collectObjects(objects, includeEmpty);
 		return objects;

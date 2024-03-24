@@ -10,6 +10,7 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import map.ObjectPattern;
 import map.OffsetPattern;
 import map.Pattern;
 import util.Console;
@@ -311,7 +312,7 @@ public class ObjectClassesFile
 					while (k < key.length() && Character.isDigit(key.charAt(k)))
 						k++;
 					int object = key.substring(j + 1, k).toInt();
-					ObjectGroup group = new ObjectGroup();
+					ObjectPattern group = new ObjectPattern();
 					group.add((byte) bank, (byte) object);
 					tokens.add(new Token(group, key.lineOf(i)));
 					i = k;

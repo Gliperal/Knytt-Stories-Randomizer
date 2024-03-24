@@ -6,6 +6,7 @@ import java.util.Random;
 
 import map.KSMap;
 import map.MapObject;
+import util.Console;
 import util.Util;
 
 public class RandoRuleTransform extends RandoRule
@@ -32,7 +33,14 @@ public class RandoRuleTransform extends RandoRule
 		inObjs.sort(null);
 
 		// Shuffle the output objects as many times as needed to match the size of input
-		output.populateWithMapObjects(map);
+		int status = output.prepForRandomization(map);
+		if (status == 1)
+			Console.printWarning("Map contains no objects for certain groups in " + outputCreationKey + ". Deleting those groups from rule.");
+		if (status == -1)
+		{
+			Console.printWarning("Map contains no objects of the type " + outputCreationKey + ". Skipping rule.");
+			return;
+		}
 		ArrayList<Integer> outObjs = output.randomlyFillList(inObjs.size(), rand);
 
 		// Randomize

@@ -5,7 +5,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
-import core.ObjectGroup;
 import util.Util;
 
 public class Screen
@@ -76,7 +75,7 @@ public class Screen
 		mapData.set(location, data);
 	}
 
-	public void collectObjects(ObjectGroup objects, boolean includeEmpty)
+	public void collectObjects(ObjectPattern objects, boolean includeEmpty)
 	{
 		for (int layer = 4; layer < 8; layer++)
 		{
