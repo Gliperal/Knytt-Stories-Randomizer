@@ -106,17 +106,18 @@ public class WeightedPattern
 		{
 			ObjectPattern x = patterns.get(i).simplify(map);
 			if (x.size() == 0)
-				simplifiedPatterns.add(x);
-			else
 			{
 				// Delete any groups that become empty
+				patterns.remove(i);
 				weights.remove(i);
 				i--;
 				groupsDeleted = true;
-				// Hack to prevent from being used for any other purposes in the future, since groups and weights might be mismatched
-				patterns = null;
 			}
+			else
+				simplifiedPatterns.add(x);
 		}
+		// Hack to prevent from being used for any other purposes in the future, since groups and weights might be mismatched
+		patterns = null;
 		// Return 1 if some groups were deleted or -1 if all were deleted
 		if (simplifiedPatterns.size() == 0)
 			return -1;

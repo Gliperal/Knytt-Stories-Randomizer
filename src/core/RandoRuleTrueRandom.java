@@ -6,6 +6,7 @@ import java.util.Random;
 
 import map.KSMap;
 import map.MapObject;
+import util.Console;
 
 public class RandoRuleTrueRandom extends RandoRule
 {
@@ -20,7 +21,14 @@ public class RandoRuleTrueRandom extends RandoRule
 	public void randomize(KSMap map, Random rand)
 	{
 		ArrayList<MapObject> targets = map.find(input);
-		output.prepForRandomization(map);
+		int status = output.prepForRandomization(map);
+		if (status == 1)
+			Console.printWarning("Map contains no objects for certain groups in " + outputCreationKey + ". Deleting those groups from rule.");
+		if (status == -1)
+		{
+			Console.printWarning("Map contains no objects of the type " + outputCreationKey + ". Skipping rule.");
+			return;
+		}
 		for (MapObject target : targets)
 			target.replace(output.randomObject(rand));
 	}
