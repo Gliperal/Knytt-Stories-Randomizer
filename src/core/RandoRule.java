@@ -8,7 +8,7 @@ import map.Pattern;
 public abstract class RandoRule
 {
 	protected Pattern input;
-	protected WeightedObjectGroup output;
+	protected WeightedPattern output;
 	protected String outputCreationKey;
 	private String creationKey;
 
@@ -18,13 +18,13 @@ public abstract class RandoRule
 		if (split.length == 1)
 		{
 			input = classData.buildObjectGroup(key);
-			output = new WeightedObjectGroup(input);
+			output = new WeightedPattern(input);
 			outputCreationKey = key;
 		}
 		else if (split.length == 2)
 		{
 			input = classData.buildObjectGroup(split[0]);
-			output = new WeightedObjectGroup(classData, split[1]);
+			output = new WeightedPattern(classData, split[1]);
 			outputCreationKey = split[1];
 		}
 		else
