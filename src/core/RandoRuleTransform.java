@@ -54,6 +54,6 @@ public class RandoRuleTransform extends RandoRule
 
 	public String toString()
 	{
-		return "Transform " + super.toDisplayString();
+		return "Transform: " + super.toDisplayString();
 	}
 }

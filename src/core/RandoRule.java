@@ -69,6 +69,6 @@ public abstract class RandoRule
 
 	public String toDisplayString()
 	{
-		return "Randomization Rule [" + creationKey + "]";
+		return "[" + creationKey + "]";
 	}
 }

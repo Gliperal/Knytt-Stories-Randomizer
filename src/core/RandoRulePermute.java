@@ -30,6 +30,6 @@ public class RandoRulePermute extends RandoRuleTransform
 
 	public String toString()
 	{
-		return "Permute " + super.toDisplayString();
+		return "Permute: " + super.toDisplayString();
 	}
 }

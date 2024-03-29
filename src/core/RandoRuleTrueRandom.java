@@ -35,6 +35,6 @@ public class RandoRuleTrueRandom extends RandoRule
 
 	public String toString()
 	{
-		return "True Random " + super.toDisplayString();
+		return "True Random: " + super.toDisplayString();
 	}
 }
