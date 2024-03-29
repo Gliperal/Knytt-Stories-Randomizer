@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Random;
 
+import util.Console;
+
 public class KSMap
 {
 	private ArrayList<Screen> screens;
@@ -26,7 +28,9 @@ public class KSMap
 		this();
 
 		// Unpack binary file
-		MMFBinaryArray mapData = new MMFBinaryArray(mapFile);
+		MMFBinaryArray mapData = new MMFBinaryArray(mapFile, 3006);
+		if (mapData.countTruncatedScreens() > 0)
+			Console.printWarning("One or more oversize screens were truncated.");
 
 		// Read map data, one screen at a time
 		for (String key : mapData.keys())
@@ -43,7 +47,7 @@ public class KSMap
 
 	public void saveToFile(Path mapFile) throws IOException
 	{
-		MMFBinaryArray mapData = new MMFBinaryArray(mapFile);
+		MMFBinaryArray mapData = new MMFBinaryArray(mapFile, 3006);
 
 		// Write data one screen at a time
 		for (Screen screen : screens)

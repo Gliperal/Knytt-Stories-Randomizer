@@ -18,13 +18,14 @@ import org.apache.commons.io.IOUtils;
 public class MMFBinaryArray
 {
 	private HashMap<String, byte[]> data;
+	private int truncatedScreens = 0;
 
 	public MMFBinaryArray()
 	{
 		this.data = new HashMap<String, byte[]>();
 	}
 
-	public MMFBinaryArray(Path file) throws IOException
+	public MMFBinaryArray(Path file, int maxSize) throws IOException
 	{
 		this();
 
@@ -46,9 +47,16 @@ public class MMFBinaryArray
 			int screenSize = readScreenSize(gis);
 
 			// Read screen data
-			byte[] screenData = readScreenData(gis, screenSize);
+			byte[] screenData = readScreenData(gis, screenSize < maxSize ? screenSize : maxSize);
 			if (screenData == null)
 				continue;
+
+			// Discard excess data, if applicable
+			if (screenSize > maxSize)
+			{
+				gis.readNBytes(screenSize - maxSize);
+				truncatedScreens++;
+			}
 
 			// Package information into screen
 			data.put(header, screenData);
@@ -83,35 +91,18 @@ public class MMFBinaryArray
 
 	private static int readScreenSize(GZIPInputStream gis) throws IOException
 	{
-		byte[] buffer = new byte[1];
+		byte[] buffer = new byte[4];
 		int bytesRead;
-
-		// Read size of screen data
 		int size = 0;
-		int currentPlace = 0;
-		boolean lastByteWasZero = false;
-		while (true)
-		{
-			// Read next character
-			bytesRead = gis.read(buffer);
-			if (bytesRead == -1)
-				throw new EOFException();
 
-			// two zeros in a row denotes end of size
-			if (buffer[0] == 0)
-			{
-				if (lastByteWasZero)
-					break;
-				lastByteWasZero = true;
-			}
-			else
-				lastByteWasZero = false;
+		// Screen size is always stored in 4 bytes
+		bytesRead = gis.readNBytes(buffer, 0, 4);
+		if (bytesRead < 4)
+			throw new EOFException("End of file encountered while reading screen size.");
 
-			// Add byte to the size (little endian)
-			int unsignedValue = (buffer[0] < 0) ? buffer[0] + 256 : buffer[0];
-			size += Math.pow(256, currentPlace) * unsignedValue;
-			currentPlace++;
-		}
+		// Convert to a single integer value (little endian)
+		for (int i = 3; i >= 0; i--)
+			size = (size << 8) | (buffer[i] & 0xff);
 		return size;
 	}
 
@@ -173,6 +164,11 @@ public class MMFBinaryArray
 
 		// Finalize
 		gos.close();
+	}
+
+	public int countTruncatedScreens()
+	{
+		return truncatedScreens;
 	}
 
 	public byte[] get(String key)

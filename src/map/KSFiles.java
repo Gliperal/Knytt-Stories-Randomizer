@@ -137,6 +137,22 @@ public class KSFiles
 		return getExecutable(dir) != null;
 	}
 
+	public static ArrayList<String> listWorlds() throws IOException, LoadException
+	{
+		init();
+		ArrayList<String> worlds = new ArrayList<String>();
+		try
+		{
+			for (Path world : Files.newDirectoryStream(worldsDir))
+				if (Files.isDirectory(world))
+					worlds.add(world.getFileName().toString());
+			return worlds;
+		} catch (IOException e)
+		{
+			throw new IOException("IOException loading worlds: " + e.getMessage());
+		}
+	}
+
 	public static String haveUserSelectWorld(Scanner input, String prompt) throws IOException, LoadException
 	{
 		init();
