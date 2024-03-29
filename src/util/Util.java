@@ -161,9 +161,9 @@ public class Util
 		String str = "";
 		for (int i = 0; i < elements.size(); i++)
 		{
-			str += elements.get(i);
 			if (i != 0)
 				str += delimiter;
+			str += elements.get(i);
 		}
 		return str;
 	}
