@@ -2,7 +2,10 @@
 
 Added Patterns.
 Removed warnings on conflicting rules (it's a feature now).
+Changed default rules.
 Fixed a bug in which empty weighted groups would cause the randomization to fail.
+Fixed a bug with reading certain non-standard map formats.
+Various other small tweaks / bugfixes.
 KS+ mod: Fixed ForceKey blocks not functioning when reduced.
 KS+ mod: Various improvements to the randomizer info screen
 	Fixed the -> button effects and sounds.

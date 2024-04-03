@@ -28,9 +28,9 @@ public class OffsetPattern implements Pattern
 		if (x < 0 || x > 24 || y < 0 || y > 9)
 			return false;
 		if (special == 'S')
-			return (s.tileAt(3, x, y) | 0x7f) != 0;
+			return (s.tileAt(3, x, y) & 0x7f) != 0;
 		if (special == 'N')
-			return (s.tileAt(3, x, y) | 0x7f) == 0;
+			return (s.tileAt(3, x, y) & 0x7f) == 0;
 		return objects.matches(s, layer, x, y);
 	}
 

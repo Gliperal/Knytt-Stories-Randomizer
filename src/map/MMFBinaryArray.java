@@ -15,6 +15,8 @@ import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.io.IOUtils;
 
+import util.Util;
+
 public class MMFBinaryArray
 {
 	private HashMap<String, byte[]> data;
@@ -54,7 +56,7 @@ public class MMFBinaryArray
 			// Discard excess data, if applicable
 			if (screenSize > maxSize)
 			{
-				gis.readNBytes(screenSize - maxSize);
+				Util.readNBytes(gis, screenSize - maxSize);
 				truncatedScreens++;
 			}
 
@@ -96,7 +98,7 @@ public class MMFBinaryArray
 		int size = 0;
 
 		// Screen size is always stored in 4 bytes
-		bytesRead = gis.readNBytes(buffer, 0, 4);
+		bytesRead = Util.readNBytes(gis, buffer, 0, 4);
 		if (bytesRead < 4)
 			throw new EOFException("End of file encountered while reading screen size.");
 

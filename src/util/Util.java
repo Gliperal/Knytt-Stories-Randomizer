@@ -1,6 +1,9 @@
 package util;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.zip.GZIPInputStream;
 
 import core.FilePiece;
 
@@ -183,5 +186,27 @@ public class Util
 				return i;
 		}
 		return -1;
+	}
+
+	public static int readNBytes(GZIPInputStream gis, byte[] buffer, int offset, int n) throws IOException
+	{
+		int totalBytesRead = 0;
+		int bytesRead;
+
+		while (totalBytesRead < n)
+		{
+			bytesRead = gis.read(buffer, offset + totalBytesRead, n - totalBytesRead);
+			if (bytesRead < 0)
+				return totalBytesRead;
+			totalBytesRead += bytesRead;
+		}
+		return totalBytesRead;
+	}
+
+	public static byte[] readNBytes(GZIPInputStream gis, int n) throws IOException
+	{
+		byte[] buffer = new byte[n];
+		int bytesRead = readNBytes(gis, buffer, 0, n);
+		return Arrays.copyOf(buffer, bytesRead);
 	}
 }
