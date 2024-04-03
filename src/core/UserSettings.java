@@ -235,9 +235,11 @@ public class UserSettings
 				try
 				{
 					// Try to use default
-					randoRules.add(RandoRule.create(type, "E", classData));
-					randoRules.add(RandoRule.create(type, "J", classData));
-					randoRules.add(RandoRule.create(type, "P", classData));
+					for (String s : new String[] {
+						"Wb","Wl","Ax","Lb","Ll","Lt","Lw","Dd","De","Df","Dg","Dn","Dx","Ec","Ee","Ef","Eg","Eh","Ei","Em","En","Ew","Ez"
+					}) {
+						randoRules.add(RandoRule.create(type, s, classData));
+					}
 				}
 				catch(ParseException e)
 				{
