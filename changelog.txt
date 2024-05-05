@@ -1,3 +1,14 @@
+========= VERSION 3.1.1 =========================================
+
+KS+ mod:
+	Added optional win restrictions.
+	Display seed on Q overlay.
+	Can now accommodate rules longer than 3006 characters.
+	Better positioned randomization hash.
+	Reduced scrollbar size.
+	Fixed a bug in which beating a level would cause Load File to break.
+
+
 ========= VERSION 3.1.0 =========================================
 
 Added Patterns.
