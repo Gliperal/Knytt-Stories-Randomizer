@@ -47,7 +47,7 @@ public class KSMap
 
 	public void saveToFile(Path mapFile) throws IOException
 	{
-		MMFBinaryArray mapData = new MMFBinaryArray(mapFile, 3006);
+		MMFBinaryArray mapData = new MMFBinaryArray();
 
 		// Write data one screen at a time
 		for (Screen screen : screens)
@@ -59,6 +59,23 @@ public class KSMap
 
 		// Finalize
 		mapData.writeToFile(mapFile);
+	}
+
+	public void addAdditionalInfo(String key, byte[] info)
+	{
+		for (int i = 1;; i++)
+		{
+			String incrementedKey = i > 1 ? key + " " + i : key;
+			additionalInfo.put(incrementedKey, Arrays.copyOf(info, 3006));
+			if (info.length <= 3006)
+				break;
+			info = Arrays.copyOfRange(info, 3006, info.length);
+		}
+	}
+
+	public void addAdditionalInfo(String key, String info)
+	{
+		addAdditionalInfo(key, info.getBytes());
 	}
 
 	public boolean addAdditionalInfo(String key, byte[] info, boolean truncate)
