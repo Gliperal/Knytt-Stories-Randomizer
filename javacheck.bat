@@ -6,7 +6,7 @@ if %errorlevel% NEQ 0 (
 	exit /b 1
 )
 set JAVA_VERSION=0
-for /f "tokens=1,2" %%i in ('java --version') do (
+for /f "tokens=1,2" %%i in ('java -version') do (
 	if "%%i" == "java" set JAVA_VERSION=%%j
 )
 for /f "delims=." %%i in ("%JAVA_VERSION%") do (
