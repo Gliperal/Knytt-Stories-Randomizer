@@ -1,5 +1,7 @@
 ========= VERSION 3.1.1 =========================================
 
+Restructured folder layout.
+Added object class descriptions to README.
 Rules longer than 3006 characters no longer get truncated.
 KS+ mod:
 	Added optional win restrictions.
