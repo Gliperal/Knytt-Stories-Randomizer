@@ -45,6 +45,11 @@ public class KSMap
 		}
 	}
 
+	public void addScreen(Screen s)
+	{
+		screens.add(s);
+	}
+
 	public void saveToFile(Path mapFile) throws IOException
 	{
 		MMFBinaryArray mapData = new MMFBinaryArray();

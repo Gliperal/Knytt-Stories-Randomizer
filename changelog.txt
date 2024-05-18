@@ -3,6 +3,7 @@
 Restructured folder layout.
 Added object class and presets descriptions to README.
 Rules longer than 3006 characters no longer get truncated.
+Moved 13:1 to Ec:solid enemies (removing from Eb:all passable enemies and Eg:ground enemies).
 KS+ mod:
 	Added optional win restrictions.
 	Display seed on Q overlay.
